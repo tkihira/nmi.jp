@@ -89,6 +89,88 @@
     .anchor {
         display: none;
     }
+
+    .right {
+        .wrap {
+            .side {
+                margin-bottom: 20px;
+                padding-bottom: 0;
+                i {
+                    margin-right: 3px;
+                }
+                .content-ul[cate] {
+                    overflow: hidden;
+                    list-style: none;
+                    margin: 0;
+                    padding: 0;
+                    li {
+                        font-size: 14px;
+                        a {
+                            display: block;
+                            width: 100%;
+                            padding: 2px 0;
+                            border-bottom: 1px solid #eee;
+                            &:hover {
+                                background-color: #dbdfee;
+                                .badge {
+                                    background-color: #dbdfee;
+                                    //transform: scale(1.2) rotate(360deg);
+                                }
+                            }
+                            .name {
+                                padding-left: 15px;
+                            }
+                            .badge {
+                                display: block;
+
+                                // width: 20px;
+                                float: right;
+                                text-align: center;
+                                margin-right: 15px;
+                                margin-top: 3px;
+                                padding: 0 10px;
+                                font-size: 12px;
+                                color: #fff;
+                                background-color: #bbb;
+                                border-radius: 50%;
+                                transition: 0.5s ease-in-out;
+                            }
+                        }
+                        &:last-of-type a {
+                            border: none;
+                        }
+                    }
+                }
+                .content-ul[recent]{
+                    padding-bottom: 16px;
+                    li{
+                        color:#aaa;
+                        font-size: 14px;
+                    }
+                }
+                .tags-cloud {
+                    font-weight: normal;
+                    a {
+                        padding: 0 3px;
+                        border-radius: 5px;
+                        &:hover {
+                            background-color: #f0e7ce;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+
+
+
+
+
+
+
+
     .right {
         float: left;
         width: 25%;
@@ -124,10 +206,13 @@
                 font-weight: bold;
             }
             a {
-                color: #4d6dad;
-                transition: 0.5s ease;
+                font-size: 12px;
+                //color: #4d6dad;
+                color: #000000;
+                //transition: 0.5s ease;
                 &:hover {
-                    color: #223253;
+                    //color: #223253;
+                    color: #787878;
                 }
             }
         }
