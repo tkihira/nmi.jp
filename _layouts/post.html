@@ -27,9 +27,25 @@ layout: default
             <div class="label-card">
             {% include tag.html %}
             </div>
-
         </div>
-        <hr>
+
+<div class="entry fix" style="overflow:hidden;">
+            <br/>
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href={{ site.url }}{{ page.url | prepend: site.baseurl }}&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="{{ page.title }}" data-url="{{ site.url }}{{ page.url | prepend: site.baseurl }}">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/{{ site.url }}{{ page.url | prepend: site.baseurl }}" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="{{ page.title }}"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="{{ page.title }}" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
         <article itemscope itemtype="http://schema.org/BlogPosting">
         {{content}}
         </article>
@@ -64,29 +80,58 @@ layout: default
 
         {% include previousAndNext.html %}
 
-        <h2 id="comments">Comments</h2>
-        {% include comments.html %}
-
-
     </div>
     <button class="anchor"><i class="fa fa-anchor"></i></button>
+
+
     <div class="right">
         <div class="wrap">
-
-            <!-- Content -->
-            <div class="side content">
+            <div class="side">
                 <div>
-                    Content
+                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                    Recent Posts
                 </div>
-                <ul id="content-side" class="content-ul">
-                    <li><a href="#similar_posts">Similar Posts</a></li>
-                    <li><a href="#comments">Comments</a></li>
+                <ul class="content-ul" recent>
+                    {% for post in site.posts offset: 0 limit: 3  %}
+                        <li><a href="{{ post.url }}">{{ post.title }}</a></li>
+                    {% endfor %}
                 </ul>
             </div>
-            <!-- 其他div框放到这里 -->
-            <!-- <div class="side">bbbb</div> -->
+
+            <!-- Content -->
+            <div class="side ">
+                <div>
+                    <i class="fa fa-th-list"></i>
+                    Categories
+                </div>
+                <ul class="content-ul" cate>
+                    {% for category in site.categories order:ascending %}
+                    <li>
+                        <a href="{{ root_url }}/{{ site.category_dir }}#{{ category | first }}" class="categories-list-item" cate="{{ category | first }}">
+                            <span class="name">
+                                {{ category | first }}
+                            </span>
+                            <span class="badge">{{ category | last | size }}</span>
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- <div class="side">
+                <div>
+                    <i class="fa fa-external-link"></i>
+                    Links
+                </div>
+                <ul  class="content-ul">
+
+                </ul>
+            </div> -->
         </div>
     </div>
+
+
+
 </div>
 <script>
 /**

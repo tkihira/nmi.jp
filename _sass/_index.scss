@@ -1,9 +1,12 @@
 .page[index] {
     a {
-        color: #4d6dad;
-        transition: 0.5s ease;
+        //color: #4d6dad;
+        color: #000000;
+        //transition: 0.5s ease;
         &:hover {
-            color: #223253;
+            color: #787878;
+            //text-decoration: underline;
+            //color: #223253;
         }
     }
     .left {
@@ -48,12 +51,15 @@
                 }
                 .read-all {
                     text-align: right;
-                    font-size: 14px;
+                    font-size: 16px;
                     a {
-                        color: #778ab0;
-                        transition: 0.2s ease;
+                        //color: #778ab0;
+                        color: #0078ed;
+                        //transition: 0.2s ease;
                         &:hover {
-                            color: #5872a7;
+                            //color: #5872a7;
+                            color: #0078ed;
+                            text-decoration: underline;
                         }
                         i {
                             padding-right: 3px;

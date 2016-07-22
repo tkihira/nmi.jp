@@ -19,11 +19,14 @@
         }
     }
     a {
-        color: #4d6dad;
-        transition: 0.5s ease;
+        color: #0078ed;
+        //color: #4d6dad;
+        //transition: 0.5s ease;
         &:hover {
-            color: #223253;
-            background-color: #f4efeb;
+            //color: #223253;
+            color: #0078ed;
+            text-decoration: underline;
+            //background-color: #f4efeb;
         }
     }
     .left {
@@ -62,7 +65,7 @@
 @media screen and (max-width: 770px) {
     .page[post] {
         .left {
-            font-size: 15px;
+            font-size: 14px;
             h2 {
                 font-size: 24px;
             }
