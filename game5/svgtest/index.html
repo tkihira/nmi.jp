@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html><head><title>SVG test</title>
+<script>
+;(function() {
+var config = {
+	ratio: 3/9
+};
+var status = {};
+var elements = {};
+var fragments = [
+	["dr", "d", "d", "d"],
+	["d", "d", "rd", "d"],
+	["r", "d", "r", "d", "r"],
+	["r", "u", "ur", "d"],
+	["ur", "u", "r", "d"],
+	["r", "d", "r", "u", "r"],
+	["ur", "d", "r", "u"],
+	["r", "du", "r", "d"],
+	["r", "du", "ur"],
+	["udr", "d", "r"],
+	["ur", "du", "u"],
+	["rd", "d", "r", "u"]
+];
+
+var createSVGElement = function(tag, attributes) {
+	var tag = document.createElementNS("http://www.w3.org/2000/svg", tag);
+	for(var key in attributes) {
+		if(attributes.hasOwnProperty(key)) {
+			tag.setAttribute(key, attributes[key]);
+		}
+	}
+	return tag;
+};
+var createUseElement = function(id, attributes) {
+	var use = createSVGElement("use", attributes);
+	use.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", "#" + id);
+	return use;
+};
+
+window.onload = function() {
+	// まずSVGの基礎要素を作成する
+	elements.svg = createSVGElement("svg", {"stroke-linejoin": "round", "stroke-linecap": "round"});
+	document.body.appendChild(elements.svg);
+	elements.defs = createSVGElement("defs");
+	elements.svg.appendChild(elements.defs);
+	// 三角形の各辺を処理する
+	var lineMap;
+	var stackTriangle = (function() {
+		var addLine = function(x1, y1, x2, y2) {
+			if(x1 > x2 || (x1 == x2 && y1 > y2)) {
+				var key = [x2, y2, x1, y1].join();
+			} else {
+				var key = [x1, y1, x2, y2].join();
+			}
+			if(lineMap[key]) {
+				delete lineMap[key];
+			} else {
+				lineMap[key] = true;
+			}
+		};
+		var addLines = function(x1, y1, x2, y2, x3, y3) {
+			addLine(x1, y1, x2, y2);
+			addLine(x2, y2, x3, y3);
+			addLine(x3, y3, x1, y1);
+		};
+		return function(x, y, lefty) {
+			if(lefty) {
+				addLines(x, y, x + 86.6, y - 50, x + 86.6, y + 50);
+			} else {
+				addLines(x, y, x, y + 100, x + 86.6, y + 50);
+			}
+		};
+	})();
+	// 新しい三角形を追加する
+	var addTriangle = function(x, y, lefty, d) {
+		if(lefty) {
+			switch(d) {
+				case "r": x += 86.6; y -= 50; break;
+				case "d": break;
+				case "u": y -= 100; break;
+			}
+		} else {
+			switch(d) {
+				case "d": y += 100; break;
+				case "u": break;
+			}
+		}
+		stackTriangle(x, y, !lefty);
+		return {x: x, y: y, lefty: !lefty};
+	};
+
+	elements.fragments = [];
+	status.pieces = [];
+	for(var i = 0; i < fragments.length; i++) {
+		var fragment = fragments[i];
+		var lefty = true;
+		var x = 0, y = 0, index = 0;
+		lineMap = {};
+		stackTriangle(x, y, lefty); // 最初の三角形を処理する
+		for(var j = 0; j < fragment.length; j++) {
+			var ds = fragment[j];
+			for(var k = 0; k < ds.length; k++) {
+				var d = ds.charAt(k);
+				var ret = addTriangle(x, y, lefty, d); // 三角形を追加する
+			}
+			// 最後の三角形を次の起点にする
+			x = ret.x;
+			y = ret.y;
+			lefty = ret.lefty;
+		}
+		// 線を結んでピースの形にする
+		var lineList = [];
+		for(var key in lineMap) {
+			lineList.push(key.split(","));
+		}
+		var pointList = [];
+		x = y = 0;
+		while(pointList.length == 0 || x != 0 || y != 0) {
+			for(var j = 0; j < lineList.length; j++) {
+				var line = lineList[j];
+				if(line[0] == x && line[1] == y) {
+					x = line[2];
+					y = line[3];
+					line[0] = line[1] = line[2] = line[3] = null;
+					pointList.push([x, y].join());
+					break;
+				}
+				if(line[2] == x && line[3] == y) {
+					x = line[0];
+					y = line[1];
+					line[0] = line[1] = line[2] = line[3] = null;
+					pointList.push([x, y].join());
+					break;
+				}
+			}
+		}
+		// ピースをSVGとしてdefsに保存する
+		var f = createSVGElement("g", {id: "f" + i});
+		poly = createSVGElement("polygon", {points: pointList.join(" "), "stroke-width": "5"});
+		f.appendChild(poly);
+		elements.defs.appendChild(f);
+		// 表示用にピースを作成する
+		var piece = createUseElement("f" + i, {fill:"red", stroke:"#800"});
+		elements.svg.appendChild(piece);
+		status.pieces.push(piece);
+	}
+
+	(function () {
+		var deg = 0;
+		(function tick() {
+			for(var i = 0; i < status.pieces.length; i++) {
+				var piece = status.pieces[i];
+				piece.setAttribute("transform", "translate(" + [90 + (i % 3) * 120, 90 + ((i / 3) | 0) * 120].join() + ") rotate(" + deg + ") scale(" + config.ratio + ")");
+			}
+			deg += 1;
+			deg %= 360;
+			setTimeout(tick, 10);
+		})();
+	})();
+};
+
+})();
+</script>
+</head><body></body></html>

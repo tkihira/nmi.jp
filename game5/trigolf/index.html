@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html><head><title>trigolf</title>
+<meta name="viewport" content="width=320,user-scalable=no"></script>
+<script src="prototype-1.6.0.2.js"></script>
+<script src="box2d.js"></script>
+<script>
+(function() {
+	var config = {
+		width: 320,
+		height: 384,
+		groundWidth: 80,
+		groundHeight: 64,
+		groundBorder: 5,
+		vertex: 3,
+		radius: 5
+	};
+	var courses = [
+		[[0, 1, 2, 3], [1, 1, 0, 0], [1, 1, 2, 0], [0, 0, 1, 1], [0, 1, 1, 0], [1, 1, 1, 1]],
+		[[0, 0, 0, 3], [0, 1, 2, 1], [1, 1, 0, 0], [0, 0, 1, 2], [0, 0, 0, 0], [1, 1, 1, 1]],
+		[[0, 0, 0, 3], [0, 0, 2, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [1, 1, 1, 1]],
+		[[0, 3, 2, 0], [0, 0, 1, 1], [0, 1, 1, 0], [1, 1, 0, 0], [0, 1, 1, 1], [1, 0, 0, 0]],
+		[[0, 1, 3, 0], [1, 1, 0, 0], [0, 1, 2, 0], [0, 0, 1, 1], [0, 2, 1, 0], [1, 1, 0, 0]],
+		[[3, 0, 0, 0], [0, 0, 0, 0], [0, 1, 1, 0], [0, 0, 0, 0], [0, 0, 0, 0], [1, 0, 2, 2]],
+		[[3, 1, 2, 0], [1, 1, 2, 0], [1, 1, 0, 0], [1, 1, 2, 0], [1, 1, 0, 0], [1, 1, 2, 0]],
+		[[3, 0, 0, 0], [0, 0, 0, 0], [0, 0, 1, 0], [0, 0, 0, 0], [0, 1, 2, 1], [1, 0, 0, 3]],
+		[[3, 0, 0, 0], [0, 2, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0], [0, 1, 0, 0], [1, 0, 0, 0]],
+	];
+	var status = {};
+
+	var init = function() {
+		var worldAABB = new b2AABB();
+		worldAABB.minVertex.Set(-1000, -1000);
+		worldAABB.maxVertex.Set(1000, 1000);
+		var gravity = new b2Vec2(0, 300);
+		var world = new b2World(worldAABB, gravity, true);
+		createBox(world, -8, -1000, 10, 1000 + config.height + 10);
+		createBox(world, config.width - 2, -1000, 10, 1000 + config.height + 10);
+		var map = courses[status.stage];
+		status.shapes = [];
+		status.bunkers = [];
+		for(var y = 0; y < map.length; y++) {
+			var g = map[y];
+			for(var x = 0; x < g.length; x++) {
+				if(g[x]) {
+					var ground = createBox(world, x * config.groundWidth, (y + 1) * config.groundHeight - config.groundBorder, config.groundWidth, config.groundBorder, g[x]);
+					status.shapes.push(ground);
+					if(g[x] == 2) {
+						status.bunkers.push(ground);
+					}
+					if(g[x] == 3) {
+						var cup = createBox(world, x * config.groundWidth + config.groundWidth * 3 / 8, (y + 1) * config.groundHeight - config.groundBorder - 2, config.groundWidth * 2 / 8, config.groundBorder, 4);
+						status.shapes.push(cup);
+						status.bunkers.push(cup);
+					}
+				}
+			}
+		}
+		status.ball= createBall(world, config.groundWidth / 2, config.height - config.radius * 2);
+		status.shapes.push(status.ball);
+		status.world = world;
+		status.state = "moving";
+		status.score++;
+	};
+	var createBox = function(world, x, y, width, height, userData) {
+		var boxDef = new b2BoxDef();
+		boxDef.extents.Set(width / 2, height / 2);
+		var box = new b2BodyDef();
+		box.AddShape(boxDef);
+		box.userData = userData;
+		box.position.Set(x + width / 2, y + height / 2);
+		return world.CreateBody(box);
+	};
+	var createBall = function(world, x, y) {
+		var ballSd = new b2PolyDef();
+		ballSd.density = 1.0;
+		ballSd.restitution = 0.8;
+		var v = ballSd.vertexCount = config.vertex;
+		for(var i = 0; i < v; i++) {
+			ballSd.vertices[i].Set(config.radius * Math.cos(Math.PI * 2 / v * i), config.radius * Math.sin(Math.PI * 2 / v * i));
+		}
+		var ball = new b2BodyDef();
+		ball.AddShape(ballSd);
+		ball.userData = 0;
+		ball.position.Set(x,y);
+		return world.CreateBody(ball);
+	};
+	var resetBall = function() {
+		status.ball.SetOriginPosition(new b2Vec2(config.groundWidth / 2, config.height - config.radius * 2), 0);
+		status.ball.SetLinearVelocity(new b2Vec2(0, 0));
+	};
+	var draw = function() {
+		var ctx = status.ctx;
+		ctx.fillStyle = "#000";
+		ctx.fillRect(0, 0, config.width, config.height);
+		ctx.strokeStyle = "#fff";
+		for(var i = 0; i < status.shapes.length; i++) {
+			var shape = status.shapes[i].m_shapeList;
+			ctx.fillStyle = ["#fff", "#0f0", "#ff0", "#f00", "#ff0"][status.shapes[i].GetUserData()];
+			ctx.strokeStyle = status.shapes[i].GetUserData()? "#000": "#fff";
+			var start = b2Math.AddVV(shape.m_position, b2Math.b2MulMV(shape.m_R, shape.m_vertices[0]));
+			ctx.beginPath();
+			ctx.moveTo(start.x, start.y);
+			for(var j = 0; j < shape.m_vertexCount; j++) {
+				var v = b2Math.AddVV(shape.m_position, b2Math.b2MulMV(shape.m_R, shape.m_vertices[j]));
+				ctx.lineTo(v.x, v.y);
+			}
+			ctx.lineTo(start.x, start.y);
+			ctx.stroke();
+			ctx.fill();
+		}
+		if(status.state == "angle") {
+			ctx.moveTo(status.ox, status.oy);
+			ctx.lineTo(status.tx, status.ty);
+			ctx.stroke();
+		}
+	};
+
+	window.onload = function() {
+		var canvas = document.getElementById("canvas");
+		canvas.width = config.width;
+		canvas.height = config.height;
+		status.ctx = canvas.getContext("2d");
+
+		status.score = 100;
+		status.stage = 0;
+		init();
+		setTimeout(function() {scrollTo(0, 0);}, 200);
+		
+		var updateScore = function() {
+			document.body.getElementsByTagName("div")[0].innerHTML = "STAGE: " + (status.stage + 1) + " / Score: " + status.score;
+		};
+		(function tick() {
+			for(var time = 0; time < 4; time++) {
+				if(status.state != "clear") {
+					status.world.Step(1 / 60, 1);
+					for(var i = 0; i < status.bunkers.length; i++) {
+						var bunker = status.bunkers[i];
+						var c = bunker.GetContactList();
+						if(c) {
+							var m = c.contact.m_manifold[0];
+							if(m.normal.y <= -1) {
+								status.ball.SetLinearVelocity(new b2Vec2(0, 0));
+								if(status.state != "clear" && bunker.GetUserData() == 4) {
+									status.state = "clear";
+									setTimeout(function() {
+										status.stage++;
+										if(status.stage == courses.length) {
+											alert("Your Score is " + status.score + "!");
+											status.score = 100;
+											status.stage = 0;
+										}
+										init();
+									}, 1500);
+								}
+							}
+						}
+					}
+				}
+			}
+			if(status.ball.GetCenterPosition().y >= config.height) {
+				status.score -= 2;
+				resetBall();
+			}
+			draw();
+			if(status.state == "moving") {
+				var v = status.ball.GetLinearVelocity();
+				if(Math.abs(v.x) < 1e-3 && Math.abs(v.y) < 1e-3) {
+					status.score--;
+					updateScore();
+					status.state = "normal";
+				}
+			}
+			setTimeout(tick, 1000 / 60);
+		})();
+		
+		var setAngle = function(e) {
+			e = ((e.touches && e.touches[0]) || e);
+			var pos = status.ball.GetCenterPosition();
+			status.ox = pos.x;
+			status.oy = pos.y;
+			status.tx = e.pageX;
+			status.ty = Math.min(e.pageY, status.oy);
+		};
+		document.body.ontouchstart = 
+		document.body.onmousedown = function(e) {
+			if(status.state == "normal") {
+				status.state = "angle";
+				setAngle(e);
+			}
+			e.preventDefault();
+		};
+		document.body.ontouchmove = 
+		document.body.onmousemove = function(e) {
+			if(status.state == "angle") {
+				setAngle(e);
+			}
+		};
+		document.body.ontouchend = 
+		document.body.onmouseup = function(e) {
+			if(status.state == "angle") {
+				status.state = "moving";
+				status.ball.WakeUp();
+				status.ball.SetLinearVelocity(new b2Vec2((status.tx - status.ox) * 2.5, (status.ty - status.oy) * 2.5));
+				status.world.Step(1 / 60, 1);
+			}
+		};
+	};
+})();
+</script></head>
+<body style="margin:0;background-color:#000"><canvas id="canvas"></canvas><div style="color:#fff"></div><br><br><br><br></body></html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html><head><title>HTML5でHSL色空間を使う - その１</title>
+<script>
+(function() {
+    window.onload = function() {
+        var div = document.createElement("div");
+        document.body.appendChild(div);
+
+        var canvas = document.createElement("canvas");
+        canvas.width = 150;
+        canvas.height = 150;
+        document.body.appendChild(canvas);
+
+        var ctx = canvas.getContext("2d");
+        
+        var h = 0;
+        var s = 100;
+        var l = 50;
+        
+        (function rotateHue() {
+            ctx.beginPath();
+            var hsl = "hsl(" + h + "," + s + "%," + l + "%)";
+    		ctx.fillStyle = hsl;
+    		div.innerHTML = hsl;
+    		ctx.fillRect(0, 0, 100, 100);
+    		h = (h + 1) % 360;
+            setTimeout(rotateHue, 20);
+        })();
+    };
+})();</script></head>
+<body></body></html>

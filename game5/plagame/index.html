@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html><head><title>plapuzzle</title>
+<meta name="viewport" content="width=320,user-scalable=no">
+<script>
+;(function() {
+var config = {
+	ratio: 4/9,
+	timeDoubleTap: 250
+};
+var status = {};
+var elements = {};
+var fragments = [
+	["dr", "d", "d", "d"],
+	["d", "d", "rd", "d"],
+	["r", "d", "r", "d", "r"],
+	["r", "u", "ur", "d"],
+	["ur", "u", "r", "d"],
+	["r", "d", "r", "u", "r"],
+	["ur", "d", "r", "u"],
+	["r", "du", "r", "d"],
+	["r", "du", "ur"],
+	["udr", "d", "r"],
+	["ur", "du", "u"],
+	["rd", "d", "r", "u"]
+];
+
+var createSVGElement = function(tag, attributes) {
+	var tag = document.createElementNS("http://www.w3.org/2000/svg", tag);
+	for(var key in attributes) {
+		if(attributes.hasOwnProperty(key)) {
+			tag.setAttribute(key, attributes[key]);
+		}
+	}
+	return tag;
+};
+var createUseElement = function(id, attributes) {
+	var use = createSVGElement("use", attributes);
+	use.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", "#" + id);
+	return use;
+};
+
+window.onload = function() {
+	// まずSVGの基礎要素を作成する
+	elements.svg = createSVGElement("svg", {"stroke-linejoin": "round", "stroke-linecap": "round"});
+	document.body.appendChild(elements.svg);
+	elements.defs = createSVGElement("defs");
+	elements.svg.appendChild(elements.defs);
+	// 左向きの三角形を作成
+	var t1 = createSVGElement("g", {id: "t1"});
+	var poly = createSVGElement("polygon", {points: "0,0 86.6,-50 86.6,50", "stroke-width": "5"});
+	t1.appendChild(poly);
+	elements.defs.appendChild(t1);
+	// 右向きの三角形を作成
+	var t2 = createSVGElement("g", {id: "t2"});
+	poly = createSVGElement("polygon", {points: "0,0 0,100 86.6,50", "stroke-width": "5"});
+	t2.appendChild(poly);
+	elements.defs.appendChild(t2);
+	// 後ろのボードを作成する
+	elements.board = createSVGElement("g", {id: "board", transform: "matrix(" + [config.ratio, 0, 0, config.ratio, 7, 7].join() + ")"});
+	elements.svg.appendChild(elements.board);
+	for(var x = 0; x < 8; x++) {
+		for(var y = 0; y < 10; y++) {
+			if((x == 0 || x == 7) && (y == 0 || y == 1 || y == 9)) {
+				continue;
+			}
+			if((x == 1 || x == 6) && y == 0) {
+				continue;
+			}
+			var lefty = ((x + y) % 2 == 0);
+			var dx = x * 86.6;
+			var dy = ((x % 2 == 0)? 50: 0) + (((y + ((x % 2 == 0)? 0: 1)) / 2) | 0) * 100;
+			var p = createUseElement((lefty? "t1": "t2"), {x: dx, y: dy, fill: "rgb(192,192,192)", stroke: "rgb(128,128,128)"});
+			elements.board.appendChild(p);
+		}
+	}
+	// 三角形の各辺を処理する
+	var lineMap;
+	var stackTriangle = (function() {
+		var addLine = function(x1, y1, x2, y2) {
+			if(x1 > x2 || (x1 == x2 && y1 > y2)) {
+				var key = [x2, y2, x1, y1].join();
+			} else {
+				var key = [x1, y1, x2, y2].join();
+			}
+			if(lineMap[key]) {
+				delete lineMap[key];
+			} else {
+				lineMap[key] = true;
+			}
+		};
+		var addLines = function(x1, y1, x2, y2, x3, y3) {
+			addLine(x1, y1, x2, y2);
+			addLine(x2, y2, x3, y3);
+			addLine(x3, y3, x1, y1);
+		};
+		return function(x, y, lefty) {
+			if(lefty) {
+				addLines(x, y, x + 86.6, y - 50, x + 86.6, y + 50);
+			} else {
+				addLines(x, y, x, y + 100, x + 86.6, y + 50);
+			}
+		};
+	})();
+	// 新しい三角形を追加する
+	var addTriangle = function(x, y, lefty, d) {
+		if(lefty) {
+			switch(d) {
+				case "r": x += 86.6; y -= 50; break;
+				case "d": break;
+				case "u": y -= 100; break;
+			}
+		} else {
+			switch(d) {
+				case "d": y += 100; break;
+				case "u": break;
+			}
+		}
+		stackTriangle(x, y, !lefty);
+		return {x: x, y: y, lefty: !lefty};
+	};
+
+	elements.fragments = [];
+	var setPosition = function(element, x, y) {
+		var postfix = element.getAttribute("transform").split("rotate")[1];
+		var transform = "scale(" + config.ratio + ") translate(" + [x, y].join() + ") rotate" + postfix;
+		element.setAttribute("transform", transform);
+	};
+	var getPosition = function(element) {
+		var pos = element.getAttribute("transform").split("translate(")[1].split(") rotate")[0].split(",");
+		return pos;
+	};
+	var setRotation = function(element, deg) {
+		var attr = element.getAttribute("transform");
+		var translate = attr.split("rotate")[0];
+		var matrix = attr.split(" matrix")[1];
+		var transform = translate + "rotate(" + deg + ")" + (matrix? " matrix" + matrix: "");
+		element.setAttribute("transform", transform);
+	};
+	var setFlip = function(element, flip) {
+		var transform = element.getAttribute("transform").split(" matrix")[0];
+		element.setAttribute("transform", transform + (flip? " matrix(-1,0,0,1,0,0)": ""));
+	};
+	var setListeners = function(element, id) {
+		element.ontouchstart = function(id) {
+			return function(e) {
+				var time = Date.now();
+				if(e.touches.length == 1 && id == status.dragId && time - status.touchedTime < config.timeDoubleTap) {
+					// ダブルタップされた場合の処理
+					status.pieces[id].flip = !status.pieces[id].flip;
+					setFlip(elements[id], status.pieces[id].flip);
+				}
+				status.touchedId = id;
+				var pos = getPosition(element);
+				status.touchedFromX = pos[0] | 0;
+				status.touchedFromY = pos[1] | 0;
+				status.touchedDragX = e.pageX;
+				status.touchedDragY = e.pageY;
+				status.touchedTime = Date.now();
+
+				e.preventDefault();
+			};
+		}(id);
+	};
+	status.pieces = {};
+	for(var i = 0; i < fragments.length; i++) {
+		var fragment = fragments[i];
+		var lefty = true;
+		var x = 0, y = 0, index = 0;
+		lineMap = {};
+		stackTriangle(x, y, lefty); // 最初の三角形を処理する
+		for(var j = 0; j < fragment.length; j++) {
+			var ds = fragment[j];
+			for(var k = 0; k < ds.length; k++) {
+				var d = ds.charAt(k);
+				var ret = addTriangle(x, y, lefty, d); // 三角形を追加する
+			}
+			// 最後の三角形を次の起点にする
+			x = ret.x;
+			y = ret.y;
+			lefty = ret.lefty;
+		}
+		// 線を結んでピースの形にする
+		var lineList = [];
+		for(var key in lineMap) {
+			lineList.push(key.split(","));
+		}
+		var pointList = [];
+		x = y = 0;
+		while(pointList.length == 0 || x != 0 || y != 0) {
+			for(var j = 0; j < lineList.length; j++) {
+				var line = lineList[j];
+				if(line[0] == x && line[1] == y) {
+					x = line[2];
+					y = line[3];
+					line[0] = line[1] = line[2] = line[3] = null;
+					pointList.push([x, y].join());
+					break;
+				}
+				if(line[2] == x && line[3] == y) {
+					x = line[0];
+					y = line[1];
+					line[0] = line[1] = line[2] = line[3] = null;
+					pointList.push([x, y].join());
+					break;
+				}
+			}
+		}
+		// ピースをSVGとしてdefsに保存する
+		var f = createSVGElement("g", {id: "f" + i});
+		poly = createSVGElement("polygon", {points: pointList.join(" "), "stroke-width": "5"});
+		f.appendChild(poly);
+		elements.defs.appendChild(f);
+		// 適当な場所に配置して、リスナーをセットする
+		var piece = createUseElement("f" + i, {transform: "scale(" + config.ratio + ") translate(" + ((i % 6) * 86.6+ 7 / config.ratio) + "," + (207 / config.ratio + ((i / 6) | 0) * 200) + ") rotate(0)", fill: "#f80", stroke: "#840"});
+		setListeners(piece, "f" + i);
+		elements.svg.appendChild(piece);
+		elements["f" + i] = piece;
+		status.pieces["f" + i] = {flip: false, deg: 0};
+	}
+	document.body.ontouchstart = function(e) {
+		if(status.state == "normal" && e.touches.length >= 2 && status.dragId) {
+			status.state = "rotate";
+			status.fromDeg = Math.atan2(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
+			e.preventDefault();
+		}
+	};
+	document.body.ontouchmove = function(e) {
+		if(status.state == "normal" && status.touchedId) {
+			status.state = "move";
+			status.dragId = status.touchedId;
+			status.fromX = status.touchedFromX;
+			status.fromY = status.touchedFromY;
+			status.dragX = status.touchedDragX;
+			status.dragY = status.touchedDragY;
+			var target = elements[status.dragId];
+			for(var i = 0; i < fragments.length; i++) {
+				var element = elements["f" + i];
+				if(element != target) {
+					var parent = element.parentNode;
+					parent.removeChild(element);
+					parent.insertBefore(element, target);
+				}
+			}
+		}
+		if(status.state == "move") {
+			var element = elements[status.dragId];
+			var x = status.fromX + (e.pageX - status.dragX) / config.ratio;
+			var y = status.fromY + (e.pageY - status.dragY) / config.ratio;
+			setPosition(element, x, y);
+		}
+		if(status.state == "rotate") {
+			if(e.touches.length >= 2) {
+				var deg = Math.atan2(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
+				var d = ((status.fromDeg - deg) * 4 / Math.PI * 180 + 360 * 3) % 360;
+				var element = elements[status.dragId];
+				setRotation(element, d | 0);
+				status.pieces[status.dragId].deg = d | 0;
+			}
+		}
+	};
+	document.body.ontouchend = function() {
+		if(status.state == "move") {
+			var element = elements[status.dragId];
+			var pos = getPosition(element);
+			var cx = pos[0] | 0;
+			var cy = pos[1] | 0;
+			(function() {
+				for(var x = 0; x < 9; x++) {
+					for(var y = 0; y < 10; y++) {
+						if(!((x + y) % 2 == 0)) {
+							continue;
+						}
+						var dx = x * 86.6 + 7 / config.ratio;
+						var dy = ((x % 2 == 0)? 50: 0) + (((y + ((x % 2 == 0)? 0: 1)) / 2) | 0) * 100 + 7 / config.ratio;
+						if((dx - cx) * (dx - cx) + (dy - cy) * (dy - cy) <= 50 * 50) {
+							cx = dx;
+							cy = dy;
+							return;
+						}
+					}
+				}
+			})();
+			setPosition(element, cx, cy);
+		} else if(status.state == "rotate") {
+			var d = Math.round(status.pieces[status.dragId].deg / 60) * 60 % 360;
+			setRotation(elements[status.dragId], d);
+			status.pieces[status.dragId].deg = d;
+		}
+		status.touchedId = null;
+		status.state = "normal";
+	};
+	status.state = "normal";
+};
+
+})();
+</script>
+</head><body style="margin:0"></body></html>

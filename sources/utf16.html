@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html><head><title>utf-conversion</title>
+<script>
+var translate = function() {
+	var src = document.getElementById("src").value;
+	var dest = "";
+	for(var i = 0; i < src.length; i++) {
+		dest += (src.charCodeAt(i) < 0x80)? src.charAt(i): "\\u" + ("0000" + src.charCodeAt(i).toString(16)).substr(-4);
+	}
+	document.getElementById("dest").value = dest;
+};
+</script></head><body style="margin:0; width:300px; height:100px">
+source: <input type="text" value="" id="src"> <input type="button" onclick="translate()" value="translate"><br>
+dest: <input type="text" value="" id="dest">
+</body></html>

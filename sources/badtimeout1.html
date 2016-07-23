@@ -1,0 +1,25 @@
+<html><head><title>setTimeoutの悪い例</title>
+<script>
+window.onload = function() {
+	var count = 0;
+	var gameMain = function() {
+		// 何か重い処理をする
+		var r = 0;
+		for(var i = 0; i < 100000; i += 1.001) {
+			r = i + i * r;
+		}
+		// 後方で呼び出す
+		if(count >= 0) {
+			setTimeout(gameMain, 1000 / 60);
+			count++;
+		}
+	};
+	var start = new Date().getTime();
+	setTimeout(function() {
+		var fps = (count / 3);
+		document.body.innerHTML = "fps:" + fps;
+		count = -1;
+	}, 3000);
+	gameMain();
+};
+</script></head><body></body></html>

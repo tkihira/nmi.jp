@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html><head><title>Box2DJS test</title>
+<script src="prototype-1.6.0.2.js"></script>
+<script src="box2d.js"></script>
+<script src='draw_world.js'></script>
+<script src='demo_base.js'></script>
+<script>
+(function() {
+	window.onload = function() {
+		var canvas = document.getElementById("canvas");
+		var ctx = canvas.getContext("2d");
+		
+		var world = createWorld();
+		var box = createBox(world, 250, 200, 10, 10);
+		var triangle = createMyShape(world, 250, 100, 10, 10, false);
+		
+		var color = "#000";
+		(function tick() {
+			world.Step(1 / 60, 1);
+			var c = box.GetContactList();
+			if(c) {
+				color = "#f00";
+				setTimeout(function() { color = "#000"; }, 50);
+			}
+			ctx.fillStyle = color;
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
+			drawWorld(world, ctx);
+			setTimeout(tick, 1 / 60);
+		})();
+		
+		document.body.onclick = function(e) {
+			triangle.WakeUp();
+			triangle.SetLinearVelocity(new b2Vec2(-600*Math.random()+300,-300));
+		};
+	};
+
+	var createMyShape = function(world, x, y) {
+		var ballSd = new b2PolyDef();
+		ballSd.density = 1.0;
+		ballSd.restitution = 0.8;
+		var v = 3;
+		var radius = 5;
+		ballSd.vertexCount = v;
+		for(var i = 0; i < v; i++) {
+			ballSd.vertices[i].Set(radius * Math.cos(Math.PI * 2 / v * i), radius * Math.sin(Math.PI * 2 / v * i));
+		}
+		var ballBd = new b2BodyDef();
+		ballBd.AddShape(ballSd);
+		ballBd.position.Set(x,y);
+		return world.CreateBody(ballBd);
+	};
+
+})();
+</script></head>
+<body style="margin:0"><canvas id="canvas" width="500" height="300"></canvas></body></html>
