@@ -39,6 +39,18 @@
                 margin: 0;
             }
         }
+        .toppre,
+        .topnex {
+            a { 
+                font-size: 12px;
+                color: #999999;
+                &:hover {
+                    color: #787878;
+                    text-decoration: none;
+                }
+            }
+
+        }
         // .post-recent {
         //     width: 100%;
         //     overflow: hidden;

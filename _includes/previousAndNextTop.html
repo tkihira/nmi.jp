@@ -1,0 +1,13 @@
+<div class="post-recent">
+    <table style="width:100%;border:0;padding:0;"><tbody><tr style="padding:0">
+        <td class="toppre" style="padding:0">
+        {% if page.previous %}
+        <a href="{{ page.previous.url | prepend: site.baseurl }}">{{ page.previous.title }}</a>
+        {% endif %}
+        </td><td class="topnex" style="text-align:right;padding:0">
+        {% if page.next %}
+        <a href="{{ page.next.url | prepend: site.baseurl }}">{{ page.next.title }}</a>
+        {% endif %}
+        </td>
+    </tr></tbody></table>
+</div>
