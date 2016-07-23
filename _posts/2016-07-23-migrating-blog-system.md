@@ -39,7 +39,7 @@ fsize=`wc -c _update_check | awk '{print $1}'`
 if [ $fsize -gt 1 ]
 then
   git pull
-  /home/admin/.rvm/gems/ruby-2.2.4/wrappers/jekyll build
+  /path/to/.rvm/gems/ruby-2.2.4/wrappers/jekyll build
   cp /dev/null _update_check
 fi
 ```
