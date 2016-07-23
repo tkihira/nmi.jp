@@ -26,3 +26,32 @@ title: WordPressからJekyllにブログシステムを移行
 使ってみてわかったのですが、これだけシンプルだと使いやすくて便利ですね。移行にもっと時間がかかるかと思っていたけど、予想よりは随分と早く移行が完了しました。
 
 これで[github](http://github.com/tkihira/nmi.jp)から直接記事を書くことが出来るようになったし、今後記事を書くペースを上げていきたいと思います。
+
+追記:
+なんちゃってgithub連携の自動更新機能を追加しました。とにかく手軽にやりたかったので、かなり手を抜いています。
+
+サーバ側でこんなスクリプトを書きました。
+
+```sh
+#!/bin/sh
+fsize=`wc -c _update_check | awk '{print $1}'`
+if [ $fsize -gt 1 ]
+then
+  git pull
+  /home/admin/.rvm/gems/ruby-2.2.4/wrappers/jekyll build
+  cp /dev/null _update_check
+fi
+```
+
+要は `_update_check` ファイルのサイズが1より大きければ、pullしてbuildして `_update_check` を空にするスクリプトです。こいつをcronで10秒おきに回しています。
+
+そしてPHPスクリプトで
+
+```php
+<?php
+shell_exec("echo updated > /path/to/_update_check");
+```
+
+というのを書きました。何で書いても良かったんですけど、CGIとかの設定しなくても動くのが楽だったのでPHP選択。そして最後にgithubのWebhooksにこのPHPのURLを設定し、`_update_check`のパーミッションを適切に設定して完了です。
+
+お手軽！
