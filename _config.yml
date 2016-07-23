@@ -13,6 +13,11 @@ url: "http://nmi.jp" # the base hostname & protocol for your site
 
 permalink: /:year-:month-:day-:title
 
+defaults:
+  -
+    values:
+      author: Takuo Kihira
+
 # other links
 twitter_username: tkihira
 facebook_username: takuo.kihira
