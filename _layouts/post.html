@@ -27,9 +27,6 @@ layout: default
             {% include category.html %}
             </div>
 
-            <div class="label-card">
-            {% include tag.html %}
-            </div>
         </div>
 
 <div class="entry fix" style="overflow:hidden;">
@@ -105,6 +102,22 @@ layout: default
 
     <div class="right">
         <div class="wrap">
+            <div class="side">
+                <div>
+                    <i class="fa fa-tags"></i>
+                    Top Popular Posts
+                </div>
+                <ul class="content-ul" recent>
+                    {% for url in page.popular_posts offset: 0 limit: 3 %}
+                        {% for post in site.posts %}
+                          {% if post.url contains url %}
+                            <li><a href="{{ post.url }}">{{ post.title }}</a></li>
+                          {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+
             <div class="side">
                 <div>
                     <i class="fa fa-pencil-square-o" aria-hidden="true"></i>

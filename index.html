@@ -49,9 +49,6 @@ layout: default
                     {% include category.html %}
                     </div>
 
-                    <div class="label-card">
-                    {% include tag.html %}
-                    </div>
                 </div>
 
 
@@ -109,6 +106,22 @@ layout: default
         <div class="wrap">
             <div class="side">
                 <div>
+                    <i class="fa fa-tags"></i>
+                    Top Popular Posts
+                </div>
+                <ul class="content-ul" recent>
+                    {% for url in page.popular_posts offset: 0 %}
+                        {% for post in site.posts %}
+                          {% if post.url contains url %}
+                            <li><a href="{{ post.url }}">{{ post.title }}</a></li>
+                          {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="side">
+                <div>
                     <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
                     Recent Posts
                 </div>
@@ -137,49 +150,6 @@ layout: default
                     </li>
                     {% endfor %}
                 </ul>
-            </div>
-            <div class="side">
-                <div>
-                    <i class="fa fa-tags"></i>
-                    Tags
-                </div>
-                <div class="tags-cloud">
-                    {% assign first = site.tags.first %}
-                    {% assign max = first[1].size %}
-                    {% assign min = max %}
-                    {% for tag in site.tags offset:1 %}
-                      {% if tag[1].size > max %}
-                        {% assign max = tag[1].size %}
-                      {% elsif tag[1].size < min %}
-                        {% assign min = tag[1].size %}
-                      {% endif %}
-                    {% endfor %}
-
-                    {% if max == min %}
-                        {% assign diff = 1 %}
-                    {% else %}    
-                        {% assign diff = max | minus: min %}
-                    {% endif %}
-
-                    {% for tag in site.tags %}
-                      {% assign temp = tag[1].size | minus: min | times: 36 | divided_by: diff %}
-                      {% assign base = temp | divided_by: 4 %}
-                      {% assign remain = temp | modulo: 4 %}
-                      {% if remain == 0 %}
-                        {% assign size = base | plus: 9 %}
-                      {% elsif remain == 1 or remain == 2 %}
-                        {% assign size = base | plus: 9 | append: '.5' %}
-                      {% else %}
-                        {% assign size = base | plus: 10 %}
-                      {% endif %}
-                      {% if remain == 0 or remain == 1 %}
-                        {% assign color = 9 | minus: base %}
-                      {% else %}
-                        {% assign color = 8 | minus: base %}
-                      {% endif %}
-                      <a href="{{ root_url }}/{{ site.tag_dir }}#{{ tag[0] }}" style="font-size: {{ size }}pt; color: #{{ color }}{{ color }}{{ color }};">{{ tag[0] }}</a>
-                    {% endfor %}
-                </div>
             </div>
 
             <!-- <div class="side">

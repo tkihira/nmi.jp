@@ -17,6 +17,12 @@ defaults:
   -
     values:
       author: Takuo Kihira
+      popular_posts:
+        - /archives/488
+        - /archives/465
+        - /archives/582
+        - /archives/763
+        - /archives/902
 
 # other links
 twitter_username: tkihira
