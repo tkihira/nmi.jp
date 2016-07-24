@@ -112,7 +112,7 @@ layout: default
                     Top Popular Posts
                 </div>
                 <ul class="content-ul" recent>
-                    {% for url in page.popular_posts offset: 0 limit: 3 %}
+                    {% for url in page.popular_posts offset: 0 %}
                         {% for post in site.posts %}
                           {% if post.url contains url %}
                             <li><a href="{{ post.url }}">{{ post.title }}</a></li>
@@ -130,26 +130,6 @@ layout: default
                 <ul class="content-ul" recent>
                     {% for post in site.posts offset: 0 limit: 3  %}
                         <li><a href="{{ post.url }}">{{ post.title }}</a></li>
-                    {% endfor %}
-                </ul>
-            </div>
-
-            <!-- Content -->
-            <div class="side ">
-                <div>
-                    <i class="fa fa-th-list"></i>
-                    Categories
-                </div>
-                <ul class="content-ul" cate>
-                    {% for category in site.categories order:ascending %}
-                    <li>
-                        <a href="{{ root_url }}/{{ site.category_dir }}#{{ category | first }}" class="categories-list-item" cate="{{ category | first }}">
-                            <span class="name">
-                                {{ category | first }}
-                            </span>
-                            <span class="badge">{{ category | last | size }}</span>
-                        </a>
-                    </li>
                     {% endfor %}
                 </ul>
             </div>
