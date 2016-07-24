@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>no title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="Haga, Takeshi" />
+    <meta name="repository" content="https://github.com/thaga/SuperKingyoSukui-JSX" />
+
+    <script src="main.jsx.js"></script>
+
+
+<script type="glsl" id="vs">
+precision mediump float;
+uniform mat4 transformMatrix;
+attribute vec4 vertex;
+varying vec3 pos;
+varying float num;
+void main() {
+	gl_Position = transformMatrix * vec4(vertex.xyz, 1.0);
+	
+	pos = vertex.xyz;
+	num = vertex.w;
+}
+</script>
+<script type="glsl" id="fs">
+precision mediump float;
+uniform vec4 lightColor;
+uniform vec4 darkColor;
+uniform sampler2D texture;
+varying vec3 pos;
+varying float num;
+void main() {
+	vec4 col;
+	vec2 p;
+	if(mod(floor((pos.z + 0.001) / 20.0) + floor((pos.x + 0.001) / 20.0) + floor((pos.y + 0.001) / 20.0), 2.0) == 0.0) {
+		gl_FragColor = darkColor;
+	} else {
+		gl_FragColor = lightColor;
+	}
+	if(lightColor == vec4(1.0, 0, 0, 1.0)) {
+		gl_FragColor = vec4(num / 255.0, 0, 0, 1.0);
+	}
+	if(lightColor == vec4(0.0, 1.0, 0, 1.0)) {
+		if(pos.x > 4999.0 || pos.x < -4999.0) {
+			p = pos.yz;
+		} else if(pos.y > 4999.0 || pos.y < -4999.0) {
+			p = pos.zx;
+		} else {
+			p = pos.xy;
+		}
+		
+		gl_FragColor = texture2D(texture, 0.5 * p / 5000.0 + 0.5);
+	}
+}
+</script>
+
+
+  </head>
+
+  <body style="position:relative; padding:0; margin:0;font-family:Futura;">
+    <canvas id='webgl-canvas' width='512' height='512' style="position: absolute;"></canvas>
+    <canvas id='touchCanvas' width='512' height='512' style="position: absolute;left:512px;display:none"></canvas>
+    <canvas id='cloud' width='512' height='512' style="position: absolute;top:512px;display:none"></canvas>
+    <div id="opening" style="position:absolute;left:0;top:0;width:512px;height:512px;background-color:rgba(0,0,0,0.5);display:block">
+    	<div style="position:absolute;width:512px;left:0;top:200px;text-align:center;color:white;font-size:60px">Rolling 2013</div>
+    </div>
+    <div id="start" style="position:absolute;left:0;top:0;width:512px;height:512px;display:none">
+    	<div style="position:absolute;width:512px;left:0;top:200px;text-align:center;font-size:80px;color:#fff">Are You Ready?</div>
+    	<div style="position:absolute;left:0;bottom:0;text-align:left;font-size:25px;color:#fff">Distance<br><span style="font-size:38px">197</span></div>
+    	<div style="position:absolute;right:0;bottom:0;text-align:right;font-size:25px;color:#ff0">Score<br><span style="font-size:38px">0</span></div>
+    </div>
+    <div id="game" style="position:absolute;left:0;top:0;width:512px;height:512px;display:none">
+    	<div id="clear" style="position:absolute;width:512px;left:0;top:270px;text-align:center;font-size:80px;color:#f00;display:none">CLEAR!</div>
+    	<div style="position:absolute;left:0;bottom:0;text-align:left;font-size:25px;color:#fff">Distance<br><span style="font-size:38px" id="distance">197</span></div>
+    	<div style="position:absolute;right:0;bottom:0;text-align:right;font-size:25px;color:#ff0">Score<br><span style="font-size:38px" id="score">0</span></div>
+    </div>
+    <div id="touch" style="position:absolute;left:0;top:0;width:512px;height:512px;background-color:rgba(0,0,0,0)">
+    </div>
+  </body>
+</html>

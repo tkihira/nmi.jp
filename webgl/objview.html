@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<div id="rcv" draggable="true" style="border: gray solid 1px; padding:32px;">ここにポイっと。</div>
+<canvas id="cvs" width=512 height=512></canvas><br>
+<input type="checkbox" id="smooth"></input> スムージング<br>
+<input type="button" id="miku" value="ミクさん召還（1Mちょい）"></input>
+
+<script src="objview.js"></script> 
+
+<script type="glsl" id="vs">
+precision mediump float;
+uniform mat4 modelviewMatrix;
+uniform mat4 projectionMatrix;
+attribute vec3 vertex;
+attribute vec3 normal;
+varying vec3 e_normal;
+void main() {
+	gl_Position = projectionMatrix * modelviewMatrix * vec4(vertex, 1.0);
+	e_normal = vec3(modelviewMatrix * vec4(normal, 0.0));
+}
+</script>
+<script type="glsl" id="fs">
+precision mediump float;
+varying vec3 e_normal;
+void main() {
+	vec3 n = normalize(e_normal);
+	float l = abs(dot(n, normalize(vec3(-1, 1, 1))));
+	gl_FragColor = vec4(l, l, l, 1.0);
+}
+</script>
+
