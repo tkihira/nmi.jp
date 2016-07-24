@@ -41,27 +41,25 @@ icon: archive
     <button class="anchor"><i class="fa fa-anchor"></i></button>
     <div class="right">
         <div class="wrap">
-
-            <!-- Content -->
-            <div class="side content">
+            <div class="side">
                 <div>
-                    Content
+                    <i class="fa fa-pencil-square-o"></i>
+                    Archives
                 </div>
-                <ul id="content-side" class="content-ul">
-                    {% assign counter = 0 %}
-                        {% for post in site.posts %}
-                          {% assign thisyear = post.date | date: "%Y" %}
-                          {% assign prevyear = post.previous.date | date: "%Y" %}
-                          {% assign counter = counter | plus: 1 %}
-                          {% if thisyear != prevyear %}
-                            <li><a class="scroll" href="#y{{ post.date | date: '%Y' }}">{{ thisyear }} ({{ counter }})</a></li>
-                            {% assign counter = 0 %}
-                          {% endif %}
-                        {% endfor %}
+                <ul class="content-ul" recent>
+                {% assign counter = 0 %}
+                    {% for post in site.posts %}
+                      {% assign thisyear = post.date | date: "%Y" %}
+                      {% assign prevyear = post.previous.date | date: "%Y" %}
+                      {% assign counter = counter | plus: 1 %}
+                      {% if thisyear != prevyear %}
+                        <li><a href="#y{{ post.date | date: '%Y' }}">{{ thisyear }} ({{ counter }})</a></li>
+                        {% assign counter = 0 %}
+                      {% endif %}
+                    {% endfor %}
                 </ul>
             </div>
-            <!-- 其他div框放到这里 -->
-            <!-- <div class="side">bbbb</div> -->
+
         </div>
     </div>
 </div>

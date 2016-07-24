@@ -36,22 +36,25 @@ icon: th-list
         <div class="wrap">
 
             <!-- Content -->
-            <div class="side content">
+            <div class="side ">
                 <div>
-                    Content
+                    <i class="fa fa-th-list"></i>
+                    Categories
                 </div>
-                <ul id="content-side" class="content-ul">
-                    {% for category in site.categories%}
-                        <li>
-                            <a class="scroll" href="#{{ category | first }}">
-                                {{ category | first }} ({{ category | last | size }})
-                            </a>
-                        </li>
+                <ul class="content-ul" cate>
+                    {% for category in site.categories order:ascending %}
+                    <li>
+                        <a href="{{ root_url }}/{{ site.category_dir }}#{{ category | first }}" class="categories-list-item" cate="{{ category | first }}">
+                            <span class="name">
+                                {{ category | first }}
+                            </span>
+                            <span class="badge">{{ category | last | size }}</span>
+                        </a>
+                    </li>
                     {% endfor %}
                 </ul>
             </div>
-            <!-- 其他div框放到这里 -->
-            <!-- <div class="side">bbbb</div> -->
+
         </div>
     </div>
 </div>
