@@ -19,10 +19,11 @@ defaults:
       author: Takuo Kihira
       popular_posts:
         - /archives/488
-        - /archives/465
+        - /2016-07-23-stock-strategy-for-early-startup-employee
         - /archives/582
         - /archives/763
         - /archives/902
+        - /archives/465
 
 # other links
 twitter_username: tkihira
