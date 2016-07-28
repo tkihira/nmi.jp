@@ -41,7 +41,7 @@ techブログだったはずなのに、最近起業関係の記事ばかり書�
 
 ### シリーズAで調達される資金額
 
-さて、一般的にシリーズAではいくらくらい調達されるものなのでしょうか？アメリカの法律外社WSGR（Wilson Sonsini Goodrich & Rosati）が公開しているレポート"[THE ENTREPRENEURS REPORT: Private Company Financing Trends - Q1 2016](https://www.wsgr.com/publications/PDFSearch/entreport/Q12016/private-company-financing-trends.htm)"によると、<span style="color:red">2015年のシリーズAの中央値が$2.7M（約3億円）</span>ということが読み取れます（Median Amounts Raisedより）。
+さて、一般的にシリーズAではいくらくらい調達されるものなのでしょうか？アメリカの法律会社WSGR（Wilson Sonsini Goodrich & Rosati）が公開しているレポート"[THE ENTREPRENEURS REPORT: Private Company Financing Trends - Q1 2016](https://www.wsgr.com/publications/PDFSearch/entreport/Q12016/private-company-financing-trends.htm)"によると、<span style="color:red">2015年のシリーズAの中央値が$2.7M（約3億円）</span>ということが読み取れます（Median Amounts Raisedより）。
 
 ニュースサイトに載るようなシリーズA調達は派手なものが多く、たとえば[この記事](http://jp.techcrunch.com/2016/07/17/20160711on-demand-sales-force-universal-avenue-closes-10m-series-a/)で会社はシードで500万ドル（約5億円）、シリーズAで1000万ドル（約10億円）の調達をしています。こういう派手な調達がどうしても目立つのですが、データから見ると一般的な調達額はそこまで派手ではなく、大体3億円前後なんだということがわかるのはありがたいですね。なお、同じサイトにある投資前時価総額の中央値（Median Pre-Money Valuation）を見ると$11.7M（約12億）であり、単純に計算すると<span style="color:red">投資家の持ち分は大体18.75%前後</span>になることが多いことも読み取れます。
 
