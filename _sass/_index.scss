@@ -4,9 +4,24 @@
         color: #000000;
         //transition: 0.5s ease;
         &:hover {
+            //color: #0078ed;
             color: #787878;
             //text-decoration: underline;
             //color: #223253;
+        }
+    }
+    .excerpt {
+        a {
+            //color: #4d6dad;
+            color: #0078ed;
+            //color: #000000;
+            //transition: 0.5s ease;
+            &:hover {
+                color: #0078ed;
+                //color: #787878;
+                text-decoration: underline;
+                //color: #223253;
+            }
         }
     }
     .left {
