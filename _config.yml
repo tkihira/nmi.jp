@@ -12,17 +12,18 @@ baseurl: "" # the subpath of your site, e.g. /blog
 url: "http://nmi.jp" # the base hostname & protocol for your site
 
 permalink: /:year-:month-:day-:title
+#show_drafts: true
 
 defaults:
   -
     values:
       author: Takuo Kihira
       popular_posts:
-        - /archives/488
         - /2016-07-23-stock-strategy-for-early-startup-employee
         - /archives/582
-        - /archives/763
+        - /2017-10-06-Making_a-business_plan
         - /archives/902
+        - /archives/488
         - /archives/465
 
 # other links
