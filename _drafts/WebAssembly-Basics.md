@@ -21,7 +21,7 @@ categories:
 
 WebAssembly（wasmとも呼ばれます）とは、ざっくり言うと<span style="color:blue;font-weight:bold">ブラウザでプログラムを高速に動かすための規格</span>です。JavaScript で出来ることが複雑化してくるに従い、JavaScript の実行スピードの遅さが課題になることが増えてきました。WebAssembly はその課題の解決を目的にしています。
 
-過去にも、実行スピードの改善を目的として ActiveX や Dart、PNaCl など色々な規格があったのですが、WebAssembly は<span style="color:red">主要なブラウザベンダーの合意のもと作成された仕様</span>であるのが特徴です。先月 Edge がデフォルトで動作するようになったので、現在はモバイルブラウザを含めた[ほとんど全てのブラウザで動作をします](http://caniuse.com/#feat=wasm)（ただしIEは除く）。
+過去にも、実行スピードの改善を目的として ActiveX や Dart、PNaCl など色々な規格があったのですが、WebAssembly は<span style="color:red">主要なブラウザベンダーの合意のもと作成された仕様</span>であるのが特徴です。先月 Edge がデフォルトの設定で動作するようになったので、現在はモバイルブラウザを含めた[ほとんど全てのブラウザで動作します](http://caniuse.com/#feat=wasm)（ただしIEは除く）。
 
 WebAssembly はバイナリ表現なので、プログラムのファイルサイズは JavaScript よりも小さく、読み込み（パース）にかかる時間も短いことが期待されます。また、あらかじめ高速に動作することを念頭に仕様が考えられているので、JavaScript よりは断然速く、ネイティブアプリの速度と比較しても遜色ない動作速度が期待されます。現在のところ大体ネイティブアプリの 60% 〜 80% くらいの速度ですが、[将来的には 90% 程度まで高速化することを目標にしている](https://www.youtube.com/watch?v=6v4E6oksar0)ようです。
 
