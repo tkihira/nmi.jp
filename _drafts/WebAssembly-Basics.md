@@ -1,9 +1,10 @@
 ---
 layout: post
-title: WebAssemblyの基礎
+title: WebAssembly の基礎
 categories:
 - HTML5
 - JavaScript
+- Emscripten
 ---
 
 [WebAssembly](http://webassembly.org/) をご存知でしょうか？2年前に突然発表された新しい規格です。まだ登場して間もないため、実際に本格的に利用しているサービスは数えるほどしかありませんが、Twitter 等を見ているとじわりじわりと評判になっており、技術としての勢いを感じます。
