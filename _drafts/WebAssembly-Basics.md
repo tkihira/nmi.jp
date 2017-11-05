@@ -45,7 +45,7 @@ WebAssembly のバイナリファイルは、<span style="font-weight:bold">.was
 
 [https://github.com/tkihira/wasm-simple-sample](https://github.com/tkihira/wasm-simple-sample)
 
-HTML ファイルと wasm ファイルのみのシンプルな構成です。HTML の内容は次の通りです。<span style="color:#ccc">array functions を使っていないのは、WebAssembly よりも array functions の方がサポートが遅いブラウザがあるためです。。。読みづらくてすみません。</span>
+HTML ファイルと wasm ファイルのみのシンプルな構成です。HTML の内容は次の通りです。<span style="color:#ccc">arrow functions を使っていないのは、WebAssembly よりも arrow functions のサポート時期が後のブラウザがあるためです。。。読みづらくてすみません。</span>
 
 ```html
 <html><head><title>WebAssembly Simple Sample</title>
@@ -63,9 +63,9 @@ fetch("./simple.wasm").then(function(response) {
 </head><body></body></html>
 ```
 
-上から見てみましょう。まずサーバから `simple.wasm` というバイナリファイルをダウンロードします。ダウンロードが終わったら、そのバイトコードを引数に `WebAssembly.compile` を呼びます。
+上から見てみましょう。まずサーバから `simple.wasm` という、足し算をする `add` 関数を含んだ WebAssembly のバイナリファイルをダウンロードします。ダウンロードが終わったら、そのバイトコードを引数に `WebAssembly.compile` を呼びます。
 
-よく勘違いをしている方が多いのですが、<span style="color:red">WebAssembly (wasm ファイル) は機械語ではありません</span>。一般的にはアセンブリ言語＝機械語であることがほとんどなのですが、WebAssembly では<span style="color:red">バイナリファイルを再度ブラウザ内部でコンパイルする必要があります</span>。
+勘違いをしている方が多いのですが、<span style="color:red">WebAssembly (wasm ファイル) 自体は機械語ではありません</span>。一般的にはアセンブリ言語＝機械語であることがほとんどなのですが、WebAssembly では<span style="color:red">バイナリファイルを再度ブラウザ内部でコンパイルする必要があります</span>。
 
 WebAssembly は対応ブラウザが動く全てのコンピュータで動くことを期待されますが、コンピュータのアーキテクチャは様々です。Windows や Mac のように Intel プロセッサを使っているコンピュータもあれば、iPhone などの ARM プロセッサを使っているコンピュータもあります。全てのプロセッサに対応したバイナリを用意するのは非現実的ですので、<span style="color:red">wasm ファイルを受け取ったブラウザ側で改めてコンパイルをする</span>設計になっているのです。小さなプログラムだとコンパイルは一瞬です。大きなプログラムはコンパイルに時間がかかりますが、それでも同等の JavaScript よりも高速に起動することがほとんどです。
 
