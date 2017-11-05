@@ -35,9 +35,9 @@ WebAssembly はバイナリ表現なので、プログラムのファイルサ�
 
 ----
 
-# WebAssembly の内部動作
+# WebAssembly の呼び出し方
 
-さて、WebAssembly はブラウザ内部でどのように動いているのでしょうか。
+さて、WebAssembly は HTML でどのように呼び出されるのでしょうか。
 
 WebAssembly のバイナリファイルは、<span style="font-weight:bold">.wasm</span> という拡張子で用意されることが多いです。HTML ファイル側では、JavaScript で wasm ファイルをダウンロードし、そこから WebAssembly の関数を取り出して呼び出す、というのが基本になります。
 
