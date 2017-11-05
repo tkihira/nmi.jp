@@ -45,7 +45,7 @@ WebAssembly のバイナリファイルは、<span style="font-weight:bold">.was
 
 [https://github.com/tkihira/wasm-simple-sample](https://github.com/tkihira/wasm-simple-sample)
 
-HTML ファイルと wasm ファイルのみのシンプルな構成です。HTML の内容は次の通りです。<span style="color:#ccc">arrow functions を使っていないのは、WebAssembly よりも arrow functions のサポート時期が後のブラウザがあるためです。。。読みづらくてすみません。</span>
+HTML ファイルと wasm ファイルのみのシンプルな構成です。HTML の内容は次の通りです。<span style="color:#ccc;font-size:small">arrow functions を使っていないのは、WebAssembly よりも arrow functions のサポート時期が後のブラウザがあるためです。気にしすぎかとは思いますが一応。</span>
 
 ```html
 <html><head><title>WebAssembly Simple Sample</title>
@@ -101,6 +101,21 @@ WebAssembly のメリットは「<span style="color:blue;font-weight:bold">高�
 
 一番有名かつ簡単なのは、[Emscripten](http://kripken.github.io/emscripten-site/) を利用することです。Emscripten を利用すると C/C++ から wasm を出力することが出来ます。Emscripten は言語仕様を拡張して JavaScript との通信を非常に簡単にしているので、printf デバッグなどもしやすい印象があります。また WebGL Binding など豊富な機能を用意しており、特にゲームライブラリなどの既存のコードの変換に適しています。
 
+Emscripten を使って WebAssembly を出力する超基本的なやり方を以下に書いておきます。Emscripten のインストール方法や詳細な使い方については、公式ページの豊富なドキュメントが参考になります。
+
+```
+$ cat > hello.c
+#include <stdio.h>
+
+int main() {
+  printf("Hello world!");
+  return 0;
+}
+^D
+$ emcc -o hello.html -s WASM=1 hello.c
+$ emrun hello.html 
+```
+
 他の選択肢としては、Clang を使うやり方、Rust からコンパイルするやり方、また最近発表された [AssemblyScript](https://github.com/AssemblyScript/assemblyscript) といって TypeScript のサブセットからコンパイルするやり方などがあります。この前の [Emscripten Night #5](https://emsn.connpass.com/event/66304/) で [@chikoski](https://twitter.com/chikoski) さんが[わかりやすいまとめ資料](https://speakerdeck.com/chikoski/20171018-wasm)を公開されているので、興味のある方は是非参考にされてみてください。
 
 ----
@@ -109,7 +124,7 @@ WebAssembly のメリットは「<span style="color:blue;font-weight:bold">高�
 
 今回の記事で WebAssembly がどのようなものかについての大体の感覚を掴んで頂けたのではないかなと思いますが、いかがでしょうか。
 
-WebAssembly が全てのモダンブラウザで使えるようになったのは、つい先月のことです。残念ながらまだ枯れた技術と言うには程遠く、ブラウザのバグや実装起因のトラブルなどが頻発しております。「WebAssembly って奴が話題みたいだから、うちのシステムを全部入れ替えてみよう！」みたいなチャレンジは、かなり大きなリスクがあることをご承知ください。それに関しては来月、[WebAssembly Advent Calendar 2017](https://qiita.com/advent-calendar/2017/webassembly) で再度書かせてもらおうと思います。
+WebAssembly が全てのモダンブラウザで使えるようになったのは、つい先月のことです。残念ながらまだ枯れた技術と言うには程遠く、ブラウザのバグや実装起因のトラブルなどが頻発しております。まずいないと思いますが、「WebAssembly って奴が話題みたいだから、うちのシステムを全部入れ替えてみよう！」みたいなチャレンジをされる方は、かなり大きなリスクがあることをご承知ください。大規模な案件での課題については、来月 [WebAssembly Advent Calendar 2017](https://qiita.com/advent-calendar/2017/webassembly) で再度書かせてもらおうと思います。
 
 アセンブリ、の言葉からイメージが先行しがちな技術ではありますが、ブラウザアプリにとっては間違いなく革新的な技術です。今までブラウザ側で処理出来なかった重いタスクをクライアントに移譲出来るようになることで、サーバの負担を減らせる可能性もあります。C/C++ などで書かれた過去の資産を、ウェブアプリとして再利用出来る可能性もあります。応用の幅の広い技術なので、もし何らかの機会やアイデアがあれば、是非触れてみてください。
 
