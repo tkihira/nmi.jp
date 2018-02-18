@@ -83,5 +83,5 @@ Chrome は DevTools のプロファイラが大変しっかりしているので
 
 # 追記(2018-02-18)
 
-Twitterにて [@azu](https://twitter.com/azu_re) さんに[このサイト](https://qiita.com/keishi/items/5f1af0851901e9021488)を教えてもらいました。上で「日本語資料は一切なかった」とか書いておきながら、こんなに詳しいサイトがあったんですね、お恥ずかしい。ありがとうございました！
+Twitterにて [azu](https://twitter.com/azu_re) さんに[このWeb](https://qiita.com/keishi/items/5f1af0851901e9021488)を教えてもらいました。上で「日本語資料は一切なかった」とか書いておきながら、こんなに詳しいサイトがあったんですね、お恥ずかしい。ありがとうございました！
 
