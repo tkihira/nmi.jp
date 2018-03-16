@@ -8,11 +8,13 @@ categories:
 - Emscripten
 ---
 
-もう結構前になりますが、Rust で Emscripten を利用することなく WebAssembly の出力ができるようになりました。WebAssembly を出力するためには、今までは主に C か C++ を利用する必要があったのですが、そこに新しく Rust という言語が追加されました。
+もう結構前になりますが、Rust で Emscripten を利用することなく WebAssembly の出力ができるようになりました。それにより、Rust を使った WebAssembly の開発が現実的な選択肢としてさらに力を帯びてきました。
 
-自分の勉強で Rust のプログラムを書いてみたので、その道筋をご紹介することで自分のような Rust 初心者の方々の助けになればと思います。もし記事中に間違い等がありましたら、是非 [@tkihira](https://twitter.com/tkihira) までご連絡ください。
+自分の勉強で Rust から WebAssembly に出力するプログラムを書いてみたので、その道筋をご紹介することで自分のような Rust 初心者の方々の WebAssembly 開発の助けになればと思い、この記事を投稿しました。
 
 
+
+もし記事中に間違い等がありましたら、是非 [@tkihira](https://twitter.com/tkihira) までご連絡ください。
 
 ----
 
@@ -72,7 +74,7 @@ $ cargo install --git https://github.com/alexcrichton/wasm-gc
 $ cargo new --lib project_name
 ```
 
-で Rust のプロジェクトを作ります（`project_name` はプロジェクト名）。Rust の main 関数から実行されるプロジェクトの場合は `--bin project_name` としますが、今回は JavaScript から呼ばれるライブラリのような形の WebAssembly を作りたかったので、`--lib` にしました。
+で Rust のプロジェクトを作ります（`project_name` はプロジェクト名）。Rust の main 関数から実行されるプロジェクトの場合は `--bin project_name` としますが、今回は JavaScript から呼ばれるライブラリのような形の WebAssembly を作りたかったので、`--lib` を指定しました。
 
 これで、カレントディレクトリに `project_name` フォルダが出来ています。中には Cargo の設定ファイル `Cargo.toml` と、スタブのソースコード `src/lib.rs` が生成されています。
 
@@ -136,7 +138,7 @@ fetch('hoge.wasm').then(response => response.arrayBuffer())
 
 ### Rust から JavaScript の呼び出し
 
-<span style="color:blue">WebAssembly から JavaScript 関数の呼び出しコストは、通常は極めて低い</span>ので、ガンガン呼び出しちゃいましょう。今回の移植では、`Math.random`、`Math.sqrt`、`Math.sin`、`Math.cos`、`Date.now` を Rust 側から呼び出しています。
+JavaScript から WebAssembly を呼び出すコストと同様に、<span style="color:blue">WebAssembly から JavaScript 関数を呼び出すコストも通常は極めて低い</span>ので、必要に応じてガンガン呼び出しちゃいましょう。今回の移植では、`Math.random`、`Math.sqrt`、`Math.sin`、`Math.cos`、`Date.now` を Rust 側から呼び出しています。
 
 Rust 側では次のように書きます。
 
