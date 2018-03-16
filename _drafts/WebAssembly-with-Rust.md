@@ -32,7 +32,7 @@ Rust が Emscripten を経由せずに WebAssembly を出力できるように�
 
 ## 今回の作品
 
-有名な JavaScript のデモを移植してみました。こちらです。
+有名な JavaScript のデモを移植してみました。クリックすると動きます。
 
 <script>
 function minecraftStart() {
@@ -42,7 +42,7 @@ function minecraftStart() {
 </script>
 <div id="minecraft_preview"><a href="#" style="text-decoration:none" onclick="minecraftStart();return false;"><img width="400" height="400" src="./img/minecraft.png"></a></div>
 
-出力は [https://tkihira.github.io/Minecraft4kRust/](https://tkihira.github.io/Minecraft4kRust/) こちらです。Githubに[ソースコード](https://github.com/tkihira/Minecraft4kRust)を用意しました。移植元は [http://jsdo.it/notch/dB1E](http://jsdo.it/notch/dB1E) こちらの JavaScript 作品です。
+ソースコードは [https://github.com/tkihira/Minecraft4kRust](https://github.com/tkihira/Minecraft4kRust) こちらです。HTMLは [https://tkihira.github.io/Minecraft4kRust/](https://tkihira.github.io/Minecraft4kRust/) こちらに用意しました。移植元は [http://jsdo.it/notch/dB1E](http://jsdo.it/notch/dB1E) こちらの JavaScript 作品です。
 
 ----
 
