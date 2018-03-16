@@ -285,7 +285,7 @@ fn hoge {
 |WebAssembly|7391ms   |135.29回/s   |
 |JavaScript |10801ms  |92.58回/s    |
 
-<span style="color:red">WebAssembly の方が 46% ほど性能が良い</span>ことがわかります。今回の JavaScript はブラウザの JIT 等の最適化が効きやすい形である上に、Canvasに出力する API の部分がそこそこ支配的であるという悪条件にも関わらず、これだけの差がでたのは驚きでした。<span style="font-weight:bold">やはり WebAssembly は速い</span>ですね。Rust の出力と、ガチガチに C で実装してコンパイラで最適化をかけた出力との速度差が気になります。
+<span style="color:red">WebAssembly の方が 46% ほど性能が良い</span>ことがわかります。今回の JavaScript はブラウザの JIT 等の最適化が効きやすい形である上に、Canvas に出力する API の処理時間もそこそこあるという悪条件にも関わらず、これだけの差がでたのは驚きでした。<span style="font-weight:bold">やはり WebAssembly は速い</span>ですね。Rust の出力と、ガチガチに C で実装してコンパイラで最適化をかけた出力との速度差が気になります。
 
 ### ファイルサイズ
 
