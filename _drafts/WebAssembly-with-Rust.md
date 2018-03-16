@@ -105,8 +105,8 @@ $ cargo fmt
 
 準備が整ったので、JavaScript から Rust にガリガリ移植します。文法などは以下のサイトが役に立ちました。
 
-[プログラミング言語Rust](https://rust-lang-ja.github.io/the-rust-programming-language-ja/1.6/book/README.html)
-[C++erのためのRust入門](https://qiita.com/EqualL2/items/a232ab0855f145bd5997#%E9%85%8D%E5%88%97)
+- [プログラミング言語Rust](https://rust-lang-ja.github.io/the-rust-programming-language-ja/1.6/book/README.html)
+- [C++erのためのRust入門](https://qiita.com/EqualL2/items/a232ab0855f145bd5997#%E9%85%8D%E5%88%97)
 
 JavaScript はすべての数値型が `f64` 型ですが、移植に合わせて整数型と浮動小数点型を区別しました。そのため型変換が多く、`let mut initial = ox - ox as i32 as f64;` などというコードを書かざるを得なかったところもありました（元のコードは `var initial = ox - (ox | 0);`）。
 
