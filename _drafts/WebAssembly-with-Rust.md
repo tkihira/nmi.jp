@@ -30,7 +30,7 @@ Rust が Emscripten を経由せずに WebAssembly を出力できるように�
 
 ## 今回の作品
 
-有名な JavaScripr のデモを移植してみました。こちらです。
+有名な JavaScript のデモを移植してみました。こちらです。
 
 <script>
 function minecraftStart() {
