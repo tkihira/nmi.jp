@@ -37,10 +37,14 @@ Rust が Emscripten を経由せずに WebAssembly を出力できるように�
 <script>
 function minecraftStart() {
     var d = document.getElementById('minecraft_preview');
-    d.innerHTML = '<iframe width="400" height="400" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" allowtransparency="true" src="https://tkihira.github.io/Minecraft4kRust/"></iframe>';
+    d.innerHTML = '<iframe style="position:relative" width="400" height="400" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" allowtransparency="true" src="https://tkihira.github.io/Minecraft4kRust/"></iframe><div style="position:absolute;left:0;top:0;width:400px;height:400px;cursor:pointer;background-color:rgba(0,0,0,0);" onclick="minecraftStop()"></div>';
 };
+function minecraftStop() {
+    var d = document.getElementById('minecraft_preview');
+    d.innerHTML = '<a href="#" style="text-decoration:none" onclick="minecraftStart();return false;"><img width="400" height="400" src="./img/minecraft.png"></a>';
+}
 </script>
-<div id="minecraft_preview"><a href="#" style="text-decoration:none" onclick="minecraftStart();return false;"><img width="400" height="400" src="./img/minecraft.png"></a></div>
+<div style="position:relative" id="minecraft_preview"><a href="#" style="text-decoration:none" onclick="minecraftStart();return false;"><img width="400" height="400" src="./img/minecraft.png"></a></div>
 
 ソースコードは [https://github.com/tkihira/Minecraft4kRust](https://github.com/tkihira/Minecraft4kRust) こちらです。HTMLは [https://tkihira.github.io/Minecraft4kRust/](https://tkihira.github.io/Minecraft4kRust/) こちらに用意しました。移植元は [http://jsdo.it/notch/dB1E](http://jsdo.it/notch/dB1E) こちらの JavaScript 作品です。
 
