@@ -77,6 +77,7 @@ $ cargo new --lib project_name
 これで、カレントディレクトリに `project_name` フォルダが出来ています。中には Cargo の設定ファイル `Cargo.toml` と、スタブのソースコード `src/lib.rs` が生成されています。
 
 WebAssembly に対応するために、Cargo.toml を編集して下記を追記します。別言語から呼ばれるライブラリであることを指定します。
+
 ```
 [lib]
 crate-type = ["cdylib"]
