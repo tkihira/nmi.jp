@@ -124,6 +124,7 @@ JavaScript はすべての数値型が `f64` 型ですが、移植に合わせ�
 JavaScript から Rust の関数を呼び出すためには、次のような関数の宣言が必要です。
 
 ```rust
+
 #[no_mangle]
 pub extern "C" fn hoge(v: f64) -> f64 {
     v + 1.0
@@ -190,20 +191,20 @@ fetch('hoge.wasm').then(response => response.arrayBuffer())
 
 数値のやり取りの仕方は上記で良いとして、配列や文字列などはどうやってやり取りすればよいのでしょうか？一般的に WebAssembly と JavaScript がメモリのやり取りをするのは結構たいへんなのですが、Rust の場合も例外ではありません。
 
-Rust の WebAssembly 出力では、すべてのデータを一つのメモリ上に格納します。いわゆる<span style="color:red">ヒープメモリ</span>というもので、巨大な配列にプログラム上で使われるすべてのデータが入っているような感覚です。JavaScript 側からはそのヒープメモリにアクセスすることが出来るので、Rust からヒープメモリのアドレス（巨大な配列のオフセット）を渡すことでデータのやり取りが出来ます。
+Rust の WebAssembly 出力では、すべてのデータを一つのメモリ上に格納します。巨大な配列にプログラム上で使われるすべてのデータが格納されている、みたいな感じです。JavaScript 側からはそのメモリにアクセスすることが出来るので、Rust からメモリのアドレス（巨大な配列のオフセット）を JavaScript に渡すことで両者間のデータのやり取りが可能になります。
 
 実例で見てみましょう。Rust から JavaScript に配列を渡してみましょう。
 
 ```rust
-static MEMORY: [i8; 5] = [1, 2, 3, 4, 5];
+static ARRAY_SHARE: [i8; 5] = [1, 2, 3, 4, 5];
 
 #[no_mangle]
 pub extern "C" fn get_address() -> *const i8 {
-   &MEMORY[0]
+   &ARRAY_SHARE[0]
 }
 ```
 
-Rust では static 宣言された配列はアドレスが変わらないことが保証されます。`get_address` 関数で、ヒープメモリ上の配列のアドレスを JavaScript に渡します。
+Rust では static 宣言された配列はアドレスが変わらないことが保証されます。`get_address` 関数で、メモリ上の配列のアドレスを JavaScript に渡します。
 
 JavaScript 側は次のようになります。
 
@@ -219,7 +220,7 @@ fetch('array.wasm').then(response => response.arrayBuffer())
     });
 ```
 
-ヒープメモリは `exports.memory` という名前でエクスポートされています。この実態は、JavaScript 上では TypedArray (ArrayBuffer) で実装されております。`get_address` でヒープメモリ上のアドレス（TypedArray のオフセット）を取得し、それを新たに `Uint8Array` の形にして 5 サイズ分取得します。これで晴れて、Rust 上の配列 `[1, 2, 3, 4, 5]` を JavaScript 側で受け取ることが出来るようになりました。
+メモリは Rust により `exports.memory` にエクスポートされています。JavaScript 上での実態は TypedArray (ArrayBuffer) で実装されております。`get_address` でメモリ上のアドレス（TypedArray のオフセット）を取得し、それを `Uint8Array` の形で 5 サイズ分取得します。これで晴れて、Rust 上の配列 `[1, 2, 3, 4, 5]` を JavaScript 側で受け取ることが出来るようになりました。
 
 文字列も全く同じような形になります。Stack Overflow に[良い質問](https://stackoverflow.com/questions/47529643/how-to-return-a-string-or-similar-from-rust-in-webassembly)があるので参照してみてください。コードだけ書くと次のような形です。
 
