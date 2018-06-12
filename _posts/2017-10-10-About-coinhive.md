@@ -11,6 +11,8 @@ categories:
 
 個人的にCoinhiveのようなサービスは<span style="color:blue">適切に使われる限り</span>仮想通貨のキラーサービスになりうると期待しています。ここでCoinhiveがどのようなサービスなのか、技術とビジネス両方から注目してみようと思います。
 
+<span style="color:red;font-size:large;font-weight:bold">2018-06-12追記: Coinhive をユーザーの許諾なしに利用していたサイトの管理者の方が神奈川県警に家宅捜索を受けたそうです。</span>詳細は[経緯の説明サイト](https://doocts.com/3403)を御覧ください。
+
 
 
 ----
