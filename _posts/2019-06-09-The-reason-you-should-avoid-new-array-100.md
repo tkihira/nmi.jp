@@ -119,7 +119,11 @@ Packed Array から Holey Array に変わるタイミングは、`delete`で要�
 
 [https://jsperf.com/smi-vs-double-vs-none](https://jsperf.com/smi-vs-double-vs-none)
 
-上の jsperf で確認すると、なぜか SMI > (none) > Double の順のスピードになっていますが、これはおそらく Double の配列は最適化時に強制的に浮動小数点扱いされてしまっている可能性が高いですね。(none) は毎回型チェックしているのでしょう。
+上の jsperf で確認すると、なぜか SMI > (none) > Double の順のスピードになっていますが、これはおそらく Double の配列は最適化で計算時に強制的に浮動小数点扱いしてしまっている可能性が高いですね。その結果無駄に浮動小数点の足し算をしているのでしょう。一方、(none) は毎回型チェックし整数型に変換しているので逆に速度が出たと推測出来ます。V8 の最適化ミスですね。
+
+[https://jsperf.com/double-vs-none](https://jsperf.com/double-vs-none)
+
+このように、浮動小数点のみのテストを見てみると、Double > (none) の順に速度が出ていることが確認出来ます。
 
 そして Packed と Holey の関係と同じように、SMI から一度 Double や (none) に状態が変わったり、Double から (none) に状態が変わると、二度と再度 SMI や Double の状態に戻ることがありません。<span style="color:red">整数配列や数字配列に余計なものを一度代入するだけで、その後の最適化がすべて失われてしまいます<span>。気をつけましょう。
 
