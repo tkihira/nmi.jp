@@ -52,7 +52,7 @@ for(let i = 0; i < array.length; i++) {
 }
 ```
 
-これで無事全ての要素が埋まりましたので、詰まった配列（Packed Array）になりました…と思いきや、実は、内部ではこれは穴あき配列（Holey Array）なのです！v8 のデバッグツール d8 で `--allow-natives-syntax` を追加することで、実際に確認することが出来ます。
+これで無事全ての要素が埋まりましたので、詰まった配列（Packed Array）になりました…と思いきや、実は、内部ではこれは穴あき配列（Holey Array）なのです！V8 のデバッグツール d8 のデバッグビルドで `--allow-natives-syntax` を追加することで、実際に確認することが出来ます。
 
 ```
 $ ~/v8/v8/out/x64.debug/d8 --allow-natives-syntax
