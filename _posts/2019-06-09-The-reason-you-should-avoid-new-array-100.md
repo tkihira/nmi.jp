@@ -19,7 +19,7 @@ categories:
 
 ## 「詰まった配列(Packed Array)」と「穴あき配列(Holey Array)」
 
-v8 は内部的に、その配列がどういうタイプの配列であるかの状態を記録しており、それを利用して最適化を適用しています。[内部的には21個ある](https://cs.chromium.org/chromium/src/v8/src/elements-kind.h?l=14&rcl=ec37390b2ba2b4051f46f153a8cc179ed4656f5d)のですが、その中で「詰まっている」か「穴があいている」かの状態が、速度に影響を与えます。
+v8 は内部的に、その配列がどういうタイプの配列であるかの状態を記録しており、その情報を利用して最適化を適用します。状態は[内部的には21個ある](https://cs.chromium.org/chromium/src/v8/src/elements-kind.h?l=14&rcl=ec37390b2ba2b4051f46f153a8cc179ed4656f5d)のですが、今回話題にするのは、その中でも「詰まっている」か「穴があいている」かの状態についてです。
 
 「詰まった配列」とは、以下のように間に空白のない配列です。V8 では `Packed Array` と呼んでいます。
 
