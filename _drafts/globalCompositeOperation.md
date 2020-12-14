@@ -62,38 +62,49 @@ W3C の [Compositeing and Blending Level 1](https://www.w3.org/TR/compositing-1/
 - 描画の割合を示す定数 `Fa` と `Fb`
 
 これらのうち、`Cs`, `αs`, `Cb`, `αb` は描画時の Canvas に描かれているデータが入力となり、`Fa` `Fb` はオペレーションによって定義されます。アウトプットの `co` `αo` については、
+
 ```
 co = αs * Fa * Cs + αb * Fb * Cb
 αo = αs * Fa + αb * Fb
 ```
+
 で決まります。要するに、 `Fa` `Fb` が各オペレーションの実際の処理を内包します。
 
 デフォルトの [Source Over](https://www.w3.org/TR/compositing-1/#porterduffcompositingoperators_srcover) を見てみましょう。
+
 ```
 Fa = 1; Fb = 1 – αs
 ```
+
 これを上記の式に代入して、
+
 ```
 co = αs * Cs + αb * Cb * (1 – αs)
 αo = αs + αb * (1 – αs)
 ```
+
 が得られます。これが、実際に `globalCompositeOperation` で実現されている効果として表れてくるのです。
 
 # globalCompositeOperation を使った色の足し算
 
 やっと本題に入りますが、（とりあえず α を無視して）`globalCompositeOperation` で色の足し算をしたい場合、
+
 ```
 co = Cs + Cb
 ```
+
 にて得ることが出来ます。なんと標準の仕様では、これが [Lighter](https://www.w3.org/TR/compositing-1/#porterduffcompositingoperators_plus) として定義されています。
+
 ```
 Fa = 1; Fb = 1
 co = αs * Cs + αb * Cb;
 αo = αs + αb
 ```
+
 これで αs と αb が共に 1 であれば、`globalCompositeOperation` を使って色の足し算が出来るのです！
 
 例えばとあるシェイプ（もしくはムービークリップ）をある canvas に書いているとして、そのキャンバスに `addColor(10,50,100)` という命令を出したい場合、
+
 ```javascript
 const canvas = getShapeOrMovieClipCanvas(id);
 const ctx = canvas.getContext('2d');
@@ -102,6 +113,7 @@ ctx.fillStyle = 'rgb(10,50,100)';
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 ctx.globalCompositeOperation = 'source-over';
 ```
+
 という形で実現することが出来るのです。
 
 色の引き算は `difference` を利用して実現するのですが、少し複雑になるのでここでは説明を省略します。[Pex.js の実際のソースコードを](https://github.com/PexJS/PexJS/blob/master/src/renderer/util_render.js#L313-L370) リポジトリから見ることが出来るので、興味のある方はご参照ください。
@@ -135,11 +147,13 @@ ctx.fillRect(0, 0, canvas.width, canvas.height);
 ```
 
 [Destination In の仕様](https://www.w3.org/TR/compositing-1/#porterduffcompositingoperators_dstin) を確認すると、
+
 ```
 Fa = 0; Fb = αs
 co = αb * Cb * αs 
 αo = αb * αs
 ```
+
 となっております。全体を `rgb(255, 255, 255, 0.9)` で描画することにより、全体を一律薄くすることが可能になります。これにより、かなり重い `drawImage` に頼ること無く blur 効果を得ることが出来るようになっています。これを WebGL で実現しようとすると WebGL 専用の Canvas が必要になってしまうため、HTML5 ではこのやり方にまさる方法はないでしょう。
 
 Canvas の API では α 値だけを書き換えることが（`getImageData` 等を使わない限り）出来ないのですが、`globalCompositeOperation` を使うことでその制限を取り払い、α 値の一括処理が可能になります。使い所は限られますが、Canvas を多用する方にとってはとても有用なテクニックだと思います。
