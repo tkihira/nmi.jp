@@ -7,13 +7,13 @@ categories:
 - JavaScript
 ---
 
-この記事は [Flash Advent Calendar 2020](https://qiita.com/advent-calendar/2020/flash) に参加しております。
+この記事は、JavaScript で Flash Player の実現を頑張った（もしくは現在進行系で頑張っている）人たちの集う [Flash Advent Calendar 2020](https://qiita.com/advent-calendar/2020/flash) に参加しております。
 
 HTML5 の Canvas はかなりの機能を有しております。Flash Player の実装にあたってこれらの豊富な Canvas の機能は大変有用なのですが、そんな中でも `globalCompositeOperation` というマイナー機能の活用方法は、今の時代でも十分に応用が効く知識です。Flash 終了への手向けとして、ここにその機能の素晴らしさと有効利用の方法を改めて紹介致します。
 
 
 
-# globalCompositeOperation とは
+# HTML5 (canvas) の globalCompositeOperation とは
 
 一言で言うと、`globalCompositeOperation` は `Composite` すなわち合成方法の指定になります。
 
@@ -131,7 +131,7 @@ ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 - 現在の Canvas の内容を保存する
 - 現在の Canvas をクリアする
-- Canvas に先程保存した内容を `globalAlpha = 0.9` くらいで描画する
+- 先程保存した内容を Canvas に `globalAlpha = 0.9` くらいで描画する
 - 残りのレンダリング処理をする
 
 という処理を入れるだけです。
