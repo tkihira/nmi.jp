@@ -128,11 +128,7 @@ function vm(bytecode) {
                 programCounter += 3; break;
             case 0xa2: // if_icmpge
                 if(stack.pop() <= stack.pop()) {
-                    if(bytecode[programCounter + 1] & 0x80) {
-                        programCounter += (0xffff0000 | bytecode[programCounter + 1] << 8 | bytecode[programCounter + 2]) >> 0;
-                    } else {
-                        programCounter += bytecode[programCounter + 1] << 8 | bytecode[programCounter + 2];
-                    }
+                    programCounter += (bytecode[programCounter + 1] << 8 | bytecode[programCounter + 2]) << 16 >> 16;
                     break;
                 }
                 programCounter += 3; break;
@@ -142,11 +138,7 @@ function vm(bytecode) {
                 variableTable[bytecode[programCounter + 1]] += bytecode[programCounter + 2];
                 programCounter += 3; break;
             case 0xa7: // goto
-                if(bytecode[programCounter + 1] & 0x80) {
-                    programCounter += (0xffff0000 | bytecode[programCounter + 1] << 8 | bytecode[programCounter + 2]) >> 0; break;
-                } else {
-                    programCounter += bytecode[programCounter + 1] << 8 | bytecode[programCounter + 2];
-                }
+                programCounter += (bytecode[programCounter + 1] << 8 | bytecode[programCounter + 2]) << 16 >> 16;
                 break;
             case 0xac: // ireturn
                 return stack.pop();
@@ -160,7 +152,7 @@ console.log(vm(bytecode));
 
 - programCounter は、今動かしているバイトコードのオフセットを記録しています
 - 通常は programCounter は 1 つだけ動きますが、オペランドのあるオペコード（`sipush`, `if_icmpge`, `iinc`）の場合はオペコード分も移動します
-- `if_icmpge` で条件を満たした場合と `goto` ではジャンプします。一番上のビットが立っている場合はマイナス方向へのジャンプなので、32bit 化して対応しています（`>> 0` によって JavaScript の浮動小数点を int32 に変換出来ます）
+- `if_icmpge` で条件を満たした場合と `goto` ではジャンプします。一番上のビットが立っている場合はマイナス方向へのジャンプになり、`<<16 >>16` によって 16bit から 32bit に符号拡張しています。
 
 これを実行すると、以下のように 0〜9999 を加算する Java のプログラムが実行されているのが確認出来ますね！
 
@@ -195,8 +187,8 @@ console.log(`Native: ${Date.now() - startTime}ms`);
 純粋なパフォーマンスを計るためにはかなり不適当なコードですが、とりあえず目をつぶってこれを実行すると、出力は以下の通りでした
 
 ```
-VM: 4877ms
-Native: 78ms
+VM: 4308ms
+Native: 77ms
 ```
 
 VM の方が 60 倍くらい遅いです。関数呼び出しのコストも計測しているので、実際はもっともっと遅いと思います（そもそも native 関数のループが定数に置換されてそうですし）。まあ「ものすごく遅い」ということが確認出来たので良いでしょう。
@@ -268,7 +260,7 @@ console.log(funcStr);
 console.log("Result: " + new Function(funcStr)())
 ```
 
-この `makeFunctionStringFromBytecode` を実行すると、bytecode から直接 JavaScript の関数を生成してくれます。あとはこれを `new Function` で関数化して実行すれば、switch 文のループを必要としない高速な動作が期待できる関数を得ることが出来ます。このコードの出力は次の通りです。
+この `makeFunctionStringFromBytecode` を実行すると、bytecode から直接 JavaScript の関数を生成してくれます。あとはこれを `new Function` で関数化して実行すれば、switch 文のループを必要としない高速な動作が期待できる関数を得ることが出来ます。簡単に言うと、<span style='color:red'>JavaScript の中で JavaScript を動的に生成し、それを実行する</span>ということです。このコードの出力は次の通りです。
 
 ```javascript
 const variableTable = [null, 0, 0];
@@ -284,7 +276,7 @@ return stack.pop();
 Result: 6
 ```
 
-switch 文で実行していた時よりも、圧倒的に速そうですね！
+上の部分が動的に生成された JavaScript で、下の Result がそれを実行した結果となります。switch 文で実行していた時よりも、圧倒的に速そうですね！
 
 # Jump 命令
 
@@ -330,14 +322,8 @@ while(true) {
                 programCounter += 3; break;
             case 0xa2: // if_icmpge
                 {
-                    let gotoAddress;
-                    if(bytecode[programCounter + 1] & 0x80) {
-                        gotoAddress = programCounter + ((0xffff0000 | bytecode[programCounter + 1] << 8 | bytecode[programCounter + 2]) >> 0);
-                    } else {
-                        gotoAddress = programCounter + (bytecode[programCounter + 1] << 8 | bytecode[programCounter + 2]);
-                    }
                     funcStr += `    if(stack.pop() <= stack.pop()) {\n`;
-                    funcStr += `      gotoLable = 'label${gotoAddress}';\n`;
+                    funcStr += `      gotoLable = 'label${programCounter + ((bytecode[programCounter + 1] << 8 | bytecode[programCounter + 2]) << 16 >> 16)}';\n`;
                     funcStr += `      break;\n`;
                     funcStr += `    }\n`;
                     programCounter += 3; break;
@@ -349,13 +335,7 @@ while(true) {
                 programCounter += 3; break;
             case 0xa7: // goto
                 {
-                    let gotoAddress;
-                    if(bytecode[programCounter + 1] & 0x80) {
-                        gotoAddress = programCounter + ((0xffff0000 | bytecode[programCounter + 1] << 8 | bytecode[programCounter + 2]) >> 0);
-                    } else {
-                        gotoAddress = programCounter + (bytecode[programCounter + 1] << 8 | bytecode[programCounter + 2]);
-                    }
-                    funcStr += `    gotoLable = 'label${gotoAddress}';\n`;
+                    funcStr += `    gotoLable = 'label${programCounter + ((bytecode[programCounter + 1] << 8 | bytecode[programCounter + 2]) << 16 >> 16)}';\n`;
                     funcStr += `    break;\n`;
                     programCounter += 3; break;
                 }
@@ -425,7 +405,7 @@ Result: 49995000
 
 # パフォーマンス
 
-前回の結果は 1 万回の実行に 4877ms かかっていましたが、さーて、どれくらい速くなっているでしょうか。検証用のコードを書いてみましょう。
+前回の結果は 1 万回の実行に 4308ms かかっていましたが、さーて、どれくらい速くなっているでしょうか。検証用のコードを書いてみましょう。
 
 ```javascript
 const funcStr = makeFunctionStringFromBytecode(bytecode)
@@ -440,10 +420,10 @@ console.log(`New VM: ${Date.now() - startTime}`);
 実行結果はこちら
 
 ```
-New VM: 2041
+New VM: 1970
 ```
 
-<span style='color:red'>なんと 2.4 倍もの速度を達成しました！</span>なお実運用においては、実際の ActionScript はもっと複雑なものが多いので、大体 5 倍くらいの速度を実現出来ていました。素晴らしいですね！
+<span style='color:red'>なんと 2.2 倍もの速度を達成しました！</span>なお実運用においては、実際の ActionScript はもっと複雑なものが多いので、大体 5 倍くらいの速度を実現出来ていました。素晴らしいですね！
 
 # なお、今なら…
 
