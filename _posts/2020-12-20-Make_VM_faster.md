@@ -15,7 +15,7 @@ categories:
 
 # VM (Virtual Machine) とは
 
-VM (Virtual Machine) という単語は様々なコンテキストで使われます。特にインフラ周りでは仮想化技術の文脈で使われ、そちらの利用例が一般的だと思いますが、プログラミング言語の文脈で VM という場合は「言語の出力を実行可能な仮想的な機械」を指すことが多いです。たとえば Java VM は、Java をコンパイルしたバイトコードを実行出来ますし、ActionScript の VM は同じ様にコンパイルされた ActionScript を実行します。
+VM (Virtual Machine) という単語は様々なコンテキストで使われます。特にインフラ周りでは仮想化技術の文脈で使われ、そちらの利用例が一般的だと思いますが、プログラミング言語の文脈で VM という場合は「言語の出力を実行可能な仮想的な機械」を指すことが多いです。たとえば Java VM は、Java をコンパイルしたバイトコードを実行出来ますし、ActionScript の VM は同じ様にコンパイルされた ActionScript を実行します。これらの VM はスタックマシンを採用していることが多いです。
 
 言語の VM（たとえば Java VM）自体をそれぞれの CPU プラットフォーム（例えば Intel であったり ARM であったり）で実装することで、プラットフォーム間の互換性を高い水準で維持することが出来るようになるのが特徴です。一方で、最初から特定の CPU プラットフォームをターゲットにしたコンパイラに比べると、実行速度の面で不利があることが多いです。
 
@@ -94,7 +94,7 @@ $ javap -c Test.class
 
 これらのインストラクションはバイトコードと 1 対 1 に対応しております。例えば `iconst_0` は `0x03`、`istore_1` は `0x3c`、`sipush 10000` はオペコードが `0x11`、オペランドが `0x27 0x10` (0x2710 == 10000) になります。
 
-VM は、これを逐次実行していくことで、最終的に Java のプログラムが実行出来るようになるわけです。
+VM によってこれを逐次実行していくことで、最終的に Java のプログラムが実行出来るようになるわけです。
 
 # VM を作ってみよう
 
@@ -148,7 +148,7 @@ function vm(bytecode) {
 console.log(vm(bytecode));
 ```
 
-簡単ですね！Wikipedia の [Java bytecode instruction listings](https://en.wikipedia.org/wiki/Java_bytecode_instruction_listings) を見ながら作りました。
+bytecode を入力すると、その実行結果を返す VM が完成しました。簡単ですね！Wikipedia の [Java bytecode instruction listings](https://en.wikipedia.org/wiki/Java_bytecode_instruction_listings) を見ながら作りました。
 
 - programCounter は、今動かしているバイトコードのオフセットを記録しています
 - 通常は programCounter は 1 つだけ動きますが、オペランドのあるオペコード（`sipush`, `if_icmpge`, `iinc`）の場合はオペコード分も移動します
@@ -223,7 +223,7 @@ bytecode: 03 3c 84 01 01 84 01 02 84 01 03 1b ac
       12: ireturn
 ```
 
-今は switch 文でループしながら各インストラクションを評価しているのですが、<span style="color:red">bytecode から JavaScript の関数を直接作ってしまうことが出来そう</span>ではないでしょうか？これが VM の高速化の基本的なアイデアとなります。具体的には次のようなコードです。
+先程の VM 実装は switch 文でループしながら各インストラクションを評価しているのですが、<span style="color:red">bytecode から JavaScript の関数を直接作ってしまうことが出来そう</span>ではないでしょうか？これが JavaScript による VM の高速化の基本的なアイデアとなります。具体的には次のようなコードです。
 
 ```javascript
 const bytecode = 
@@ -257,10 +257,10 @@ const stack = [];
 
 const funcStr = makeFunctionStringFromBytecode(bytecode);
 console.log(funcStr);
-console.log("Result: " + new Function(funcStr)())
+console.log("// Result: " + new Function(funcStr)())
 ```
 
-この `makeFunctionStringFromBytecode` を実行すると、bytecode から直接 JavaScript の関数を生成してくれます。あとはこれを `new Function` で関数化して実行すれば、switch 文のループを必要としない高速な動作が期待できる関数を得ることが出来ます。簡単に言うと、<span style='color:red'>JavaScript の中で JavaScript を動的に生成し、それを実行する</span>ということです。このコードの出力は次の通りです。
+説明のため、`test2` で使用されているニーモニックに限定した実装になっております。この `makeFunctionStringFromBytecode` を実行すると、bytecode から直接 JavaScript のプログラム文字列を生成してくれます。あとはこれを `new Function` で関数化して実行すれば、switch 文のループを必要としない実行関数を得ることが出来ます。簡単に言うと、<span style='color:red'>JavaScript の中で JavaScript を動的に生成し、それを実行する</span>ということです。このコードの出力は次の通りです。
 
 ```javascript
 const variableTable = [null, 0, 0];
@@ -273,10 +273,10 @@ variableTable[1] += 3;
 stack.push(variableTable[1]);
 return stack.pop();
 
-Result: 6
+// Result: 6
 ```
 
-上の部分が動的に生成された JavaScript で、下の Result がそれを実行した結果となります。switch 文で実行していた時よりも、圧倒的に速そうですね！
+上の部分が動的に生成された JavaScript の文字列で、下の Result がそれを `new Function` で関数化し実行した結果となります。見ただけで、switch 文の実装よりも圧倒的に速そうに見えますね！
 
 # Jump 命令
 
@@ -349,10 +349,17 @@ while(true) {
 
 const funcStr = makeFunctionStringFromBytecode(bytecode)
 console.log(funcStr);
-console.log("Result: " + new Function(funcStr)())
+console.log("// Result: " + new Function(funcStr)())
 ```
 
-`if_icmpge` と `goto` において、`gotoLabel` に適切な分岐先を代入した上で break しているのがご確認いただけると思います。これによって分岐命令が来たタイミングで一旦 switch 文の外にでて、再び `while(true)` によって switch 文により適切な場所から実行が開始される仕組みです。
+この実装の大まかなアイデアは次の通りです。
+
+- `while(true)` と `switch(gotoLable)` で全体をくくる
+- 全てのインストラクションの変換時の直前に `case 'labelXXX':` というラベル（XXX はprogramCounter）を生成し、これらのラベルをジャンプ対象にする
+- ジャンプが必要ない場合は break をつけず、次の命令を実行させる
+- ジャンプ命令の場合は飛び先のラベルを `gotoLable` に代入した上で break する
+
+`if_icmpge` と `goto` において、`gotoLabel` に適切な分岐先を代入した上で break しているのがご確認いただけると思います。これによって分岐命令が来たタイミングで一旦 switch 文の外にでて、再び `while(true)` によって switch 文により適切なラベルの場所から実行が開始される仕組みです。
 
 このコードの実行結果は以下の通りです。
 
@@ -398,7 +405,7 @@ while(true) {
     return stack.pop();
   }
 }
-Result: 49995000
+// Result: 49995000
 ```
 
 このように、実行時にバイトコードから JavaScript の関数を直接出力する、いわば JIT のような機能を持たせることによって、大幅な高速化が可能になります
@@ -414,16 +421,16 @@ const func = new Function(funcStr);
 const count = 10000;
 var startTime = Date.now();
 for(var i = 0; i < count; i++) func();
-console.log(`New VM: ${Date.now() - startTime}`);
+console.log(`New VM: ${Date.now() - startTime}ms`);
 ```
 
 実行結果はこちら
 
 ```
-New VM: 1970
+New VM: 1970ms
 ```
 
-<span style='color:red'>なんと 2.2 倍もの速度を達成しました！</span>なお実運用においては、実際の ActionScript はもっと複雑なものが多いので、大体 5 倍くらいの速度を実現出来ていました。素晴らしいですね！
+<span style='color:red'>なんと 2.2 倍もの速度を達成しました！</span>なお実運用においては、実際の ActionScript はもっと複雑なものが多いので、さらなる高速化を実現出来ていました。素晴らしいですね！
 
 # なお、今なら…
 
