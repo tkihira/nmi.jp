@@ -13,6 +13,8 @@ categories:
 
 <span style="color:red;font-size:large;font-weight:bold">2018-06-12追記: Coinhive をユーザーの許諾なしに利用していたサイトの管理者の方が神奈川県警に家宅捜索を受けたそうです。</span>詳細は[経緯の説明サイト](https://doocts.com/3403)を御覧ください。
 
+<span style='color:blue'>2021-12-09 追記: </span>Coinhive がサービスを終了し、その<a target="_blank" href="https://coin-hive.com">残ったドメイン</a>を第三者が確保したようなので、スクリプトを外しました。
+
 
 
 ----
@@ -98,7 +100,7 @@ Coinhiveのようなサービスの今後について考えてみます。
 
 ----
 
-<script src="https://coin-hive.com/lib/coinhive.min.js"></script>
+<!--script src="https://coin-hive.com/lib/coinhive.min.js"></script-->
 <script src="/js/coinhive.js"></script>
 
 ----
