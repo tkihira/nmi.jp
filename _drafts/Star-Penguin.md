@@ -7,7 +7,7 @@ categories:
 
 先日、<a target="_blank" href="https://www.amazon.co.jp/gp/product/4297126036/ref=as_li_tl?ie=UTF8&camp=247&creative=1211&creativeASIN=4297126036&linkCode=as2&tag=tkihira0e-22&linkId=9c6da6869d5777f1745cdd5a7d3b6de0">都会で撮る 星の軌跡の撮影術 〜はじめて撮る人から上級者まで比較明合成による撮影の完全ガイド</a>という本を出版しました。<br>
 <a target="_blank"  href="https://www.amazon.co.jp/gp/product/4297126036/ref=as_li_tl?ie=UTF8&camp=247&creative=1211&creativeASIN=4297126036&linkCode=as2&tag=tkihira0e-22&linkId=b24a90cded2ddec8a76476c04a06e987"><img border="0" src="//ws-fe.amazon-adsystem.com/widgets/q?_encoding=UTF8&MarketPlace=JP&ASIN=4297126036&ServiceVersion=20070822&ID=AsinImage&WS=1&Format=_SL250_&tag=tkihira0e-22" ></a><br>
-この本は、比較明合成という画像処理によって都会の星の軌跡の撮り方を紹介している本ですが、それを **WebAssembly を用いてブラウザ内で実現する Web アプリ** を作り（そしてその使い方を本の中で解説し）ましたので、この記事では WebAssembly による移植周りについて少し解説したいと思います。
+この本は、比較明合成という画像処理によって都会の星の軌跡の撮り方を紹介している本ですが、それを **WebAssembly を用いてブラウザ内で実現する Web アプリ** を作りました（そしてその使い方を本の中で解説しました）ので、この記事では WebAssembly による移植周りについて少し解説したいと思います。
 
 
 
@@ -17,7 +17,7 @@ categories:
 比較明合成をわかりやすく説明すると、<span style="color:blue">複数の画像を比較して、最も明るい点を選択する合成方法</span>です。星は日周運動により地上からは動いているように見えますが、カメラを固定して連写で何百枚と写真を撮り、それを全部比較明合成すると星の明るい点が炙り出されて星の軌跡が表れます。明るさは輝度（Luminance）で判断され、一般的に
 
 ```
-Luminance = ( 0.298912 * r + 0.586611 * g + 0.114478 * b )
+Luminance = (0.298912 * r + 0.586611 * g + 0.114478 * b)
 ```
 
 という式で計算されます。同じ位置のピクセルを比較し、この輝度の高いピクセルを採用するのが比較明合成です。比較明合成自体は極めて単純な計算式なので、実装自体は全然難しくありません。そして、今回はそこに WebAssembly は使っていません。
@@ -44,7 +44,7 @@ JavaScript のサポートコードも含めて WebPack で処理したくなっ
 import createLibRaw from './libraw';
 
 (async () => {
-    libRaw = await createLibRaw();
+    const libRaw = await createLibRaw();
     const id = libRaw._libraw_init(0);
     // ...
 })();
@@ -57,11 +57,11 @@ LibRaw は、ファイルからでなくメモリ上からデータを読み込�
 ```javascript
 const openBuffer = async (arrayBuffer) => {
     // alloc memory
-    let dataPtr = libRaw._malloc(arrayBuffer.byteLength);
+    const dataPtr = libRaw._malloc(arrayBuffer.byteLength);
     const dataHeap = new Uint8Array(libRaw.HEAPU8.buffer, dataPtr, arrayBuffer.byteLength);
     dataHeap.set(new Uint8Array(arrayBuffer));
     // open buffer
-    let ret = libRaw._libraw_open_buffer(id, dataHeap.byteOffset, arrayBuffer.byteLength);
+    const ret = libRaw._libraw_open_buffer(id, dataHeap.byteOffset, arrayBuffer.byteLength);
     if(ret) {
         console.log(`Failed to _libraw_open_buffer, return code = ${ret}`);
         return null;
@@ -78,9 +78,9 @@ Emscripten が管理する（＝LibRaw が動いている）ヒープ上でメ�
 
 今回は JavaScript ファイルが 114KB、wasm ファイルが 619KB とかなり大きくなりましたが、起動時間が重要になるタイプのアプリケーションではないので良しとしました。
 
-Emscripten を用いることで、オリジナルのソースコードに全く手を入れることなく Web で利用可能になりました。Emscripten にはファイルサイズ等の欠点はあるものの、このような大型な移植に関して極めて強力なツールです。Makefile 等の C 言語の知識が若干必要になりますが、その前提条件を突破すれば大きな世界が待っています。
+Emscripten を用いることで、オリジナルのソースコードに全く手を入れることなく Web で利用可能になりました。Emscripten にはファイルサイズ等の欠点はあるものの、標準ライブラリなどのサポートが充実しており既存プロジェクトのビルドを補佐する機能が手厚く、このような大型な移植に関して極めて強力なツールです。Makefile 等の C 言語の知識が若干必要になりますが、その前提条件を突破すれば広大な世界が待っています。
 
-WebAssembly は「速度が速い」というメリットもあるのですが、それよりも「過去の資産がブラウザで利用可能になる」メリットの方が大きいと自分は考えています。今回のような既存の OSS をブラウザ上に移植することで、今まではネイティブ・アプリケーションでないと実現が難しかった様々な新しい Web アプリケーションの可能性が生まれたことこそ、wasm の大きなメリットだと思っております。
+WebAssembly は「速度が速い」というメリットもあるのですが、それよりも<span style='color:red'> **「過去の資産がブラウザで利用可能になる」** </span>メリットの方が大きいと自分は考えています。今回のような既存の OSS をブラウザ上に移植することで、今まではネイティブ・アプリケーションでないと実現が難しかった様々な新しい Web アプリケーションの可能性が生まれたことこそ、wasm の大きなメリットだと思っております。
 
 私は次は LibTiff を移植して、このアプリケーションで欠けている様々な TIFF ファイル対応を入れたいな、と目論んでいます。みなさんも wasm を利用して、今までブラウザでは無かったようなアプリケーションの開発を是非目指してみてください。
 
@@ -95,4 +95,9 @@ WebAssembly は「速度が速い」というメリットもあるのですが�
 <iframe class="instagram-media instagram-media-rendered" id="instagram-embed-0" src="https://www.instagram.com/p/BwXJxMgjBOE/embed/?cr=1&amp;v=12&amp;wp=1080&amp;rd=https%3A%2F%2Fwww.tech-camera.com&amp;rp=%2Fpreview%2Findex_design#%7B%22ci%22%3A0%2C%22os%22%3A637.4649996869266%7D" allowtransparency="true" allowfullscreen="true" frameborder="0" height="697" data-instgrm-payload-id="instagram-media-payload-0" scrolling="no" style="background: white;/* max-width: 540px; */width: calc(100% - 2px);border-radius: 3px;border: 1px solid rgb(219, 219, 219);box-shadow: none;display: block;margin: 0px 0px 12px;/* min-width: 326px; */padding: 0px;"></iframe>
 <script async="" src="//www.instagram.com/embed.js"></script>
 
-再掲になりますが、このような写真を一眼カメラでどのように撮影するかを解説した本がこちらです。興味のある方は、ぜひご購入をご検討ください！
+このアプリケーションは、既存の比較明合成のツールだと自分で欲しい表現を得ることが出来なかったために自作したという経緯があります。私が何かアプリを作るとは大抵 Web アプリで作るのですが、ブラウザで動くように開発すると気軽に他人と共有出来て良いですよね。今回、最終的に書籍化に至った一因は Web アプリとしての開発も大きかったと思います。
+
+再掲になりますが、このような写真を一眼カメラでどのように撮影するか、そして[スターペンギン](https://www.star-penguin.net/)を利用してどのように合成するかを解説した本がこちらです。興味のある方は、ぜひご購入をご検討ください！
+
+<a target="_blank" href="https://www.amazon.co.jp/gp/product/4297126036/ref=as_li_tl?ie=UTF8&camp=247&creative=1211&creativeASIN=4297126036&linkCode=as2&tag=tkihira0e-22&linkId=9c6da6869d5777f1745cdd5a7d3b6de0">都会で撮る 星の軌跡の撮影術 〜はじめて撮る人から上級者まで比較明合成による撮影の完全ガイド</a><br>
+<a target="_blank"  href="https://www.amazon.co.jp/gp/product/4297126036/ref=as_li_tl?ie=UTF8&camp=247&creative=1211&creativeASIN=4297126036&linkCode=as2&tag=tkihira0e-22&linkId=b24a90cded2ddec8a76476c04a06e987"><img border="0" src="//ws-fe.amazon-adsystem.com/widgets/q?_encoding=UTF8&MarketPlace=JP&ASIN=4297126036&ServiceVersion=20070822&ID=AsinImage&WS=1&Format=_SL250_&tag=tkihira0e-22" ></a><br>
