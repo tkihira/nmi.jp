@@ -40,14 +40,17 @@ BF とは、8 つの記号のみで構成されるプログラミング言語で
 const start = function() {
     document.getElementById('startbutton').disabled = true;
     document.getElementById('startbutton').value = '実行中';
+    document.getElementById('bf_output').value = '';
     window.worker = new Worker('/js/wasm-jit-multi-functions.js');
+    const startTime = Date.now();
     worker.postMessage(bfCode);
     worker.onmessage = function (e) {
         if (e.data) {
-            const c = String.fromCharCode(e.data);
-            document.getElementById('bf_output').value += c;
+            document.getElementById('bf_output').value += String.fromCharCode(e.data);
         } else {
-            document.getElementById('startbutton').value = '終了';
+            document.getElementById('bf_output').value += `time: ${(Date.now() - startTime) / 1000} sec.`;
+            document.getElementById('startbutton').value = '再実行';
+            document.getElementById('startbutton').disabled = false;
             worker.terminate();
         }
     };
