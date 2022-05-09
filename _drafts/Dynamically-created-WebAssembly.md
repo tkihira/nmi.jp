@@ -34,6 +34,26 @@ BF とは、8 つの記号のみで構成されるプログラミング言語で
 
 今回実行するのは、[マンデルブロ集合を描画する BF のプログラム](https://github.com/erikdubbelboer/brainfuck-jit/blob/master/mandelbrot.bf)です。マンデルブロ集合と呼ばれるフラクタル図形の描画しますが、良い感じに重いためにベンチマーク用に採用しました。
 
+<input id='startbutton' type="button" value="実行" onclick="start()"> 実行ボタンを押すと、以下にマンデルブロ集合の出力結果が得られます<br>
+<script src='/js/bfCode.js'></script>
+<script>
+const start = function() {
+    document.getElementById('startbutton').disabled = true;
+    document.getElementById('startbutton').value = '実行中';
+    window.worker = new Worker('/js/wasm-jit-multi-functions.js');
+    worker.postMessage(bfCode);
+    worker.onmessage = function (e) {
+        if (e.data) {
+            document.getElementById('bf_output').value += String.fromCharCode(e.data);
+        } else {
+            document.getElementById('startbutton').value = '終了';
+            worker.terminate();
+        }
+    };
+};
+</script>
+<textarea id="bf_output" rows='50' cols='130' style="font-size:8px"></textarea>
+
 この記事の目的は、この<span style='color:#f00'>マンデルブロ集合の描画を行う BF のプログラムを、様々な JavaScript や WebAssembly のコードで実行し、そのベンチマークを取ること</span>です。BF の高速な実行が目的ではないのでご了承ください。
 
 # 実装の紹介
@@ -58,18 +78,18 @@ BF とは、8 つの記号のみで構成されるプログラミング言語で
 
 それぞれのコードは、[ここで実際に皆さんのブラウザで試していただくことが出来ます](https://dynamic-wasm.vercel.app/)。私の環境で実行した結果はこのようになりました。なお実行はすべて Worker で行われており、また一度実行が終わった後にページリロードして再度実行した時の結果を表示しております。あまり正確な計測ではなく、正しく最適化されていない可能性があるであろうことをご容赦ください。
 
-|   プログラム   |   Chrome   | Mobile Chrome |  Firefox   |   Safari   | Mobile Safari |
-|--------------|------------|---------------|------------|------------|---------------|
-|js-simple     |172.057 sec.|367.725 sec.   |147.361 sec.|117.136 sec.|89.155 sec.    |
-|js-jit        |40.963 sec. |283.213 sec.   |47.105 sec. |4.698 sec.  |4.441 sec.     |
-|js-jit-multi  |9.988 sec.  |17.982 sec.    |17.002 sec. |6.79 sec.   |7.134 sec.     |
-|wasm-simple   |61.784 sec. |300.845 sec.   |79.478 sec. |44.982 sec. |50.959 sec.    |
-|wasm-jit      |4.474 sec.  |10.04 sec.     |2.489 sec.  |75.996 sec. |61.432 sec.    |
-|wasm-jit-multi|3.286 sec.  |9.427 sec.     |3.93 sec.   |2.725 sec.  |2.126 sec.     |
+|         プログラム          |   Chrome   | Mobile Chrome |  Firefox   |   Safari   | Mobile Safari |
+|---------------------------|------------|---------------|------------|------------|---------------|
+|1. js-simple               |172.057 sec.|367.725 sec.   |147.361 sec.|117.136 sec.|89.155 sec.    |
+|2. js-jit                  |40.963 sec. |283.213 sec.   |47.105 sec. |4.698 sec.  |4.441 sec.     |
+|3. js-jit-multi-functions  |9.988 sec.  |17.982 sec.    |17.002 sec. |6.79 sec.   |7.134 sec.     |
+|4. wasm-simple             |61.784 sec. |300.845 sec.   |79.478 sec. |44.982 sec. |50.959 sec.    |
+|5. wasm-jit                |4.474 sec.  |10.04 sec.     |2.489 sec.  |75.996 sec. |61.432 sec.    |
+|6. wasm-jit-multi-functions|3.286 sec.  |9.427 sec.     |3.93 sec.   |2.725 sec.  |2.126 sec.     |
 
 以下では、それぞれのプログラム実装について詳細を説明していきます。
 
-## JavaScript simple implementation（js-simple）
+## 1. JavaScript simple implementation（js-simple）
 
 [ソースコード](https://github.com/tkihira/dynamic-wasm/blob/main/js-simple.js) / [実行結果](https://dynamic-wasm.vercel.app/js-simple.html)
 
@@ -77,7 +97,7 @@ BF とは、8 つの記号のみで構成されるプログラミング言語で
 
 一切最適化を施していないため、実行結果はその他のプログラムに比べて一番遅くなっており、<span style="color:blue">各プラットフォームで最も速い結果に比べて 30 倍〜50 倍ほど遅くなっています</span>。
 
-## JavaScript just-in-time implementation: single function (js-jit)
+## 2. JavaScript just-in-time implementation: single function (js-jit)
 
 [ソースコード](https://github.com/tkihira/dynamic-wasm/blob/main/js-jit.js) / [実行結果](https://dynamic-wasm.vercel.app/js-jit.html)
 
@@ -112,7 +132,7 @@ output(null);
 
 この方法は、シンプルな方法に比べると、数倍程度の大幅な高速化が期待出来ます（Mobile Chrome でも影響が小さいながらもしっかり効果は出ています）。特に Safari の場合は、巨大な関数でも問題なく最適化が適用されたようで、30 倍〜50 倍ほどの高速化が達成出来ました。
 
-## JavaScript just-in-time implementation: multiple functions (js-jit-multi-functions)
+## 3. JavaScript just-in-time implementation: multiple functions (js-jit-multi-functions)
 
 [ソースコード](https://github.com/tkihira/dynamic-wasm/blob/main/js-jit-multi-functions.js) / [実行結果](https://dynamic-wasm.vercel.app/js-jit-multi-functions.html)
 
@@ -121,7 +141,7 @@ output(null);
 js-jit の場合は 129,014 byte もの巨大な単一関数であったのを複数の関数に分割したことで、ブラウザの JavaScript 最適化が効きやすくなっています。Safari の場合は単一関数で十分に最適化が効いていたので遅くなっていますが、Chrome においては js-jit に比べても 5 倍〜15 倍ほどの顕著な速度差が出ています。
 
 
-## WebAssembly simple implementation (wasm-simple)
+## 4. WebAssembly simple implementation (wasm-simple)
 
 [ソースコード](https://github.com/tkihira/dynamic-wasm/blob/main/wasm-simple.wat) / [実行結果](https://dynamic-wasm.vercel.app/wasm-simple.html)
 
@@ -129,7 +149,7 @@ js-jit の場合は 129,014 byte もの巨大な単一関数であったのを�
 
 どのプラットフォームにおいても、<span style="color:blue">JavaScript の同様の実装（js-simple）と比べると 2 〜 3 倍程度速くなっています</span>（Mobiel Chrome を除く）が、一方で<span style="color:blue">工夫された JavaScript の実装（js-jit）よりは遅い</span>ことが読み取れます。今回の例は WebAssembly に有利なサンプルではありますが、<span style="color:red">JavaScript を単純に wasm に移植するだけでも数倍程度の高速化が期待出来る</span>かもしれません。
 
-## WebAssembly just-in-time implementation: single function (wasm-jit)
+## 5. WebAssembly just-in-time implementation: single function (wasm-jit)
 
 [ソースコード](https://github.com/tkihira/dynamic-wasm/blob/main/wasm-jit.js) / [実行結果](https://dynamic-wasm.vercel.app/wasm-jit.html)
 
@@ -137,7 +157,7 @@ js-jit の場合は 129,014 byte もの巨大な単一関数であったのを�
 
 このプログラムの結果は、Chrome と Firefox では（Mobile Chrome を含めて）爆速であったのに引き換え、<span style="color:blue">Safari では単純な実装よりもむしろ大幅に遅くなってしまっています</span>。この結果から、Safari では最適化が効いていないであろうことが推測されます。この実装で出力される単一関数の Function Body は 88,566 bytes あり、これが最適化を阻害していることが予想されたため、別の実装を用意して比較してみました。
 
-## WebAssembly just-in-time implementation: multiple functions (wasm-jit-multi-functions)
+## 6. WebAssembly just-in-time implementation: multiple functions (wasm-jit-multi-functions)
 
 [ソースコード](https://github.com/tkihira/dynamic-wasm/blob/main/wasm-jit-multi-functions.js) / [実行結果](https://dynamic-wasm.vercel.app/wasm-jit-multi-functions.html)
 
