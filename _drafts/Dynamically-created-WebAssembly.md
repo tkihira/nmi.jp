@@ -36,9 +36,9 @@ BF とは、8 つの記号のみで構成されるプログラミング言語で
 
 この記事の目的は、この<span style='color:#f00'>マンデルブローの描画を行う BF のプログラムを、様々な JavaScript や WebAssembly のコードで実行し、そのベンチマークを取ること</span>です。BF の高速な実行が目的ではないのでご了承ください。
 
-# プログラムの紹介
+# 実装の紹介
 
-今回実装したプログラムを簡単に紹介します。ソースコードは [github](https://github.com/tkihira/dynamic-wasm) にあるので参考にしてみてください。
+今回の実装を簡単に紹介します。ソースコードは [github](https://github.com/tkihira/dynamic-wasm) にあるので参考にしてみてください。
 
 - [JavaScript simple implementation](https://github.com/tkihira/dynamic-wasm/blob/main/js-simple.js): JavaScript で素直に実装したプログラム
 - [JavaScript just-in-time implementation](https://github.com/tkihira/dynamic-wasm/blob/main/js-jit.js): JavaScript で動的に JavaScript を生成するプログラム
@@ -47,6 +47,7 @@ BF とは、8 つの記号のみで構成されるプログラミング言語で
 - [WebAssembly just-in-time implementation: multiple functions](https://github.com/tkihira/dynamic-wasm/blob/main/wasm-jit-multi-functions.js): JavaScript で WebAssembly を動的に生成するプログラム（複数関数）
 
 ポイントは、
+
 - JavaScript で書かれているか、WebAssembly で書かれているか
 - 単純な実装か、動的にプログラムを生成する実装か
 - WebAssembly の場合、単一関数にまとめて出力するか、複数関数に分割して出力するか
@@ -66,7 +67,7 @@ BF とは、8 つの記号のみで構成されるプログラミング言語で
 |wasm-jit      |4.474 sec.  |10.04 sec.     |2.489 sec.  |75.996 sec. |61.432 sec.    |
 |wasm-jit-multi|3.286 sec.  |9.427 sec.     |3.93 sec.   |2.725 sec.  |2.126 sec.     |
 
-それぞれのプログラムについて詳細を説明していきます。
+以下では、それぞれのプログラム実装について詳細を説明していきます。
 
 ## JavaScript simple implementation（js-simple）
 
