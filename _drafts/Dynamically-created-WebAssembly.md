@@ -34,7 +34,7 @@ BF とは、8 つの記号のみで構成されるプログラミング言語で
 
 今回実行するのは、[マンデルブロ集合を描画する BF のプログラム](https://github.com/erikdubbelboer/brainfuck-jit/blob/master/mandelbrot.bf)です。マンデルブロ集合と呼ばれるフラクタル図形の描画しますが、良い感じに重いためにベンチマーク用に採用しました。
 
-<input id='startbutton' type="button" value="実行" onclick="start()"> 実行ボタンを押すと、以下にマンデルブロ集合の出力結果が得られます<br>
+<input id='startbutton' type="button" value="実行" onclick="start()"> 実行ボタンを押すと、今回一番高速だった実装によるマンデルブロ集合の出力結果が得られます。<br>
 <script src='/js/bfCode.js'></script>
 <script>
 const start = function() {
@@ -71,7 +71,7 @@ const start = function() {
 
 - JavaScript で書かれているか、WebAssembly で書かれているか
 - 単純な実装か、動的にプログラムを生成する実装か
-- WebAssembly の場合、単一関数にまとめて出力するか、複数関数に分割して出力するか
+- 動的に生成する場合、単一関数にまとめて出力するか、複数関数に分割して出力するか
 
 の違いがあります。
 
