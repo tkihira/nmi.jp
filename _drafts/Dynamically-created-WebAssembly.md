@@ -44,7 +44,8 @@ const start = function() {
     worker.postMessage(bfCode);
     worker.onmessage = function (e) {
         if (e.data) {
-            document.getElementById('bf_output').textContent += String.fromCharCode(e.data);
+            const c = String.fromCharCode(e.data);
+            document.getElementById('bf_output').value += c;
         } else {
             document.getElementById('startbutton').value = '終了';
             worker.terminate();
@@ -52,7 +53,7 @@ const start = function() {
     };
 };
 </script>
-<pre id="bf_output" style="width:100%;font-size:8px;line-height:8px"></pre>
+<textarea id="bf_output" rows='50' cols='160' style="width:100%;white-space:nowrap;font-family:monospace;font-size:8px;line-height:8px"></textarea>
 
 この記事の目的は、この<span style='color:#f00'>マンデルブロ集合の描画を行う BF のプログラムを、様々な JavaScript や WebAssembly のコードで実行し、そのベンチマークを取ること</span>です。BF の高速な実行が目的ではないのでご了承ください。
 
