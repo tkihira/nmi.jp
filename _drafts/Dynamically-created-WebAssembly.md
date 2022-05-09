@@ -76,7 +76,7 @@ BF とは、8 つの記号のみで構成されるプログラミング言語で
 
 一切最適化を施していないため、実行結果はその他のプログラムに比べて一番遅くなっており、<span style="color:blue">各プラットフォームで最も速い結果に比べて 30 倍〜50 倍ほど遅くなっています</span>。
 
-## JavaScript just-in-time implementation (js-jit)
+## JavaScript just-in-time implementation: single function (js-jit)
 
 [ソースコード](https://github.com/tkihira/dynamic-wasm/blob/main/js-jit.js) / [実行結果](https://dynamic-wasm.vercel.app/js-jit.html)
 
@@ -84,7 +84,7 @@ BF とは、8 つの記号のみで構成されるプログラミング言語で
 
 この方法は、シンプルな方法に比べると、数倍程度の大幅な高速化が期待出来ます（Mobile Chrome でも影響が小さいながらもしっかり効果は出ています）。特に Safari の場合は、巨大な関数でも問題なく最適化が適用されたようで、30 倍〜50 倍ほどの高速化が達成出来ました。
 
-## JavaScript just-in-time implementation (js-jit-multi-functions)
+## JavaScript just-in-time implementation: multiple functions (js-jit-multi-functions)
 
 [ソースコード](https://github.com/tkihira/dynamic-wasm/blob/main/js-jit-multi-functions.js) / [実行結果](https://dynamic-wasm.vercel.app/js-jit-multi-functions.html)
 
@@ -101,7 +101,7 @@ js-jit の場合は 129,014 byte もの巨大な単一関数であったのを�
 
 どのプラットフォームにおいても、<span style="color:blue">JavaScript の同様の実装（js-simple）と比べると 2 〜 3 倍程度速くなっています</span>（Mobiel Chrome を除く）が、一方で<span style="color:blue">工夫された JavaScript の実装（js-jit）よりは遅い</span>ことが読み取れます。今回の例は WebAssembly に有利なサンプルではありますが、<span style="color:red">JavaScript を単純に wasm に移植するだけでも数倍程度の高速化が期待出来る</span>かもしれません。
 
-## WebAssembly just-in-time implementation: one function (wasm-jit)
+## WebAssembly just-in-time implementation: single function (wasm-jit)
 
 [ソースコード](https://github.com/tkihira/dynamic-wasm/blob/main/wasm-jit.js) / [実行結果](https://dynamic-wasm.vercel.app/wasm-jit.html)
 
@@ -111,7 +111,7 @@ js-jit の場合は 129,014 byte もの巨大な単一関数であったのを�
 
 ## WebAssembly just-in-time implementation: multiple functions (wasm-jit-multi-functions)
 
-[ソースコード](https://github.com/tkihira/dynamic-wasm/blob/main/wasm-jit-mutli-functions.js) / [実行結果](https://dynamic-wasm.vercel.app/wasm-jit-multi-functions.html)
+[ソースコード](https://github.com/tkihira/dynamic-wasm/blob/main/wasm-jit-multi-functions.js) / [実行結果](https://dynamic-wasm.vercel.app/wasm-jit-multi-functions.html)
 
 このプログラムは、BF の各記号に対応する WebAssembly を直接<span style="color:blue">バイナリ</span>として生成し、それを `WebAssembly.instantiate()` で関数化させている所までは wasm-jit と同じなのですが、『`[`』と『`]`』が登場するたびに、その中身を別関数に分離して出力しています。今回のマンデルブローのプログラムには 686 個の 『`[`』が存在するため、結果として 686 個 + 2 個（ベース関数）の計 688 個の関数に分割しています。これもハンドアセンブルしましたが、このソースコードには各バイトがどういう意味を持つのかコメントをしっかり書いたので、wasm のバイナリ形式に興味のある方は是非目を通してみてください。
 
@@ -127,11 +127,11 @@ WebAssembly を単純に導入するだけでも、それぞれ数倍程度の�
 
 ## 最適化のかかり方によって結果は大きく異なる
 
-今回のように JavaScript や WebAssembly のコードを自動生成するときには、出力されるコードは一般的なコードの特性と大きく違うことが多く、今回のように最適化がうまく適用されないことが多いです。自動生成するコードがよくあるコードに近づくように意識すると良いかもしれません。自動生成された巨大な単一関数を複数の関数に分割するテクニックは、今回に限らず様々なトラブルで効果の期待できるテクニックですので、コードの自動生成で問題に直面した時のために記憶の片隅に置いておくと良いでしょう。
+今回のように JavaScript や WebAssembly のコードを自動生成するときには、出力されるコードは一般的なコードの特性と大きく違うことが多く、今回のように最適化がうまく適用されないことが多いです。自動生成の出力コードが普段我々が書くコードに近づくように意識すると良いかもしれません。自動生成された巨大な単一関数を複数の関数に分割するテクニックは、今回に限らず様々なトラブルで効果の期待できるテクニックですので、コードの自動生成で問題に直面した時のために記憶の片隅に置いておくと良いでしょう。
 
 ## WebAssembly の最適化は少し予測しづらい
 
-JavaScript において、どのようなコードに最適化がかかるのかはある程度の勘所を持っている方も多いと思いますが、WebAssembly における最適化の勘所は中々難しそうだという認識を持っています（ここでいう最適化は WebAssembly のバイトコード自体にかかる最適化の話であり、その前のコンパイラのフロントエンド・バックエンドで入る最適化とは別の話であることにご注意ください）。Chrome や Safari といったプラットフォームによって最適化の傾向は大きく異なるので、その点もご注意ください。
+JavaScript においてどのようなコードに最適化がかかりやすいかについてはある程度の勘所を持っている方も多いと思いますが、WebAssembly における最適化の勘所は中々難しそうだという認識を持っています（ここでいう最適化は WebAssembly のバイトコード自体にかかる最適化の話であり、その前のコンパイラのフロントエンド・バックエンドで入る最適化とは別の話であることにご注意ください）。Chrome や Safari といったプラットフォームによって最適化の傾向は大きく異なるので、その点もご注意ください。
 
 ## WebAssembly の実行は、Chrome において DevTools を開くだけで遅くなる
 
@@ -140,13 +140,13 @@ Chrome において、DevTools をただ開くと wasm の実行が極めて遅�
 - DevTools を開くと TurboFan の最適化がキャンセルされて遅くなる
 - しかし Profile タブで Profile を取るときには再度 TurboFan の最適化が適用される
 
-という挙動になっております。<span style="color:red">ただ DevTools を開いているだけで wasm の実行がかなり遅くなります。大変気づきにくいトリガーなので、wasm 系の開発をされる時にはお気をつけください</span>。
+という挙動になっております。<span style="color:red">Chrome では、ただ DevTools を開いているだけで wasm の実行がかなり遅くなります。大変気づきにくいトリガーなので、wasm 系の開発をされる時にはお気をつけください</span>。
 
-## Safari において Worker の GC 判定にバグがある
+## Safari において Worker の GC 判定にバグがあり、たまに突然止まる
 
 これは WebAssembly の話ではないのですが、今回の実装中に再現方法を見つけたバグであることと、今まで WebAssembly を利用しているときに頻繁に遭遇したバグであるということもあり、ここでも共有します。
 
-現行の Safari では、Worker それ自体が起動し handler が設定されていたとしても、Worker に root から辿れない場合には GC されてしまうバグがあります。実際に[こちらのページから試していただけます](https://dynamic-wasm-6128yfdg3-tkihira.vercel.app/worker-stall.html)が、PC もしくは iOS の Safari（15 以前）でアクセスすると一部の Worker が高確率で止まることが確認できるかと思います。タイミングバグでもあるので、発生しないこともあるかもしれません。
+現行の Safari では、Worker それ自体が起動し handler が設定されていたとしても、Worker の参照が root から辿れない場合には GC されてしまうバグがあります。実際に[こちらのページから試していただけます](https://dynamic-wasm-6128yfdg3-tkihira.vercel.app/worker-stall.html)が、PC もしくは iOS の Safari（15 以前）でアクセスすると一部の Worker が高確率で止まることが確認できるかと思います。タイミングバグでもあるので、発生しないこともあるかもしれません。
 
 Worker がいきなり止まってしまうバグに遭遇された方は、とりあえずは window.worker みたいなプロパティに代入することで回避出来るかと思います。既に [WebKit の Bugzilla に報告しております](https://bugs.webkit.org/show_bug.cgi?id=240062)ので近々修正されると思いますが、現状で困っている方はこの workaround をご利用ください。
 
