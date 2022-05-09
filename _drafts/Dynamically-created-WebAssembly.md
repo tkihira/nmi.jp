@@ -52,7 +52,7 @@ const start = function() {
     };
 };
 </script>
-<textarea id="bf_output" rows='50' cols='130' style="font-size:8px"></textarea>
+<textarea id="bf_output" rows='50' cols='160' style="font-size:8px"></textarea>
 
 この記事の目的は、この<span style='color:#f00'>マンデルブロ集合の描画を行う BF のプログラムを、様々な JavaScript や WebAssembly のコードで実行し、そのベンチマークを取ること</span>です。BF の高速な実行が目的ではないのでご了承ください。
 
