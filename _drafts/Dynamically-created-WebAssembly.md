@@ -30,11 +30,11 @@ BF とは、8 つの記号のみで構成されるプログラミング言語で
 
 今回は、このような言語があるのだ、という程度に理解してもらえれば問題ありません。詳しい解説は [Wikipedia](https://ja.wikipedia.org/wiki/Brainfuck) を参考にしてみてください。[英語版の Wikipedia](https://en.wikipedia.org/wiki/Brainfuck#Hello_World!) には Hello World プログラムの解説もあります。
 
-## マンデルブロー
+## マンデルブロ集合
 
-今回実行するのは、[マンデルブローを描画する BF のプログラム](https://github.com/erikdubbelboer/brainfuck-jit/blob/master/mandelbrot.bf)です。マンデルブローと呼ばれるフラクタル図形の描画しますが、良い感じに重いためにベンチマーク用に採用しました。
+今回実行するのは、[マンデルブロ集合を描画する BF のプログラム](https://github.com/erikdubbelboer/brainfuck-jit/blob/master/mandelbrot.bf)です。マンデルブロ集合と呼ばれるフラクタル図形の描画しますが、良い感じに重いためにベンチマーク用に採用しました。
 
-この記事の目的は、この<span style='color:#f00'>マンデルブローの描画を行う BF のプログラムを、様々な JavaScript や WebAssembly のコードで実行し、そのベンチマークを取ること</span>です。BF の高速な実行が目的ではないのでご了承ください。
+この記事の目的は、この<span style='color:#f00'>マンデルブロ集合の描画を行う BF のプログラムを、様々な JavaScript や WebAssembly のコードで実行し、そのベンチマークを取ること</span>です。BF の高速な実行が目的ではないのでご了承ください。
 
 # 実装の紹介
 
@@ -83,13 +83,40 @@ BF とは、8 つの記号のみで構成されるプログラミング言語で
 
 このプログラムは、BF の各記号に対応する JavaScript を直接文字列として追記し、それを `new Function()` で関数化させています。無駄な whlie 文のコストを減らすのみならず、ブラウザの JavaScript の最適化の恩恵をそのまま受けられるなど数多くのメリットが受けられます。[以前のブログで紹介した方法](http://nmi.jp/2020-12-20-Make_VM_faster)もこのやり方です。
 
+ちょっと詳しく解説しましょう。例えば BF で `++++++++[>++++++++<-]>+.` というプログラムがあった場合、
+
+- まず `let pointer = 0;const memory = new Int32Array(30000);` を関数の先頭に置く
+- BF コード中の `+` を `memory[pointer]++;` に、`[` を `while (memory[pointer]) {` に、`>` を `pointer++;` に、というようにそれぞれ変換していく
+- 最後に `output(null);` を追加する（コードが終了したことを main thread に通知する）
+
+という処理をすることにより、最終的に（少し整形しましたが）
+
+```javascript
+let pointer = 0;
+const memory = new Int32Array(30000);
+memory[pointer]++; memory[pointer]++; memory[pointer]++; memory[pointer]++;
+memory[pointer]++; memory[pointer]++; memory[pointer]++; memory[pointer]++;
+while (memory[pointer]) {
+    pointer++;
+    memory[pointer]++; memory[pointer]++; memory[pointer]++; memory[pointer]++;
+    memory[pointer]++; memory[pointer]++; memory[pointer]++; memory[pointer]++;
+    pointer--;
+}
+pointer++;
+memory[pointer]++;
+output(memory[pointer]);
+output(null);
+```
+
+という文字列を作り出します。これを `new Function()` で関数化して実行することで、BF のコードが実行される仕組みです。
+
 この方法は、シンプルな方法に比べると、数倍程度の大幅な高速化が期待出来ます（Mobile Chrome でも影響が小さいながらもしっかり効果は出ています）。特に Safari の場合は、巨大な関数でも問題なく最適化が適用されたようで、30 倍〜50 倍ほどの高速化が達成出来ました。
 
 ## JavaScript just-in-time implementation: multiple functions (js-jit-multi-functions)
 
 [ソースコード](https://github.com/tkihira/dynamic-wasm/blob/main/js-jit-multi-functions.js) / [実行結果](https://dynamic-wasm.vercel.app/js-jit-multi-functions.html)
 
-このプログラムは、BF の各記号に対応する JavaScript を直接文字列として追記し、それを `new Function()` で関数化させているところまでは js-jit と同じなのですが、『`[`』と『`]`』が登場するたびに、その中身を別関数に分離して出力しています。今回のマンデルブローのプログラムには 686 個の 『`[`』が存在するため、結果として 686 個 + 2 個（ベース関数）の計 688 個の関数に分割しています。
+このプログラムは、BF の各記号に対応する JavaScript を直接文字列として追記し、それを `new Function()` で関数化させているところまでは js-jit と同じなのですが、『`[`』と『`]`』が登場するたびに、その中身を別関数に分離して出力しています。今回のマンデルブロ集合のプログラムには 686 個の 『`[`』が存在するため、結果として 686 個 + 2 個（ベース関数）の計 688 個の関数に分割しています。
 
 js-jit の場合は 129,014 byte もの巨大な単一関数であったのを複数の関数に分割したことで、ブラウザの JavaScript 最適化が効きやすくなっています。Safari の場合は単一関数で十分に最適化が効いていたので遅くなっていますが、Chrome においては js-jit に比べても 5 倍〜15 倍ほどの顕著な速度差が出ています。
 
@@ -114,7 +141,7 @@ js-jit の場合は 129,014 byte もの巨大な単一関数であったのを�
 
 [ソースコード](https://github.com/tkihira/dynamic-wasm/blob/main/wasm-jit-multi-functions.js) / [実行結果](https://dynamic-wasm.vercel.app/wasm-jit-multi-functions.html)
 
-このプログラムは、BF の各記号に対応する WebAssembly を直接<span style="color:blue">バイナリ</span>として生成し、それを `WebAssembly.instantiate()` で関数化させている所までは wasm-jit と同じなのですが、『`[`』と『`]`』が登場するたびに、その中身を別関数に分離して出力しています。今回のマンデルブローのプログラムには 686 個の 『`[`』が存在するため、結果として 686 個 + 2 個（ベース関数）の計 688 個の関数に分割しています。これもハンドアセンブルしましたが、このソースコードには各バイトがどういう意味を持つのかコメントをしっかり書いたので、wasm のバイナリ形式に興味のある方は是非目を通してみてください。
+このプログラムは、BF の各記号に対応する WebAssembly を直接<span style="color:blue">バイナリ</span>として生成し、それを `WebAssembly.instantiate()` で関数化させている所までは wasm-jit と同じなのですが、『`[`』と『`]`』が登場するたびに、その中身を別関数に分離して出力しています。今回のマンデルブロ集合のプログラムには 686 個の 『`[`』が存在するため、結果として 686 個 + 2 個（ベース関数）の計 688 個の関数に分割しています。これもハンドアセンブルしましたが、このソースコードには各バイトがどういう意味を持つのかコメントをしっかり書いたので、wasm のバイナリ形式に興味のある方は是非目を通してみてください。
 
 このプログラムは、<span style="color:red">ほぼすべてのプラットフォームにおいて最速の結果を達成しました</span>。wasm-jit で非常に遅かった Safari でもしっかり最適化が効いて爆速になっていることが確認出来ます。Firefox においては wasm-jit の段階で最適化が完全に適用されていたために遅くなりましたが、それでも他の実装に比べれば圧倒的なスピードを達成しています。
 
