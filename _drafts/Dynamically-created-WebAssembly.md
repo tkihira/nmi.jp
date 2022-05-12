@@ -44,7 +44,7 @@ const start = function() {
     document.getElementById('startbutton').disabled = true;
     document.getElementById('startbutton').value = '実行中';
     document.getElementById('bf_output').value = '';
-    window.worker = new Worker('/js/wasm-jit-multi-functions.js');
+    window.worker = new Worker('/js/wasm-dcc-multi-functions.js');
     const startTime = Date.now();
     worker.postMessage(bfCode);
     worker.onmessage = function (e) {
@@ -68,11 +68,11 @@ const start = function() {
 今回の実装を簡単に紹介します。ソースコードは [github](https://github.com/tkihira/dynamic-wasm) にあるので参考にしてみてください。
 
 - [JavaScript simple implementation](https://github.com/tkihira/dynamic-wasm/blob/main/js-simple.js): JavaScript で素直に実装したプログラム
-- [JavaScript just-in-time implementation](https://github.com/tkihira/dynamic-wasm/blob/main/js-jit.js): 動的に JavaScript を生成するプログラム（単一関数）
-- [JavaScript just-in-time implementation](https://github.com/tkihira/dynamic-wasm/blob/main/js-jit.js): 動的に JavaScript を生成するプログラム（複数関数）
+- [JavaScript dynamic-code-creation implementation](https://github.com/tkihira/dynamic-wasm/blob/main/js-dcc.js): 動的に JavaScript を生成するプログラム（単一関数）
+- [JavaScript dynamic-code-creation implementation](https://github.com/tkihira/dynamic-wasm/blob/main/js-dcc.js): 動的に JavaScript を生成するプログラム（複数関数）
 - [WebAssembly simple implementation](https://github.com/tkihira/dynamic-wasm/blob/main/wasm-simple.wat): WebAssembly で素直に実装したプログラム
-- [WebAssembly just-in-time implementation: single function](https://github.com/tkihira/dynamic-wasm/blob/main/wasm-jit.js): 動的に WebAssembly を生成するプログラム（単一関数）
-- [WebAssembly just-in-time implementation: multiple functions](https://github.com/tkihira/dynamic-wasm/blob/main/wasm-jit-multi-functions.js): 動的に WebAssembly を生成するプログラム（複数関数）
+- [WebAssembly dynamic-code-creation implementation: single function](https://github.com/tkihira/dynamic-wasm/blob/main/wasm-dcc.js): 動的に WebAssembly を生成するプログラム（単一関数）
+- [WebAssembly dynamic-code-creation implementation: multiple functions](https://github.com/tkihira/dynamic-wasm/blob/main/wasm-dcc-multi-functions.js): 動的に WebAssembly を生成するプログラム（複数関数）
 
 ポイントは、
 
@@ -89,11 +89,11 @@ const start = function() {
 |         プログラム          |   Chrome   | Mobile Chrome |  Firefox   |   Safari   | Mobile Safari |
 |---------------------------|------------|---------------|------------|------------|---------------|
 |1. js-simple               |172.057 sec.|367.725 sec.   |147.361 sec.|117.136 sec.|89.155 sec.    |
-|2. js-jit                  |40.963 sec. |283.213 sec.   |47.105 sec. |4.698 sec.  |4.441 sec.     |
-|3. js-jit-multi-functions  |9.988 sec.  |17.982 sec.    |17.002 sec. |6.79 sec.   |7.134 sec.     |
+|2. js-dcc                  |40.963 sec. |283.213 sec.   |47.105 sec. |4.698 sec.  |4.441 sec.     |
+|3. js-dcc-multi-functions  |9.988 sec.  |17.982 sec.    |17.002 sec. |6.79 sec.   |7.134 sec.     |
 |4. wasm-simple             |61.784 sec. |300.845 sec.   |79.478 sec. |44.982 sec. |50.959 sec.    |
-|5. wasm-jit                |4.474 sec.  |10.04 sec.     |2.489 sec.  |75.996 sec. |61.432 sec.    |
-|6. wasm-jit-multi-functions|3.286 sec.  |9.427 sec.     |3.93 sec.   |2.725 sec.  |2.126 sec.     |
+|5. wasm-dcc                |4.474 sec.  |10.04 sec.     |2.489 sec.  |75.996 sec. |61.432 sec.    |
+|6. wasm-dcc-multi-functions|3.286 sec.  |9.427 sec.     |3.93 sec.   |2.725 sec.  |2.126 sec.     |
 
 以下では、それぞれのプログラム実装について詳細を説明していきます。
 
@@ -105,9 +105,9 @@ const start = function() {
 
 一切最適化を施していないため、実行結果はその他のプログラムに比べて一番遅くなっており、<span style="color:blue">各プラットフォームで最も速い結果に比べて 30 倍〜50 倍ほど遅くなっています</span>。
 
-## 2. JavaScript just-in-time implementation: single function (js-jit)
+## 2. JavaScript dynamic-code-creation implementation: single function (js-dcc)
 
-[ソースコード](https://github.com/tkihira/dynamic-wasm/blob/main/js-jit.js) / [実行結果](https://dynamic-wasm.vercel.app/js-jit.html)
+[ソースコード](https://github.com/tkihira/dynamic-wasm/blob/main/js-dcc.js) / [実行結果](https://dynamic-wasm.vercel.app/js-dcc.html)
 
 このプログラムは、BF の各記号に対応する JavaScript を直接文字列として追記し、それを `new Function()` で関数化させています。無駄な whlie 文のコストを減らすのみならず、ブラウザの JavaScript の最適化の恩恵をそのまま受けられるなど数多くのメリットが受けられます。[以前のブログで紹介した方法](http://nmi.jp/2020-12-20-Make_VM_faster)もこのやり方です。
 
@@ -140,13 +140,13 @@ output(null);
 
 この方法は、シンプルな方法に比べると、数倍程度の大幅な高速化が期待出来ます（Mobile Chrome でも影響が小さいながらもしっかり効果は出ています）。特に Safari の場合は、巨大な関数でも問題なく最適化が適用されたようで、30 倍〜50 倍ほどの高速化が達成出来ました。
 
-## 3. JavaScript just-in-time implementation: multiple functions (js-jit-multi-functions)
+## 3. JavaScript dynamic-code-creation implementation: multiple functions (js-dcc-multi-functions)
 
-[ソースコード](https://github.com/tkihira/dynamic-wasm/blob/main/js-jit-multi-functions.js) / [実行結果](https://dynamic-wasm.vercel.app/js-jit-multi-functions.html)
+[ソースコード](https://github.com/tkihira/dynamic-wasm/blob/main/js-dcc-multi-functions.js) / [実行結果](https://dynamic-wasm.vercel.app/js-dcc-multi-functions.html)
 
-このプログラムは、BF の各記号に対応する JavaScript を直接文字列として追記し、それを `new Function()` で関数化させているところまでは js-jit と同じなのですが、『`[`』と『`]`』が登場するたびに、その中身を別関数に分離して出力しています。今回のマンデルブロ集合のプログラムには 686 個の 『`[`』が存在するため、結果として 686 個 + 2 個（ベース関数）の計 688 個の関数に分割しています。
+このプログラムは、BF の各記号に対応する JavaScript を直接文字列として追記し、それを `new Function()` で関数化させているところまでは js-dcc と同じなのですが、『`[`』と『`]`』が登場するたびに、その中身を別関数に分離して出力しています。今回のマンデルブロ集合のプログラムには 686 個の 『`[`』が存在するため、結果として 686 個 + 2 個（ベース関数）の計 688 個の関数に分割しています。
 
-js-jit の場合は 129,014 byte もの巨大な単一関数であったのを複数の関数に分割したことで、ブラウザの JavaScript 最適化が効きやすくなっています。Safari の場合は単一関数で十分に最適化が効いていたので遅くなっていますが、Chrome においては js-jit に比べても 5 倍〜15 倍ほどの顕著な速度差が出ています。
+js-dcc の場合は 129,014 byte もの巨大な単一関数であったのを複数の関数に分割したことで、ブラウザの JavaScript 最適化が効きやすくなっています。Safari の場合は単一関数で十分に最適化が効いていたので遅くなっていますが、Chrome においては js-dcc に比べても 5 倍〜15 倍ほどの顕著な速度差が出ています。
 
 
 ## 4. WebAssembly simple implementation (wasm-simple)
@@ -155,23 +155,23 @@ js-jit の場合は 129,014 byte もの巨大な単一関数であったのを�
 
 このプログラムは、WebAssembly で BF の文字を 1 文字ずつパースし実行する実装で、js-simple とほぼ同じ構造を意識した wasm 移植です。wat と呼ばれる wasm のテキストフォーマットで記述し、[wabt の wat2wasm](https://github.com/WebAssembly/wabt) で wasm 化しています。いわばアセンブリ言語を直書きしているようなもので、正直この規模のプログラムでも結構きつかったです。人の手で書くものではないですね。
 
-どのプラットフォームにおいても、<span style="color:blue">JavaScript の同様の実装（js-simple）と比べると 2 〜 3 倍程度速くなっています</span>（Mobiel Chrome を除く）が、一方で<span style="color:blue">工夫された JavaScript の実装（js-jit）よりは遅い</span>ことが読み取れます。今回の例は WebAssembly に有利なサンプルではありますが、<span style="color:red">JavaScript を単純に wasm に移植するだけでも数倍程度の高速化が期待出来る</span>かもしれません。
+どのプラットフォームにおいても、<span style="color:blue">JavaScript の同様の実装（js-simple）と比べると 2 〜 3 倍程度速くなっています</span>（Mobiel Chrome を除く）が、一方で<span style="color:blue">工夫された JavaScript の実装（js-dcc）よりは遅い</span>ことが読み取れます。今回の例は WebAssembly に有利なサンプルではありますが、<span style="color:red">JavaScript を単純に wasm に移植するだけでも数倍程度の高速化が期待出来る</span>かもしれません。
 
-## 5. WebAssembly just-in-time implementation: single function (wasm-jit)
+## 5. WebAssembly dynamic-code-creation implementation: single function (wasm-dcc)
 
-[ソースコード](https://github.com/tkihira/dynamic-wasm/blob/main/wasm-jit.js) / [実行結果](https://dynamic-wasm.vercel.app/wasm-jit.html)
+[ソースコード](https://github.com/tkihira/dynamic-wasm/blob/main/wasm-dcc.js) / [実行結果](https://dynamic-wasm.vercel.app/wasm-dcc.html)
 
-このプログラムは、BF の各記号に対応する WebAssembly を直接<span style="color:blue">バイナリ</span>として生成し、それを `WebAssembly.instantiate()` で関数化させています。生成される関数は、1 つの巨大な wasm 関数になります。js-jit を純粋に WebAssembly に適用したものになります。まさか 2022 年にもなってハンドアセンブルすることになるとは思わず、新鮮な体験が出来ました。もしあなたが似たようなことをやりたいと思うならば、[binaryen.js](https://github.com/AssemblyScript/binaryen.js/) などを使うことを強くオススメします。
+このプログラムは、BF の各記号に対応する WebAssembly を直接<span style="color:blue">バイナリ</span>として生成し、それを `WebAssembly.instantiate()` で関数化させています。生成される関数は、1 つの巨大な wasm 関数になります。js-dcc を純粋に WebAssembly に適用したものになります。まさか 2022 年にもなってハンドアセンブルすることになるとは思わず、新鮮な体験が出来ました。もしあなたが似たようなことをやりたいと思うならば、[binaryen.js](https://github.com/AssemblyScript/binaryen.js/) などを使うことを強くオススメします。
 
 このプログラムの結果は、Chrome と Firefox では（Mobile Chrome を含めて）爆速であったのに引き換え、<span style="color:blue">Safari では単純な実装よりもむしろ大幅に遅くなってしまっています</span>。この結果から、Safari では最適化が効いていないであろうことが推測されます。この実装で出力される単一関数の Function Body は 88,566 bytes あり、これが最適化を阻害していることが予想されたため、別の実装を用意して比較してみました。
 
-## 6. WebAssembly just-in-time implementation: multiple functions (wasm-jit-multi-functions)
+## 6. WebAssembly dynamic-code-creation implementation: multiple functions (wasm-dcc-multi-functions)
 
-[ソースコード](https://github.com/tkihira/dynamic-wasm/blob/main/wasm-jit-multi-functions.js) / [実行結果](https://dynamic-wasm.vercel.app/wasm-jit-multi-functions.html)
+[ソースコード](https://github.com/tkihira/dynamic-wasm/blob/main/wasm-dcc-multi-functions.js) / [実行結果](https://dynamic-wasm.vercel.app/wasm-dcc-multi-functions.html)
 
-このプログラムは、BF の各記号に対応する WebAssembly を直接<span style="color:blue">バイナリ</span>として生成し、それを `WebAssembly.instantiate()` で関数化させている所までは wasm-jit と同じなのですが、『`[`』と『`]`』が登場するたびに、その中身を別関数に分離して出力しています。今回のマンデルブロ集合のプログラムには 686 個の 『`[`』が存在するため、結果として 686 個 + 2 個（ベース関数）の計 688 個の関数に分割しています。これもハンドアセンブルしましたが、このソースコードには各バイトがどういう意味を持つのかコメントをしっかり書いたので、wasm のバイナリ形式に興味のある方は是非目を通してみてください。
+このプログラムは、BF の各記号に対応する WebAssembly を直接<span style="color:blue">バイナリ</span>として生成し、それを `WebAssembly.instantiate()` で関数化させている所までは wasm-dcc と同じなのですが、『`[`』と『`]`』が登場するたびに、その中身を別関数に分離して出力しています。今回のマンデルブロ集合のプログラムには 686 個の 『`[`』が存在するため、結果として 686 個 + 2 個（ベース関数）の計 688 個の関数に分割しています。これもハンドアセンブルしましたが、このソースコードには各バイトがどういう意味を持つのかコメントをしっかり書いたので、wasm のバイナリ形式に興味のある方は是非目を通してみてください。
 
-このプログラムは、<span style="color:red">ほぼすべてのプラットフォームにおいて最速の結果を達成しました</span>。wasm-jit で非常に遅かった Safari でもしっかり最適化が効いて爆速になっていることが確認出来ます。Firefox においては wasm-jit の段階で最適化が完全に適用されていたために遅くなりましたが、それでも他の実装に比べれば圧倒的なスピードを達成しています。
+このプログラムは、<span style="color:red">ほぼすべてのプラットフォームにおいて最速の結果を達成しました</span>。wasm-dcc で非常に遅かった Safari でもしっかり最適化が効いて爆速になっていることが確認出来ます。Firefox においては wasm-dcc の段階で最適化が完全に適用されていたために遅くなりましたが、それでも他の実装に比べれば圧倒的なスピードを達成しています。
 
 # 知見・ノウハウ
 
