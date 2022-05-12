@@ -11,6 +11,9 @@ JavaScript を動的に生成することで高速化を図るテクニックに
 
 [Java の Virtual Machine よりも Brainfuck の方が知名度が高い](https://twitter.com/tkihira/status/1511872190773280768)というアンケート結果が出ましたので、この記事では Brainfuck（以下 BF と略します）をターゲットとして解説します。
 
+
+
+
 ----
 
 # BF とは何か
@@ -65,14 +68,15 @@ const start = function() {
 今回の実装を簡単に紹介します。ソースコードは [github](https://github.com/tkihira/dynamic-wasm) にあるので参考にしてみてください。
 
 - [JavaScript simple implementation](https://github.com/tkihira/dynamic-wasm/blob/main/js-simple.js): JavaScript で素直に実装したプログラム
-- [JavaScript just-in-time implementation](https://github.com/tkihira/dynamic-wasm/blob/main/js-jit.js): JavaScript で動的に JavaScript を生成するプログラム
+- [JavaScript just-in-time implementation](https://github.com/tkihira/dynamic-wasm/blob/main/js-jit.js): 動的に JavaScript を生成するプログラム（単一関数）
+- [JavaScript just-in-time implementation](https://github.com/tkihira/dynamic-wasm/blob/main/js-jit.js): 動的に JavaScript を生成するプログラム（複数関数）
 - [WebAssembly simple implementation](https://github.com/tkihira/dynamic-wasm/blob/main/wasm-simple.wat): WebAssembly で素直に実装したプログラム
-- [WebAssembly just-in-time implementation: one function](https://github.com/tkihira/dynamic-wasm/blob/main/wasm-jit.js): JavaScript で WebAssembly を動的に生成するプログラム（単一関数）
-- [WebAssembly just-in-time implementation: multiple functions](https://github.com/tkihira/dynamic-wasm/blob/main/wasm-jit-multi-functions.js): JavaScript で WebAssembly を動的に生成するプログラム（複数関数）
+- [WebAssembly just-in-time implementation: single function](https://github.com/tkihira/dynamic-wasm/blob/main/wasm-jit.js): 動的に WebAssembly を生成するプログラム（単一関数）
+- [WebAssembly just-in-time implementation: multiple functions](https://github.com/tkihira/dynamic-wasm/blob/main/wasm-jit-multi-functions.js): 動的に WebAssembly を生成するプログラム（複数関数）
 
 ポイントは、
 
-- JavaScript で書かれているか、WebAssembly で書かれているか
+- JavaScript で実行されているか、WebAssembly で実行されているか
 - 単純な実装か、動的にプログラムを生成する実装か
 - 動的に生成する場合、単一関数にまとめて出力するか、複数関数に分割して出力するか
 
