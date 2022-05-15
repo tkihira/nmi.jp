@@ -68,8 +68,8 @@ const start = function() {
 今回の実装を簡単に紹介します。ソースコードは [github](https://github.com/tkihira/dynamic-wasm) にあるので参考にしてみてください。
 
 - [JavaScript simple implementation](https://github.com/tkihira/dynamic-wasm/blob/main/js-simple.js): JavaScript で素直に実装したプログラム
-- [JavaScript dynamic-code-creation implementation](https://github.com/tkihira/dynamic-wasm/blob/main/js-dcc.js): 動的に JavaScript を生成するプログラム（単一関数）
-- [JavaScript dynamic-code-creation implementation](https://github.com/tkihira/dynamic-wasm/blob/main/js-dcc.js): 動的に JavaScript を生成するプログラム（複数関数）
+- [JavaScript dynamic-code-creation implementation: single function](https://github.com/tkihira/dynamic-wasm/blob/main/js-dcc.js): 動的に JavaScript を生成するプログラム（単一関数）
+- [JavaScript dynamic-code-creation implementation: multiple functions](https://github.com/tkihira/dynamic-wasm/blob/main/js-dcc.js): 動的に JavaScript を生成するプログラム（複数関数）
 - [WebAssembly simple implementation](https://github.com/tkihira/dynamic-wasm/blob/main/wasm-simple.wat): WebAssembly で素直に実装したプログラム
 - [WebAssembly dynamic-code-creation implementation: single function](https://github.com/tkihira/dynamic-wasm/blob/main/wasm-dcc.js): 動的に WebAssembly を生成するプログラム（単一関数）
 - [WebAssembly dynamic-code-creation implementation: multiple functions](https://github.com/tkihira/dynamic-wasm/blob/main/wasm-dcc-multi-functions.js): 動的に WebAssembly を生成するプログラム（複数関数）
@@ -109,7 +109,7 @@ const start = function() {
 
 [ソースコード](https://github.com/tkihira/dynamic-wasm/blob/main/js-dcc.js) / [実行結果](https://dynamic-wasm.vercel.app/js-dcc.html)
 
-このプログラムは、BF の各記号に対応する JavaScript を直接文字列として追記し、それを `new Function()` で関数化させています。無駄な whlie 文のコストを減らすのみならず、ブラウザの JavaScript の最適化の恩恵をそのまま受けられるなど数多くのメリットが受けられます。[以前のブログで紹介した方法](http://nmi.jp/2020-12-20-Make_VM_faster)もこのやり方です。
+このプログラムは、BF の各記号に対応する JavaScript を直接文字列として追記し、それを `new Function()` で関数化させています。無駄な while 文のコストを減らすのみならず、ブラウザの JavaScript の最適化の恩恵をそのまま受けられるなど数多くのメリットが受けられます。[以前のブログで紹介した方法](http://nmi.jp/2020-12-20-Make_VM_faster)もこのやり方です。
 
 ちょっと詳しく解説しましょう。例えば BF で `++++++++[>++++++++<-]>+.` というプログラムがあった場合、
 
