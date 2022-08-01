@@ -102,4 +102,4 @@ hello();
 
 面白いです。`alert` がグローバルオブジェクトのプロパティであることを利用して、window の getter を使って<span style="color:red">関数の引数が評価される前に alert を呼び出す</span>という力技です。当然ながら、alert を表示した後に `x.f()` で TypeError が出てしまいますが、題意である「アラートを表示させることが出来るか」に関しては完璧に満たしています。
 
-これなら、globalThis などを使えば Node.js でも動きますね（alert が存在しないけど）。満点です・・・
+これなら、globalThis などを使えば Node.js でも動きますね（alert が存在しないけど）。満点です・・・💯
