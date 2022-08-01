@@ -84,7 +84,7 @@ Python で顕著でしたが、メジャーバージョンが上がると過去�
 
 # 余談: kazuho さんに貰った別解
 
-[@kazuho](https://twitter.com/kazuho/) さんから、別解として次のような解答をもらいました（一部変更しています）
+[@kazuho](https://twitter.com/kazuho/) さんから、別解として次のような解答をもらいました（一部変更しています）。許可を頂いたのでこちらで紹介します。
 
 ```javascript
 var origAlert = alert;
