@@ -5,7 +5,9 @@ categories:
 - JavaScript
 ---
 
-先日、次のような JavaScript クイズを出しました。
+先日、次のような JavaScript クイズを Twitter で出しました。
+
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">// どういう順番で表示されるでしょうか？<br>console.log(1);<br>(async () =&gt; {<br> console.log(2);<br> await new Promise(r =&gt; {<br> setTimeout(r, 1000);<br> console.log(3);<br> });<br> console.log(4);<br>})();<br>console.log(5);</p>&mdash; Takuo Kihira (@tkihira) <a href="https://twitter.com/tkihira/status/1429061261895946240?ref_src=twsrc%5Etfw">August 21, 2021</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
 答えとしては 3, 10, 4 なのですが、for 文の let 初期化専用の例外処理がない場合は 10, 10, 10 になるべき問題です。<span style="color:blue">クロージャーをしっかり理解していれば（そして例外処理を知らなければ）、答えは全部 10 になるはずなのです</span>。今回この記事では、なぜ 10 になるべきなのか、そしてなぜ 10 にならないのか、について解説します。
 
