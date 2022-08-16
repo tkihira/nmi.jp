@@ -262,7 +262,7 @@ for 文中で let で初期化した場合、ループごとにレキシカル�
 
 よって、(e) で `perIterationBindings` の中身一つずつ、すなわち let で初期化される変数名一つずつにおいて処理を開始します。まずその変数名を `bn` とします（例えば `i` のような名前が入っています）。そして、(i) で新しく作ったレキシカル環境 `thisIterationEnv` に `bn` 変数を追加し、(ii) で退避したレキシカル環境 `lastIterationEnv` から変数名 `bn` の値を `lastValue` に取り出し、それを新しく作ったレキシカル環境 `thisIterationEnv` の `bn` に保存しています。
 
-**すなわち、ここで古いレキシカル環境 `lastIterationEnv` の変数名 `bn` を新しいレキシカル環境 `thisIterationEnv` の変数名 `bn` にコピーしているのです！**
+**すなわち、ここで古いレキシカル環境 `lastIterationEnv` の変数名 `bn` に入っている値を、新しいレキシカル環境 `thisIterationEnv` の変数名 `bn` の値としてコピーしているのです！**
 
 そして (f) で、現在のレキシカル環境を新しく作った `thisIterationEnv` に設定して終了します。これにて、次のループで参照されるレキシカル環境は以前のループとは別の環境に変わります。
 
