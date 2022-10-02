@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Wordle のソルバー（Hard Mode 対応）を作った
+title: Wordle のソルバー（Hard Mode 対応）を作りました
 categories:
 - JavaScript
 ---
