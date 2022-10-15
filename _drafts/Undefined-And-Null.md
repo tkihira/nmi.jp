@@ -248,7 +248,7 @@ JavaScript は動的言語であり、いかに TypeScript を使ってガチガ
 
 そして、`| undefined` で定義された型に対して、さらに `| null` を追加するのはどう考えてもナンセンスです。なのでそういった値に対して `null` を代入したくなった場合は、`null` ではなくて `undefined` を代入する方が自然になるでしょう。
 
-そのように、TypeScript の環境下においては `undefined` を代入用途でも利用するのは理解が出来る話であり、TypeScript を使っていると自然と `undefined` を扱うことが増えるのではないかと思います。TypeScript において `undefined` を使うのは、むしろ自然な話なのかもしれません。
+このように、TypeScript の環境下においては `undefined` を代入用途でも利用するのは理解が出来る話であり、TypeScript を使っていると自然と `undefined` を扱うことが増えるのではないかと思います。TypeScript において `undefined` を使うのは、むしろ自然な話なのかもしれません。
 
 （ここら辺の情報は [@shibu_jp](https://twitter.com/shibu_jp) さん提供です、ありがとうございます！）
 
