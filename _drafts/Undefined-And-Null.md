@@ -23,6 +23,14 @@ console.log(undefined !== null); // true
 console.log(undefined == null); // true
 ```
 
+他の falsy な値（false とみなされる値）との比較は、ゆるい比較演算子であっても区別されます（仕様 同上）。
+
+```javascript
+console.log(undefined == false); // false
+console.log(null == ""); // false
+console.log(undefined == 0); // false
+```
+
 この「ゆるい比較演算子による `null` と `undefined` の比較」は、広く使われています。
 
 ```javascript
@@ -42,7 +50,7 @@ checkValue(0); // value is falsy
 
 0 や 空文字列のような falsy な値は受け付けつつ、`null` と `undefined` を弾きたい、という場面において、「`null` とのゆるい比較演算子による比較」は歴史的にもよく使われています。覚えておくと良いでしょう。
 
-私の個人的な意見では、`null` と `undefined` の仕様上の違いにおいて、<span style="color:blue">実務上覚えておく必要があるのはここまで</span>です。ここから下は「意味上の違い」まで読み飛ばしても大丈夫だと思います。
+私の個人的な意見ですが、`null` と `undefined` の言語仕様上の違いにおいて、<span style="color:red">実務上しっかりと覚えておく必要があるのはここまで</span>だと思います。ここから下は「意味上の違い」の章まで読み飛ばしても大丈夫だと思います。でもせっかく書いたのでよければ読んでください。
 
 余談ですが、少し特殊な例として、ブラウザにおいてゆるい比較演算子は `document.all` と `undefined` ならびに `null` を区別しません（[仕様 B.3.6.2](https://tc39.es/ecma262/#sec-IsHTMLDDA-internal-slot-aec)）。詳細については[以前のブログ記事](http://nmi.jp/2022-08-01-Document-Dot-All)にまとめましたので、興味のある方は読んでみてください。
 
@@ -126,7 +134,9 @@ console.log(void "Hello, world!"); // undefined
 console.log(void (() => console.log("abc"))()); // abc, undefined
 ```
 
-なお余談になりますが、ECMAScript 3 時代（IE 6 の時代）はグローバルオブジェクトの `undefined` プロパティを書き換えることが可能でしたので、一部のコードでは以下のようなコードを書いて `undefined` 上書き対策を行うテクニックもありました。jQuery などで使われていた記憶があります。今はもうグローバルオブジェクトの `undefined` プロパティが上書きされる心配はないので、このようなテクニックは必要ありません。
+なお `void` 演算子は、近年実際に使われる機会は滅多にありません。存在すらしらない方も多いので、あまり使わない方が良いと思います。なぜこんな謎演算子を予約語にして `undefined` を予約語にしなかったのか…。
+
+余談になりますが、ECMAScript 3 時代（IE 6 の時代）はグローバルオブジェクトの `undefined` プロパティを書き換えることが可能でしたので、一部のコードでは以下のようなコードを書いて `undefined` 上書き対策を行うテクニックもありました。jQuery などで使われていた記憶があります。今はもうグローバルオブジェクトの `undefined` プロパティが上書きされる心配はないので、このようなテクニックは必要ありません。
 
 ```javascript
 (function (undefined) {
@@ -135,11 +145,11 @@ console.log(void (() => console.log("abc"))()); // abc, undefined
 })();
 ```
 
-そしてこのように `undefined` という引数名や変数名に `undefined` を代入するテクニックがあるせいで、もし仕様で `undefined` を予約語に変更すると、jQuery を含む過去のコードで動かないものが多数出てしまいます。そのため、今から `undefined` を予約語にしたくともすることが出来なくなっているのです。悲しい歴史です。
+そして、このように `undefined` という引数名や変数名に `undefined` を代入するテクニックがあるせいで、もし今さら仕様で `undefined` を予約語に変更してしまうと、jQuery を含む過去のコードで動かないものが多数出てしまいます。それは `Don't break the web.` の原則に反します。そのため、今やもう `undefined` を予約語にしたくともすることが出来なくなっているのです。悲しい歴史です。
 
 # 意味上の違い
 
-<span style="font-weight: bold">ここまでは事実ベースで書いてきましたが、ここからは私見が入ります</span>。ご注意ください。
+<span style="font-weight: bold">ここまでは事実ベースで書いてきましたが、ここからは私見も入ります</span>。ご注意ください。
 
 ## `undefined`
 
@@ -198,6 +208,8 @@ console.log(document.getElementById("")); // null
 
 `null` は `undefined` と違って、明示的に指定しない限り、滅多に登場しません。<span style="color:red">ECMAScript の範囲で `null` リテラルを参照せずに `null` を作り出すのは至難の業です</span>。これは良い JavaScript クイズになると思います。[私の思いついた・教えてもらった作り出し方（ネタバレ注意）](https://gist.github.com/tkihira/808ca736e6ff289844c65bbfd3ce5fe5)以外にもし別解がある方は是非 [@tkihira](https://twitter.com/tkihira) まで教えて下さい。
 
+一方で、DOM や Node.js の API では値が存在しないことを示す返り値に `null` を返すものがほとんどで、明示的に `undefined` を返すものはあまりありません。
+
 ECMAScript では `typeof null === "object"` の仕様から想像するに、`null` を「インスタンスのないオブジェクト」という意味で捉えているのかな、と個人的に考えております。なので、数値型を返す関数で 0 が false を意味したり、文字列型を返す関数で空文字列 "" が false を意味するのと同じように、オブジェクト型を返す関数において false の意味を返したい時に `null` を利用するのが良いのではないだろうか、と考えております。
 
 # 個人的な `undefined` と `null` の使い分けの考え方
@@ -210,7 +222,7 @@ ECMAScript では `typeof null === "object"` の仕様から想像するに、`n
 
 前述したように `undefined` は突然登場するタイミングが多くある一方で `null` は予期せぬタイミングで登場することはほとんどありません。一切 `undefined` を変数などに代入しないコーディングスタイルを利用していると、もし実行時に何らかの変数やプロパティに `undefined` が入っていた場合、それは即座にバグであることが確定します。そしてそれは大抵の場合、配列外アクセスや存在しないプロパティへのアクセスによって生み出されているはずなので、デバッグも比較的容易になります。
 
-JavaScript はスクリプト言語であり、いかに TypeScript を使ってガチガチに型を定義していようとも、実行時に `undefined` が入ることを 100% 防ぐことは出来ません。なので、もしコードで `undefined` を明示的に代入していたり、もしくは変数やプロパティの中に `undefined` が入りうるパスを許している場合、その `undefined` が実行時エラーによって発生したのか、意図的に代入しているのかを即座に判断することが出来なくなります。
+JavaScript は動的言語であり、いかに TypeScript を使ってガチガチに型を定義していようとも、実行時に `undefined` が入ることを 100% 防ぐことは出来ません。なので、もしコードで `undefined` を明示的に代入していたり、もしくは変数やプロパティの中に `undefined` が入りうるパスを許している場合、その `undefined` が実行時エラーによって発生したのか、意図的に代入しているのかを即座に判断することが出来なくなります。
 
 全ての変数やプロパティに `undefined` を入れないか、許容するにしても引数のみにし、それも絶対に他の変数等に伝搬させない形を徹底することで、実行時に `undefined` が発生するバグが出た場合の調査を楽にすることが出来ます。<span style="color:red">一般的に `undefined` と `NaN` は根本原因の場所とは全然関係のない場所で顕在化することが多く</span>、問題が発生した際に少しでもトラッキングを楽にするという意味で効果的だと思います。
 
@@ -224,7 +236,7 @@ JavaScript はスクリプト言語であり、いかに TypeScript を使って
 
 自分の場合、プロパティや引数などを `undefined` であるかどうか確認する必要がある時は、ゆるい比較演算子を用いて `value == null` と比較することがほとんどです。ただ稀に本当に `undefined` のみと比較しなければいけないことがある場合は、躊躇なく厳密な比較演算子 === を用いて `value === undefined` と比較しています。
 
-まとめると、`undefined` を代入等で変数やプロパティに入れることには反対だが、`undefined` と比較するのは寛容である、ということです。
+まとめると、個人的に `undefined` を代入等で変数やプロパティに入れることには反対だが、`undefined` と比較するのは寛容である、ということです。
 
 # TypeScript の `null` と `undefined` の考え方
 
