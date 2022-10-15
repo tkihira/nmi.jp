@@ -19,11 +19,11 @@ JavaScript (ECMAScript) において、仕様上 `undefined` と `null` は当�
 厳密な比較演算子 === において `undefined` と `null` は区別されます。ゆるい比較演算子 == においては両者は区別されません（[仕様 7.2.14](https://tc39.es/ecma262/#sec-islooselyequal)）。
 
 ```javascript
-console.log(undefined !== null); // true
+console.log(undefined === null); // false
 console.log(undefined == null); // true
 ```
 
-他の falsy な値（false とみなされる値）との比較は、ゆるい比較演算子であっても区別されます（仕様 同上）。
+他の falsy な値（false とみなされる値）との比較は、ゆるい比較演算子であっても区別されます（[仕様 同上](https://tc39.es/ecma262/#sec-islooselyequal)）。
 
 ```javascript
 console.log(undefined == false); // false
@@ -50,7 +50,7 @@ checkValue(0); // value is falsy
 
 0 や 空文字列のような falsy な値は受け付けつつ、`null` と `undefined` を弾きたい、という場面において、「`null` とのゆるい比較演算子による比較」は歴史的にもよく使われています。覚えておくと良いでしょう。
 
-私の個人的な意見ですが、`null` と `undefined` の言語仕様上の違いにおいて、<span style="color:red">実務上しっかりと覚えておく必要があるのはここまで</span>だと思います。ここから下は「意味上の違い」の章まで読み飛ばしても大丈夫だと思います。でもせっかく書いたのでよければ読んでください。
+<span style="color:red">私の個人的な意見ですが、`null` と `undefined` の言語仕様上の違いにおいて、実務上しっかりと覚えておく必要があるのはここまで</span>だと思います。ここから下は「意味上の違い」の章まで読み飛ばしても大丈夫だと思います。
 
 余談ですが、少し特殊な例として、ブラウザにおいてゆるい比較演算子は `document.all` と `undefined` ならびに `null` を区別しません（[仕様 B.3.6.2](https://tc39.es/ecma262/#sec-IsHTMLDDA-internal-slot-aec)）。詳細については[以前のブログ記事](http://nmi.jp/2022-08-01-Document-Dot-All)にまとめましたので、興味のある方は読んでみてください。
 
