@@ -102,7 +102,7 @@ console.log(Number(undefined)); // NaN
 console.log(Number(null)); // 0
 ```
 
-String 型に変換すると、`undefined` は `"undefined"` という文字列に、`null` は `"null"` という文字列に変換されます。
+String 型に変換すると、`undefined` は `"undefined"` という文字列に、`null` は `"null"` という文字列に変換されます（[仕様 7.1.17](https://tc39.es/ecma262/#sec-tostring)）。
 
 ```javascript
 console.log(String(undefined)); // "undefined"
@@ -288,7 +288,7 @@ Use undefined. Do not use null.
 
 私は上記の本は当時の JavaScript においてはとても良い本だと思って他人にも積極的に勧めていた一方で、その本における `undefined` と `null` の扱い方が非常に悪いものだったという意見を持っておりました。手元にないのですが、Appendix において「決して == を使うな、常に === を使え」という指摘があった記憶があります。当時、それを真に受けた人たちの `value !== null && value !== undefined` という（個人的には見るに堪えない）コードが量産されました。
 
-これらの Douglas Crockford の考え方それ自体は面白いなと思っており、おそらく TypeScript の `null` を絶対に使わないという考え方も、このような考え方が根底にあるのかな、と想像しております。皆さんの「なぜ TypeScript は `null` を使わないのか」を想像する足がかりになれば、と思います。
+私はこれらの Douglas Crockford の考え方それ自体は面白いなと思っており、おそらく TypeScript の `null` を絶対に使わないという考え方も、このような考え方が根底にあるのかな、と想像しております。皆さんの「なぜ TypeScript は `null` を使わないのか」を想像する足がかりになれば、と思います。
 
 # まとめ
 
