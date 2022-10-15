@@ -200,7 +200,7 @@ console.log(document.getElementById("")); // null
 
 ECMAScript では `typeof null === "object"` の仕様から想像するに、`null` を「インスタンスのないオブジェクト」という意味で捉えているのかな、と個人的に考えております。なので、数値型を返す関数で 0 が false を意味したり、文字列型を返す関数で空文字列 "" が false を意味するのと同じように、オブジェクト型を返す関数において false の意味を返したい時に `null` を利用するのが良いのではないだろうか、と考えております。
 
-# `undefined` と `null` の使い分けの考え方
+# 個人的な `undefined` と `null` の使い分けの考え方
 
 <span style="color:red">ここからは完全に個人の見解となります</span>のでご注意ください。
 
@@ -226,8 +226,58 @@ JavaScript はスクリプト言語であり、いかに TypeScript を使って
 
 まとめると、`undefined` を代入等で変数やプロパティに入れることには反対だが、`undefined` と比較するのは寛容である、ということです。
 
+# TypeScript の `null` と `undefined` の考え方
+
+ここまで読んでいただいた方に対してちゃぶ台をひっくり返すのは大変に心苦しいのですが、この<span style="color:red">私の考え方はおそらく TypeScript の思想と真っ向から対立しています</span>。
+
+## TypeScript の `? Optional`
+
+まず実用の観点での話ですが、TypeScript は `? Optional` の定義が `| undefined` を示すように出来ており、型定義を短くするためには `null` ではなく `undefined` を利用する方が便利です。引数の Optional 定義はそもそもの JavaScript の挙動とも一致するので、引数において `undefined` を多用するのは自然なことでしょう。
+
+そして、`| undefined` で定義された型に対して、さらに `| null` を追加するのはどう考えてもナンセンスです。なのでそういった値に対して `null` を代入したくなった場合は、`null` ではなくて `undefined` を代入する方が自然になるでしょう。
+
+そのように、TypeScript の環境下においては `undefined` を代入用途でも利用するのは理解が出来る話であり、TypeScript を使っていると自然と `undefined` を扱うことが増えるのではないかと思います。
+
+（ここら辺の情報は [@shibu_jp](https://twitter.com/shibu_jp) さん提供です、ありがとうございます！）
+
+## TypeScript Deep Div の考え方
+
+（以下の情報は [@bad_at_math](https://twitter.com/bad_at_math) さん提供です、ありがとうございます！）
+
+[TypeScript Deep Dive](https://basarat.gitbook.io/typescript/) という本には、["Null vs. Undefined"](https://basarat.gitbook.io/typescript/recap/null-undefined) という章において
+
+```
+JavaScript (and by extension TypeScript) has two bottom types : null and undefined. They are intended to mean different things:
+- Something hasn't been initialized : undefined.
+- Something is currently unavailable: null.
+```
+
+という記載があります。私のような `undefined` 撲滅過激派の思考からすると少し生ぬるい感じがしますが、この考え方に従うのも良いと思います。
+
+## TypeScript Contributor の Coding Guideline
+
+TypeScript の Contributor のための Coding Guidline の ["null and undefined"](https://github.com/microsoft/TypeScript/wiki/Coding-guidelines#null-and-undefined) の節には、シンプルに
+
+```
+Use undefined. Do not use null.
+```
+
+とわかりやすく書いてあります。`null` 撲滅過激派ですね！
+
+なおページの一番上に、しつこいくらいに「これは TypeScript コミュニティのための規範的なガイドラインじゃないからね！！！！」って書いてあります。あくまで TypeScript の Contributor のための Coding Guideline という点には留意してください。でも TypeScript の人たちが基本的にこういう考え方をしているというのは参考になるところですね。
+
+### 余談
+
+さて、なぜ TypeScript の Contributor は `null` を使わないのでしょうか。
+
+「JavaScript: The Good Parts」という（もう時代遅れの本であり、むしろ読むべきではない本だと思うので、敢えてリンクは貼らないでおきます）、2008年に出版されて JavaScript 業界にに大きな影響を与えた本があります。その著者の Douglas Crockford は、JSLint 等の開発者としても有名ですが、[2014 年の講演](https://www.youtube.com/watch?v=PSGEjv3Tqo0&t=561s)において「私は `null` を使わない」と表明しています。要約すると、「`undefined` と `null` は同じ様な型であり、別々に存在する意味はない。そして言語で `undefined` が頻出するなら、`null` は必要ない」という考え方のようです。
+
+私は上記の本は当時の JavaScript においてはとても良い本だと思って他人にも積極的に勧めていた一方で、その本における `undefined` と `null` の扱い方が非常に悪いものだったという意見を持っておりました。手元にないのですが、Appendix において「決して == を使うな、常に === を使え」という指摘があった記憶があります。当時、それを真に受けた人たちの `value !== null && value !== undefined` という（個人的には見るに堪えない）コードが量産されました。
+
+これらの Douglas Crockford の考え方それ自体は面白いなと思っており、おそらく TypeScript の `null` を絶対に使わないという考え方も、このような考え方が根底にあるのかな、と想像しております。皆さんの「なぜ TypeScript は `null` を使わないのか」を想像する足がかりになれば、と思います。
+
 # まとめ
 
-JavaScript において `undefined` 値は頻出しますので、その取り扱いについては慣れておく必要があります。しかし残念ながら、仕様上 `undefined` や `null` は一貫しない振る舞いをしているように感じることも多く、直感的に扱いづらい値です。その挙動を仕様から追いたくなった場合には、本記事はきっと役に立つことでしょう。
+JavaScript において `undefined` 値は頻出しますので、その取り扱いについては慣れておく必要があります。しかし残念ながら、仕様上 `undefined` や `null` は一貫しない振る舞いをしているように感じることも多く、直感的に扱いづらい値です。その挙動を仕様から追いたくなった場合には、本記事はきっと役に立つことでしょう。また `null` と `undefined` の違いによる問題に直面する機会はそこまでないと思いますが、もしどちらの値を使うのが望ましいか悩むことなどがあった際には、この記事にかかれているいくつかの事例が手助けになるかと思います。
 
-`null` と `undefined` の違いによる問題に直面する機会はそこまでないと思いますが、もしどちらの値を使うのが望ましいか悩むことなどがあった際に、この記事が解決の手助けになると幸いです。
+そして `undefined` と `null` をどのように使うか、という点に関しては、世の中千差万別の考え方があって面白いですね。それぞれのコーディングスタイルにはそれぞれ筋の通った考え方があり、それを理解することは言語自体に対する考え方をも深めるものだと思います。この記事が皆さんの JavaScript に対する興味や理解を深めるものになれば光栄です。
