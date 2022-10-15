@@ -8,6 +8,8 @@ categories:
 JavaScript で頻出する `undefined` と `null` について語ります。
 
 
+
+
 # 言語仕様上の違い
 
 JavaScript (ECMAScript) において、仕様上 `undefined` と `null` は当然ながら明確に区別されています。いくつか言語仕様上の扱いについて挙げてみます。
