@@ -1,6 +1,6 @@
 ---
 layout: post
-title: undefined と null の違い
+title: JavaScript の undefined と null を完全に理解する
 categories:
 - JavaScript
 ---
