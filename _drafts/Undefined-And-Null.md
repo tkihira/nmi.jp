@@ -280,7 +280,7 @@ Use undefined. Do not use null.
 
 なおページの一番上に、しつこいくらいに<span style="color:red;font-weight:bold">「これは TypeScript コミュニティのための規範的なガイドラインじゃないからね！！！！」</span>って書いてあります。これがTypeScript のあくまで TypeScript の Contributor のための Coding Guideline という点には留意してください。でも TypeScript 本体の開発者たちが基本的にこういう考え方をしているというのは参考になるところです。
 
-もっとも、[@_\_gfx_\_](https://twitter.com/__gfx__) さんはこのような過激な意見を言っていました。
+もっとも、[@\_\_gfx\_\_](https://twitter.com/__gfx__) さんはこのような過激な意見を言っていました。
 
 > TypeScript compilerはTypeScriptの最古のコードなので、そのコーディングスタイルはあまり参考にすべきでない、というのがコミュニティのコンセンサスだと思いますよ…。
 
