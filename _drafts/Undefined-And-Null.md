@@ -242,9 +242,9 @@ JavaScript は動的言語であり、いかに TypeScript を使ってガチガ
 
 ここまで読んでいただいた方に対してちゃぶ台をひっくり返すのは大変に心苦しいのですが、この<span style="color:red">私の考え方はおそらく TypeScript の思想と真っ向から対立しています</span>。
 
-## TypeScript の `? Optional`
+## TypeScript の　optional property `(foo?: T)`
 
-まず実用の観点での話ですが、TypeScript は `? Optional` が実用上 `| undefined` と同じ内容を示すように出来ており（セマンティクスは異なるのですが）、型定義を短くするためには `null` ではなく `undefined` を利用する方が便利です。引数の Optional 定義はそもそもの JavaScript の挙動とも一致するので、引数において `undefined` を多用するのは自然なことでしょう。
+まず実用の観点での話ですが、TypeScript の optional property `(foo?: T)` が実用上 `| undefined` と同じ内容を示すように出来ており（セマンティクスは異なるのですが）、型定義を短くするためには `null` ではなく `undefined` を利用する方が便利です。引数の Optional 定義はそもそもの JavaScript の挙動とも一致するので、引数において `undefined` を多用するのは自然なことでしょう。
 
 そして、`| undefined` で定義された型に対して、さらに `| null` を追加するのはどう考えてもナンセンスです。なのでそういった値に対して `null` を代入したくなったり、引数を別の変数にコピーしたくなった場合は、`null` ではなくて `undefined` を利用する方が自然になるでしょう。
 
