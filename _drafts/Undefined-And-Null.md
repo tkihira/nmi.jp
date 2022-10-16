@@ -301,3 +301,11 @@ JavaScript において `undefined` 値は頻出しますので、その取り�
 そして `undefined` と `null` をどのように使うか、という点に関しては、世の中千差万別の考え方があって面白いですね。それぞれのコーディングスタイルにはそれぞれ筋の通った考え方があり、それを理解することは言語自体に対する考え方をも深めるものだと思います。この記事が皆さんの JavaScript に対する興味や理解を深めるものになれば光栄です。
 
 最後に。<span style="color:blue">正直に申し上げると、`undefined` と `null` の使い分けの重要度は低いです。これは自転車置き場の議論に近いものがあります。あまり本気にならない方が良い</span>と思います。それぞれの言語仕様上の違いさえ理解していれば、使い分けは大きな問題ではないと思います。
+
+# 余談: なぜ `undefined` と `null` が別々に登場したのか
+
+JavaScript の開発者である Brendan 氏がツイッターで以下のような発言をされています（[@bad_at_math](https://twitter.com/bad_at_math) さん、ありがとうございます）。
+
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr"><a href="https://twitter.com/ronkorving?ref_src=twsrc%5Etfw">@ronkorving</a> 1/ Java &lt;=&gt; JS bridge (LiveConnect) part of plan from start because MILLJ. Java had null and primitives, e.g. int string double.</p>&mdash; BrendanEich (@BrendanEich) <a href="https://twitter.com/BrendanEich/status/652440848299372544?ref_src=twsrc%5Etfw">October 9, 2015</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+ここからのスレッドを読むと、歴史的には Java と JavaScript の通信に対するサポートが言語設計の基底にあったようです。なるほどなぁ…。
