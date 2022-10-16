@@ -278,7 +278,7 @@ Use undefined. Do not use null.
 
 事実、どのように使い分けるのかを悩むくらいなら、一切使わないという考え方は合理的だと思います。どちらを撲滅しやすいかを考えると、残念ながら `null` 撲滅の方が多くのメンバーの間で意思統一しやすいと思います。とはいえ DOM や Node.js の API 等で `null` を返すものは大量に存在するわけで、結局のところどちらも完全な撲滅は出来ないのですが。
 
-なおページの一番上に、しつこいくらいに<span style="color:red;font-weight:bold">「これは TypeScript コミュニティのための規範的なガイドラインじゃないからね！！！！」</span>って書いてあります。これがTypeScript のあくまで TypeScript の Contributor のための Coding Guideline という点には留意してください。でも TypeScript 本体の開発者たちが基本的にこういう考え方をしているというのは参考になるところです。
+なお、このページの一番上に<span style="color:red;font-weight:bold">「今すぐ読むのをやめろ！これは TypeScript コミュニティのための規範的なガイドラインじゃないぞ！！！！」</span>ってデカデカと書いてあります。これがあくまで TypeScript の Contributor のための Coding Guideline という点には留意してください。でも TypeScript 本体の開発者たちが基本的にこういう考え方をしているというのは参考になるところです。
 
 もっとも、[@\_\_gfx\_\_](https://twitter.com/__gfx__) さんはこのような過激な意見を言っていました。
 
