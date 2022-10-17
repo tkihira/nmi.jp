@@ -64,7 +64,7 @@ console.log(dda == undefined); // true
 
 ## JSON
 
-JSON に変換する際にも `undefined` と `null` で差があります。
+JSON に変換する際にも `undefined` と `null` で差があります。([@tamtam180](https://twitter.com/tamtam180) さん、指摘ありがとうございます)。
 
 `null` は JSON 化する時に特に問題なく扱えます（[仕様 25.5.2.2 の 5](https://tc39.es/ecma262/#sec-serializejsonproperty)）。
 
@@ -83,6 +83,8 @@ console.log(JSON.stringify(obj));
 ```
 
 そもそもの JSON の仕様に `undefined` がないため、一貫性のない挙動になっています。気をつけましょう。
+
+----
 
 そして<span style="color:red">私の個人的な意見ですが、`null` と `undefined` の言語仕様上の違いにおいて、実務上しっかりと覚えておく必要があるのはここまで</span>だと思います。ここから下は「意味上の違い」の章まで読み飛ばしても大丈夫だと思います。
 
