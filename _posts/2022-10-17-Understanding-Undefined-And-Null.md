@@ -50,8 +50,6 @@ checkValue(0); // value is falsy
 
 0 や 空文字列のような falsy な値は受け付けつつ、`null` と `undefined` を弾きたい、という場面において、「`null` とのゆるい比較演算子による比較」は歴史的にもよく使われています。覚えておくと良いでしょう。
 
-<span style="color:red">私の個人的な意見ですが、`null` と `undefined` の言語仕様上の違いにおいて、実務上しっかりと覚えておく必要があるのはここまで</span>だと思います。ここから下は「意味上の違い」の章まで読み飛ばしても大丈夫だと思います。
-
 余談ですが、少し特殊な例として、ブラウザにおいてゆるい比較演算子は `document.all` と `undefined` ならびに `null` を区別しません（[仕様 B.3.6.2](https://tc39.es/ecma262/#sec-IsHTMLDDA-internal-slot-aec)）。詳細については[以前のブログ記事](http://nmi.jp/2022-08-01-Document-Dot-All)にまとめましたので、興味のある方は読んでみてください。
 
 ```javascript
@@ -63,6 +61,30 @@ console.log(document.all === null); // false
 const dda = document.all;
 console.log(dda == undefined); // true
 ```
+
+## JSON
+
+JSON に変換する際にも `undefined` と `null` で差があります。
+
+`null` は JSON 化する時に特に問題なく扱えます（[仕様 25.5.2.2 の 5](https://tc39.es/ecma262/#sec-serializejsonproperty)）。
+
+```javascript
+const obj = {key: null, array: [1, null, 3, null]};
+console.log(JSON.stringify(obj));
+// {"key":null,"array":[1,null,3,null]}
+```
+
+一方、`undefined` は<span style="color:red">オブジェクトの value に指定されていた場合はその要素が無視され</span>（[仕様 25.5.2.5 の 8-b](https://tc39.es/ecma262/#sec-serializejsonobject)）、<span style="color:red">配列の要素であった場合には `null` に変換されます</span>（[仕様 25.5.2.6 の 8-b](https://tc39.es/ecma262/#sec-serializejsonarray)）。
+
+```javascript
+const obj = {key: undefined, array: [1, undefined, 3, undefined]};
+console.log(JSON.stringify(obj));
+// {"array":[1,null,3,null]}
+```
+
+そもそもの JSON の仕様に `undefined` がないため、一貫性のない挙動になっています。気をつけましょう。
+
+そして<span style="color:red">私の個人的な意見ですが、`null` と `undefined` の言語仕様上の違いにおいて、実務上しっかりと覚えておく必要があるのはここまで</span>だと思います。ここから下は「意味上の違い」の章まで読み飛ばしても大丈夫だと思います。
 
 ## 型
 
