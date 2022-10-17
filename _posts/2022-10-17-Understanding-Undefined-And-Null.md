@@ -294,6 +294,10 @@ Use undefined. Do not use null.
 
 私はこれらの Douglas Crockford の考え方それ自体は面白いなと思っており、おそらく TypeScript の `null` を絶対に使わないという考え方も、このような考え方が根底にあるのかな、と想像しております。皆さんの「なぜ TypeScript は `null` を使わないのか」を想像する足がかりになれば、と思います。
 
+なお Node.js コミュニティ会長の [@yosuke_furukawa](https://twitter.com/yosuke_furukawa) さんは以下のようなコメントでした。
+
+> null よりも undefined を好んで使ってるの、 Douglas Crockford か TS Contributor しか居ない気もしている
+
 # まとめ
 
 JavaScript において `undefined` 値は頻出しますので、その取り扱いについては慣れておく必要があります。しかし残念ながら、仕様上 `undefined` や `null` は一貫しない振る舞いをしているように感じることも多く、直感的に扱いづらい値です。その挙動を仕様から追いたくなった場合には、本記事はきっと役に立つことでしょう。また `null` と `undefined` の違いによる問題に直面する機会はそこまでないと思いますが、もしどちらの値を使うのが望ましいか悩むことなどがあった際には、この記事にかかれているいくつかの事例が手助けになるかと思います。
