@@ -127,7 +127,7 @@ console.log(JSON.parse(JSON.stringify(obj)))
 
 # 余談その1: whatwg の仕様を確認
 
-一番最初に書いた通り、そもそも `console.log` は（私の記憶が正しければ）Firebug が最初に実装し、その後各実装が勝手に作っていた記憶があります。少なくとも IE6 の時代には `console.log` などという便利な命令はなく、開発者は自前でコンソール用の DIV や TEXTAREA を用意して、そこにデバッグログを表示していました。
+一番最初に書いた通り、そもそも `console.log` は ECMAScript の言語仕様にありません。（私の記憶が正しければ）Firebug が最初に実装し、その後各実装が勝手に作っていた記憶があります。少なくとも IE6 の時代には `console.log` などという便利な命令はなく、開発者は自前でコンソール用の DIV や TEXTAREA を用意して、そこにデバッグログを表示していました。
 
 [whatwg で策定されている console.log の仕様があります](https://console.spec.whatwg.org/)。ただあまり有用なことは書かれておりません。「ああ、やっぱり実装依存だったんだなぁ」と確認する程度の役には立ちます。
 
@@ -150,7 +150,7 @@ console.log("%cHello, %cWorld!", "color:red; font-weight: bold; font-size: 100px
 
 ![Console Log DevTools](/img/console-log-4.png)
 
-私はこれを利用して、スマートニュースの英語版のページにロゴを仕込みました。<span style="red">わずか 1554 byte でスマートニュースのロゴを表示しております</span>。自信作です。
+私はこれを利用して、スマートニュースの英語版のページにロゴを仕込みました。<span style="red">わずか 1554 byte でスマートニュースのロゴを表示しております</span>。色情報をハフマン符号化で圧縮しつつ、Base64 にランレングスも駆使してコードゴルフした自信作です。
 
 ![Console Log DevTools](/img/console-log-5.png)
 
