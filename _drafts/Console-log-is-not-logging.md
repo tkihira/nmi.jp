@@ -136,7 +136,7 @@ console.log(JSON.parse(JSON.stringify(obj)))
 The printer operation is implementation-defined. 
 ```
 
-[Node.js の実装](https://console.spec.whatwg.org/#nodejs-printer)が参考に書かれいるくらいが見どころでしょうか。
+[Node.js の実装](https://console.spec.whatwg.org/#nodejs-printer)が参考に書かれているくらいが見どころでしょうか。
 
 # 余談その2: ブラウザ `console.log` の装飾機能
 
