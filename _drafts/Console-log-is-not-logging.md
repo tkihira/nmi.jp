@@ -16,7 +16,7 @@ JavaScript を書いたことがある人ならば一度は使うであろう `c
 
 まずはさらっと基本をおさらいしましょう。
 
-大前提なのですが、`console.log` は <span style="color:blue">JavaScript の言語仕様（ECMAScript）で定義されていません</span>。ブラウザ向けには [whatwg の仕様](https://console.spec.whatwg.org/)がありますが、あくまでもそれはブラウザ向けの仕様であり、Node.js を含むほぼ全ての JavaScript 環境で使えるのは `console.log` がとても便利なので各環境で用意してくれているおかげです。似たような存在として `setTimeout` があります。
+大前提なのですが、`console.log` は <span style="color:blue">JavaScript の言語仕様（ECMAScript）で定義されていません</span>。ブラウザ向けには [whatwg の仕様](https://console.spec.whatwg.org/)がありますが、あくまでもそれはブラウザ向けの仕様であり、Node.js を含むほぼ全ての JavaScript 環境で使えるのは `console.log` がとても便利なので各環境で用意してくれているおかげです。似たような存在として `setTimeout` があります。今回は `console.log` の細かい話はしませんので、それ自体に興味のある方は[こういった記事](https://future-architect.github.io/typescript-guide/console.html)を見てみてください。
 
 というわけで、`console.log` とは、大抵は<span style="color:red">どこかになにかを出力する関数</span>です。「どこ」に「何」を出力するか、というのは実装によって異なります。今回は Node.js と Chrome を比べて見てみましょう。
 
@@ -103,7 +103,7 @@ console.log(a);
 
 上記を理解すると、実行時に変更されうるオブジェクトや配列を `console.log` で表示する際に気をつけよう、という結論になると思います。基本的にはそれで良いのですが、<span style="color:blue">実はもう一段深い落とし穴</span>があるので、そちらも紹介させてください。
 
-上記の仮説が正しければ、DevTools のコンソールは表示しているオブジェクトへの参照を持っていることになります。そして、参照を持っているということは、<span color="red">Chrome のコンソールに表示されているオブジェクトはガベージコレクションの対象になりません</span>。DevTools を開いている限り、そのオブジェクトは開放されないことになります（閉じると開放されます）。
+上記の仮説が正しければ、DevTools のコンソールは表示しているオブジェクトへの参照を持っていることになります。そして、参照を持っているということは、<span style="color:red">Chrome のコンソールに表示されているオブジェクトはガベージコレクションの対象になりません</span>。DevTools を開いている限り、そのオブジェクトは開放されないことになります（閉じると開放されます）。
 
 これは、DevTools を使ってメモリリークの調査をしている時に、とんでもない落とし穴になります。どれだけ修正してもメモリリークが消えない・・・という時は、もしかしたらコンソールに出しているデバッグ用のメッセージが参照を握っているせいかもしれません。もしその状況に陥ったら、その `console.log` の出力を消さない限り、メモリリークの調査をしようとして DevTools を開いた時だけ発生し、DevTools を閉じている時には発生しないメモリリークになってしまいます。
 
