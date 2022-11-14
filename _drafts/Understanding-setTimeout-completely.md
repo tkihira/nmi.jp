@@ -15,6 +15,8 @@ categories:
 
 
 
+本文中で、**microtask** という言葉と **macrotask** という言葉を使い分けております。microtask はいわゆる Promise 等で指定される次のイベントループの前に処理されるもの、macrotask はいわゆる setTimeout 等で指定される次回以降のイベントループで処理されるものです。この記事では主に macrotask について言及しております。字面が似ているのでご注意ください。
+
 # `setTimeout` のおさらい
 
 `setTimeout` は JavaScript の言語仕様である ECMAScript では定義されておりません。[whatwg で仕様が定義されております](https://html.spec.whatwg.org/multipage/timers-and-user-prompts.html)が、後述しますが仕様通りの実装ではないブラウザが多いです。Node.js でも利用可能です。
@@ -111,7 +113,7 @@ tick();
 5. If nesting level is greater than 5, and timeout is less than 4, then set timeout to 4.
 ```
 
-簡単に説明すると、`setTimeout` の中で `setTimeout` が 5 回より多く呼ばれ、かつ timeout 指定が 4 ミリ秒以下だった場合には、強制的に 4 ミリ秒に設定されます。適当なコードによって CPU を無駄に消費されないように負荷対策をしているのです。
+簡単に説明すると、`setTimeout` の中で `setTimeout` が 5 回より多く呼ばれ、かつ timeout 指定が 4 ミリ秒未満だった場合には、強制的に 4 ミリ秒に設定されます。適当なユーザーコードによって CPU を無駄に消費されないように負荷対策をしているのです。
 
 実験してみましょう。以下のようなコードを書いてみます。
 
@@ -139,6 +141,8 @@ Chrome での結果は以下の通りでした。
 仕様では 6 回目から発生するはずなのですが、4 回目から発生しています。仕様違反ですね！まあ、なにはともあれ数回目からはスロットリングが発生していることが確認出来ました。Firefox でも同様の仕様違反があるように見受けられました。Safari は仕様通りのスロットリングがかかっているようです。
 
 なお [Chromium のソースコードを確認](https://source.chromium.org/chromium/chromium/src/+/main:third_party/blink/renderer/core/frame/dom_timer.cc;l=96-100;drc=d9b81bd5e8768064e3ad258115c960d08fe32b55)したところ、彼らは[これが仕様違反であるのはわかっている](https://bugs.chromium.org/p/chromium/issues/detail?id=1108877)ようです。個人的にはこの回数の差に意味があるように思えないのですが、しかし既に動いているコードを触りたくない気持ちもよくわかります。たいした違反でもないですしね。
+
+なお最初の数回だけでも 0ms が受け入れられたのは比較的最近で、一昔前は最初の 1 回目からスロットリングが発生しておりました。後述しますが、ブラウザにおいて `postMessage` を利用することでこのスロットリング制限を抜けることが出来ますが、そもそもスロットリングはユーザーの CPU を過負荷にさせないための機能ですので、あまり多用しないようにしましょう。
 
 # 巨大な数値の扱い
 
