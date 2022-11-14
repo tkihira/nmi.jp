@@ -9,7 +9,7 @@ categories:
 
 先に書いておきますが、ものすごくニッチで細かい話ばかり並びます。突然私が、ただ純粋に `setTimeout` について調べたくなったので、その結果をまとめただけのものです。普通に開発している人には必要のない情報が多くなるでしょう。この記事は基礎から `setTimeout` を学ぼう、という方には全然向かないと思います。
 
-また、ある程度 JavaScript のイベントループについてある程度理解していることを前提とします。その詳しい理解には、[@PADAone](https://twitter.com/pd1xx) さんの書かれた「[イベントループとプロミスチェーンで学ぶJavaScriptの非同期処理](https://zenn.dev/estra/books/js-async-promise-chain-event-loop)」という本の中の「[それぞれのイベントループ](https://zenn.dev/estra/books/js-async-promise-chain-event-loop/viewer/c-epasync-what-event-loop)」を読んで頂けると良いかと思います。
+また、JavaScript のイベントループについてある程度理解していることを前提とします。その詳しい理解には、[@PADAone](https://twitter.com/pd1xx) さんの書かれた「[イベントループとプロミスチェーンで学ぶJavaScriptの非同期処理](https://zenn.dev/estra/books/js-async-promise-chain-event-loop)」という本の中の「[それぞれのイベントループ](https://zenn.dev/estra/books/js-async-promise-chain-event-loop/viewer/c-epasync-what-event-loop)」を読んで頂けると良いかと思います。
 
 
 
