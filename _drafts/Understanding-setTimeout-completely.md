@@ -27,7 +27,7 @@ categories:
 const id = setTimeout(() => console.log("3 seconds"), 3000);
 ```
 
-確実に 3000 ミリ秒後に発火するわけではありません。だいたい 3000 ミリ秒ちょうどかちょっと後くらいに実行されます。後述しますがスロットリングによってたまに長時間実行されずに放置されることもあります。
+確実に 3000 ミリ秒後に発火するわけではありません。だいたい 3000 ミリ秒ちょうどかちょっと後くらいに実行されます。後述しますがスロットリングなどの影響で、たまに長時間実行されずに放置されることもあります。
 
 ブラウザの場合、返り値として timeoutId と呼ばれるゼロより大きい整数値が返ってきます。この id を `clearTimeout` に渡すことによって、発火前にキャンセルすることが出来ます。
 
@@ -51,7 +51,7 @@ Node.js の場合、返り値としては Timeout クラスが返ってきます
 
 余談ですが、`setInterval` の `clearInterval` 忘れはよくあるメモリリークの原因です。個人的にはそれが嫌なので毎回 `setTimeout` で呼ぶのが好みです。
 
-`setTimeout` で渡されたコードが実行されるのは、現在の実行コンテキストが終わった次のイベントループになります。
+`setTimeout` で渡されたコードが実行されるのは、現在の実行コンテキストが終わった次以降のイベントループになります。
 
 `setTimeout` や `setInterval`、また Node.js にしかないですが `setImmediate` に渡されたコードは「macrotask」として実行されます。microtask ではありませんので、コールバック内から再度これらの関数を登録して即座に呼んでも、イベントループをブロックする心配はありません。
 
@@ -71,7 +71,7 @@ const tick = () => {
 tick(); // ブロックする。このコンテキストが終了したら、以降一切他のコードは実行されない。ブラウザなら UI も固まってしまう
 ```
 
-なお Node.js の `process.nextTick` は厳密には microtask とも違うキューで管理されており、他の microtask よりも先に処理されます。microtask が V8 で管理されているのに対して、`process.nextTick` は Node.js 独自に管理しているタスクキューになります。Promise の登場前に必要に応じて作られた機能なのですが、既に Node.js 内部処理で利用しまくっているために今さら microtask 等に一本化出来ない、という悲しい歴史的事情によるものだと聞いております。
+なお Node.js の `process.nextTick` は厳密には microtask とも違うキューで管理されており、他の microtask よりも先に処理されます。microtask が V8 で管理されているのに対して、`process.nextTick` は Node.js 独自に管理しているタスクキューになります。そもそも `process.nextTick` は Promise の登場前に必要に応じて作られた機能なのですが、既に Node.js 内部処理でこれを多用しているため、今さら microtask 等に一本化出来ない、という歴史的事情によるものだと聞いております。
 
 ここらへんまでが前提です。では本編行ってみましょう！
 
@@ -208,7 +208,7 @@ immediate
 
 Chrome と Firefox は、イベントループ 1 回ごとに各種類の macrotask を 1 回ずつ律儀に回しているため、スロットリングが始まるまでの数回位はイベントループにおいて毎回実行されることが確認出来ます。実際に見てみましょう。
 
-JavaScript には `setImmediate` がありませんので、毎イベントループに確実にタスクをキューイングするために `postMessage` を利用しています。これは `setTimeout` の 4ms のスロットリング制限を抜けるための有用なテクニックですが、あまり悪用しないようにしましょう。
+JavaScript には `setImmediate` がありませんので、毎イベントループに確実にタスクをキューイングするために `postMessage` を利用しています。前述した通りこれは `setTimeout` の 4ms のスロットリング制限を抜けるための有用なテクニックですが、ユーザー環境に負荷をかける可能性があるのであまり多用しないようにしましょう。
 
 ```javascript
 let count = 10;
@@ -314,23 +314,38 @@ console.log(setTimeout("", 3000)); // => 0
 console.log(setTimeout(" ", 3000)); // => non-zero
 ```
 
-そもそも [setTimeout が 0 を返すのは仕様違反](https://html.spec.whatwg.org/multipage/timers-and-user-prompts.html)なのですが、まあ割とブラウザはこういう実務上なんの問題もない仕様違反であれば気軽にやってきます。[Chromium のソースコードではこの部分](https://source.chromium.org/chromium/chromium/src/+/main:third_party/blink/renderer/core/frame/window_or_worker_global_scope.cc;l=171-174)です。コメントには "historically a performance issue" って書いてあるけれど、出典等がないために詳細は全く不明です。これがパフォーマンスに影響を与えるとは思えないのですが、一体どんな事情であったのか気になりますね。
+そもそも [setTimeout が 0 を返すのは仕様違反](https://html.spec.whatwg.org/multipage/timers-and-user-prompts.html)なのですが、実務上なんの問題もない仕様違反ではあります。[Chromium のソースコードではこの部分](https://source.chromium.org/chromium/chromium/src/+/main:third_party/blink/renderer/core/frame/window_or_worker_global_scope.cc;l=171-174)です。コメントには "historically a performance issue" って書いてあるけれど、出典等がないために詳細は全く不明です。これがパフォーマンスに影響を与えるとは思えないのですが、一体どんな事情であったのか気になりますね。
 
 他にも Chrome は eval が実行出来ない環境でこの形式の呼び出しをすると、DevTools に警告を出した上で登録を失敗させ 0 を返してきます。
 
 ![setTimeout-4.png](/img/setTimeout-4.png)
 
-まあ eval なんて使うなってことです。
+まあ eval なんて使うなってことですね。
 
-## Node.js の Promisify 対応
+## Node.js の Promise 対応
+
+`setTimeout` を素直に Promise 化すると、以下のようなコードになります。これはブラウザでも頻出するコードです。
+
+```javascript
+await new Promise(r => setTimeout(r, 3000)); // wait 3 seconds
+```
+
+Node.js では、promisify を利用して `setTimeout` を Promise 化して使う用途もあるようです。
 
 <blockquote class="twitter-tweet"><p lang="ja" dir="ltr">Nodeの場合だけ自分は、await util.promisify(setTimeout)(1000) で時間停止させるコード書くこと多い気がする</p>&mdash; 蝉丸ファン (@about_hiroppy) <a href="https://twitter.com/about_hiroppy/status/1551926207784296449?ref_src=twsrc%5Etfw">July 26, 2022</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
-setTimeout を promisify を利用して Promise 化して使う用途もあるようです。本来の setTimeout の構文は promisify とは相容れないのですが、Node.js は `util.promisify.custom` シンボルを使って[例外処理の指定が出来る](https://nodejs.org/dist/latest-v12.x/docs/api/util.html#util_custom_promisified_functions)ようです。躊躇なくこういう拡張を入れていく、後先を考えていない感じがいかにも JavaScript っぽいですね（褒めてません）。個人的には普通に Promise を書く方が断然好みです。
+本来の `setTimeout` の構文は promisify とは相容れないのですが、Node.js は `util.promisify.custom` シンボルを使って[例外処理の指定が出来る](https://nodejs.org/dist/latest-v12.x/docs/api/util.html#util_custom_promisified_functions)ようで、これを使って対応されているようです。
+
+なお、[@yosuke_furukawa](https://twitter.com/yosuke_furukawa) さんに教えていただいたのですが、Node.js v15 以降では `timers/promises` より Promise に対応した `setTimeout` をそのまま利用出来るようです。
 
 ```javascript
-await new Promise(r => setTimeout(r, 1000));
+import { setTimeout } from 'timers/promises';
+
+const response = await setTimeout(3000, '3 seconds');
+console.log(response);
 ```
+
+名前空間は違うものの関数シグネチャが違うのに同じ関数名であることに個人的には危機感を覚えるのですが（後述する WinterCG の文脈ではアウトな気がする）、Promise native な setTimeout が標準で準備されたので、上記のような Promisify の対応は Node.js においては必要なくなっております。promisify の利用は過去の書き方として覚えておきましょう。
 
 ## `setInterval` と `setTimeout` の使い分け
 
@@ -352,3 +367,17 @@ tick();
 この書き方だと `tick` 内部で終了条件を確認しているため、timeoutId を持ち回すことなく発火を止めることが出来ます。
 
 ここで重要なポイントは、「実際の処理」の前に `setTimeout` を書くことです。一番最後に `setTimeout` を書くと、この例だと「処理にかかった実行時間＋100ms」に次の `tick` が呼ばれることになってしまい、処理にかかった実行時間が大きくなればなるほど定期的な実行の誤差が生じます。気をつけてください。
+
+## WinterCG による標準化
+
+先日の [console.log のブログ記事](http://nmi.jp/2022-11-14-Be-careful-about-console-log-in-chrome)を書いた際に [@petamoriken](https://twitter.com/petamoriken) さんにご指摘を受けたのですが、現在こういった「ECMAScript に入っていないけれど、ほぼ標準になっている便利な API」の標準化作業が [WinterCG](https://wintercg.org/) によって進められています。
+
+JavaScript は様々な理由から、ブラウザと直接の関係がない場所でも使われるようになってきました。Node.js や deno のみならず、Cloudflare の edge computing などにおいても JavaScript は広く使われています。そういった環境で標準化されていない API をサポートするときには各所それぞれが独自の実装をしていました（今回の記事の Node.js の `setTimeout` 実装がよい例になっていると思います）。この状態が続くと、例えば Node.js で書いたコードが deno や他の非ブラウザー環境で動かなくなる、というような事態が懸念されます。それを防ぐために Cloudflare などが中心となって [WinterCG](https://wintercg.org/) という団体を作って活動しています。
+
+[こちらの日本語記事](https://blog.cloudflare.com/ja-jp/introducing-the-wintercg-ja-jp/) に詳しいのですが、
+
+> WinterCGが独立して、独自の標準APIセットを公開することを意図しているわけではありません。WinterCGから生まれる新しい仕様のアイデアは、まずW3CとWHATWGの既存のワークストリームで検討され、できるだけ幅広い意見の一致を得ることを目指します。
+
+という形で、既存の仕様と協力しながら良い設計を探求していくスタイルのようです。まだ活動が始まったばかりですが、良いアウトプットが出ることを期待しております。なお `setTimeout` についてはこのように書かれています。
+
+> いずれかの環境が標準化APIの定義と異なる場合(例えば、setTimeout()およびsetInterval()のNode.js実装)、その違いを説明した明確な文書が用意されます。このような差異は既存コードとの後方互換性のためにのみ存在する必要があります。
