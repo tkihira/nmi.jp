@@ -295,7 +295,33 @@ immediate
 
 `setImmediate` と `setTimeout` の差は、主にここにあります。覚えておいて損はないかもしれません。
 
+# 正確なタイミング測定にはどうすればいいのか？
+
+（この節は [@bad_at_math](https://twitter.com/bad_at_math) さんからの情報提供を元に書いております。ありがとうございます！）
+
+<span style="color:red; font-weight: bold">結論から言うと、正確なタイミング計測は諦めるのが一番良い選択肢です</span>。ただ、ビジネス要件として可能な限り正確な測定を求められることがあるかもしれません。そんな時には、 **cross-domain Iframe の Web Worker の中で setTimeout を作成する** のが最もマシな選択肢になるでしょう。
+
+[The most accurate way to schedule a function in a web browser](https://medium.com/teads-engineering/the-most-accurate-way-to-schedule-a-function-in-a-web-browser-eadcd164da12)
+
+2020 年 10 月に発表されたこのブログは、何億もの実機で計測したログを元にそう結論づけております。この記事中では Web Worker を生成するコストまで計測していて、とんでもなく参考になりました。記事中でも言及がありますが、Android の成績が一様に悪いのは、iOS と違って低スペックな端末の混入率が非常にたかいことが大きな要因の 1 つになっている点には留意しましょう。
+
+些細な問題点として `requestAnimationFrame` の実装がおかしかったり（毎フレームコールバック関数を生成しているのは明らかにおかしい）、最も正確に測れるであろう `postMessage` の計測をしていなかったり（ただしこれは意図的かもしれません。`postMessage` は非常に端末に負担をかけるので…）、といったことがありますが、結論には全く異論がないので素晴らしい記事です。長いですが興味のある方はぜひ読んでみてください。
+
 # 他の小ネタ
+
+## 必ず時間順・登録順に発火するか？
+
+`setTimeout` が時間順・登録順に発火するかどうかについて気になりますが、仕様的には両者ともに保証されていないと捉えて良いと思います。[仕様 5.2](https://html.spec.whatwg.org/multipage/timers-and-user-prompts.html#map-of-active-timers) に以下のような記載があり、保証されているように見えます。
+
+> Wait until any invocations of this algorithm that had the same global and orderingIdentifier, that started before this one, and whose milliseconds is equal to or less than this one's, have completed.
+
+しかしこの部分は `Run the following steps in parallel:` の中にあり、この [in parallel の定義](https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel)を読むと、
+
+> To run steps in parallel means those steps are to be run, one after another, at the same time as other logic in the standard (e.g., at the same time as the event loop). This standard does not define the precise mechanism by which this is achieved, be it time-sharing cooperative multitasking, fibers, threads, processes, using different hyperthreads, cores, CPUs, machines, etc.
+
+とあります。すなわち、parallel に実行するための実装は一切規定されていないので、5.2 で保証されているのはあくまでも「前に実行（invocation）されている処理が終わるのを待つ」だけだと捉えられ、結果としてどのような実行順になるのかは仕様で明確に定義されていないと考えて良いと思います（ただ、invocation の定義次第で両者とも保証されていると言ってもよいかもしれません。ここは少し不明瞭です）。
+
+なお、モダンブラウザならびに Node.js の実装では「時間順・（同じ時間の場合は）登録順」の発火になります。<span style="color:blue">しかしその実装に依存したコードを書かないほうが良いでしょう</span>。
 
 ## 文字列による関数の指定
 
