@@ -15,7 +15,7 @@ categories:
 
 
 
-本文中で、**microtask** という言葉と **macrotask** という言葉を使い分けております。microtask はいわゆる Promise 等で指定される次のイベントループの前に処理されるもの、macrotask はいわゆる setTimeout 等で指定される次回以降のイベントループで処理されるものです。この記事では主に macrotask について言及しております。字面が似ているのでご注意ください。
+本文中で、**microtask** という言葉と **(macro)task** という言葉を使い分けております。microtask はいわゆる Promise 等で指定される次のイベントループの前に処理されるもの、(macro)task はいわゆる setTimeout 等で指定される次回以降のイベントループで処理されるものです。この記事では主に (macro)task について言及しております。字面が似ているのでご注意ください。
 
 # `setTimeout` のおさらい
 
@@ -53,7 +53,7 @@ Node.js の場合、返り値としては Timeout クラスが返ってきます
 
 `setTimeout` で渡されたコードが実行されるのは、現在の実行コンテキストが終わった次以降のイベントループになります。
 
-`setTimeout` や `setInterval`、また Node.js にしかないですが `setImmediate` に渡されたコードは「macrotask」として実行されます。microtask ではありませんので、コールバック内から再度これらの関数を登録して即座に呼んでも、イベントループをブロックする心配はありません。
+`setTimeout` や `setInterval`、また Node.js にしかないですが `setImmediate` に渡されたコードは「(macro)task」として実行されます。microtask ではありませんので、コールバック内から再度これらの関数を登録して即座に呼んでも、イベントループをブロックする心配はありません。
 
 ```javascript
 const tick = () => {
@@ -206,7 +206,7 @@ immediate
 
 ## Chrome と Firefox の場合
 
-Chrome と Firefox は、イベントループ 1 回ごとに各種類の macrotask を 1 回ずつ律儀に回しているため、スロットリングが始まるまでの数回位はイベントループにおいて毎回実行されることが確認出来ます。実際に見てみましょう。
+Chrome と Firefox は、イベントループ 1 回ごとに各種類の (macro)task を 1 回ずつ律儀に回しているため、スロットリングが始まるまでの数回位はイベントループにおいて毎回実行されることが確認出来ます。実際に見てみましょう。
 
 JavaScript には `setImmediate` がありませんので、毎イベントループに確実にタスクをキューイングするために `postMessage` を利用しています。前述した通りこれは `setTimeout` の 4ms のスロットリング制限を抜けるための有用なテクニックですが、ユーザー環境に負荷をかける可能性があるのであまり多用しないようにしましょう。
 
@@ -232,7 +232,7 @@ postMessage("");
 
 ![setTimeout-2.png](/img/setTimeout-2.png)
 
-スロットリングが始まるまでは、キレイに timeout と message が並んでいることが確認出来ます。`setTimeout` をゼロ秒で呼ぶと、毎回のイベントループで実行されているようです。一番下の `setTimeout` と `postMessage` を呼ぶ順番を逆にすると結果も反転しますので、同じ macrotask として優先度なしにキューイングされていることも確認出来ます。
+スロットリングが始まるまでは、キレイに timeout と message が並んでいることが確認出来ます。`setTimeout` をゼロ秒で呼ぶと、毎回のイベントループで実行されているようです。一番下の `setTimeout` と `postMessage` を呼ぶ順番を逆にすると結果も反転しますので、同じ (macro)task として優先度なしにキューイングされていることも確認出来ます。
 
 ## Safari の場合
 
@@ -291,7 +291,7 @@ immediate
 immediate
 ```
 
-これは、実は Node.js の `setTimeout` は [timeout に 0ms を指定できない仕様](https://nodejs.org/api/timers.html#settimeoutcallback-delay-args)のためです。[0ms を指定すると 1ms に設定されます](https://github.com/nodejs/node/blob/main/lib/internal/timers.js#L166)。そして、1ms の間に `setImmediate` の macrotask が複数回走るためです。
+これは、実は Node.js の `setTimeout` は [timeout に 0ms を指定できない仕様](https://nodejs.org/api/timers.html#settimeoutcallback-delay-args)のためです。[0ms を指定すると 1ms に設定されます](https://github.com/nodejs/node/blob/main/lib/internal/timers.js#L166)。そして、1ms の間に `setImmediate` の (macro)task が複数回走るためです。
 
 `setImmediate` と `setTimeout` の差は、主にここにあります。覚えておいて損はないかもしれません。
 
