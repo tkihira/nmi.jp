@@ -348,6 +348,18 @@ console.log(setTimeout(" ", 3000)); // => non-zero
 
 まあ eval なんて使うなってことですね。
 
+## IE で使えない第三引数
+
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">IEでは使えないsetTimeoutの第3引数のこと以外は完璧に理解できた！ / setTimeout を完璧に理解する <a href="https://t.co/ISdXVsj0dt">https://t.co/ISdXVsj0dt</a></p>&mdash; Yosuke HASEGAWA (@hasegawayosuke) <a href="https://twitter.com/hasegawayosuke/status/1594529176354054144?ref_src=twsrc%5Etfw">November 21, 2022</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+[@hasegawayosuke](https://twitter.com/hasegawayosuke) さんから教えていただいたのですが、IE では setTimeout の第三引数（arguments）が使えなかったそうです。なので文字列による関数の指定が流行っていた可能性がある、と。なるほど・・・。
+
+当時でも関数式を使えば自由に引数を渡すことは出来たのですが、2000 年代前半は関数式という考え方がほとんど普及していなかったので、引数が書けないとどうしていいのかわからない人が多かったのかもしれません。
+
+```javascript
+setTimeout(function() { func(arg1, arg2, arg3); }, 1000);
+```
+
 ## Node.js の Promise 対応
 
 `setTimeout` を素直に Promise 化すると、以下のようなコードになります。これはブラウザでも頻出するコードです。
