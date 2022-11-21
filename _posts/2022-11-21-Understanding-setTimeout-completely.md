@@ -360,6 +360,10 @@ console.log(setTimeout(" ", 3000)); // => non-zero
 setTimeout(function() { func(arg1, arg2, arg3); }, 1000);
 ```
 
+追記:
+
+[@kazuho さんによる](https://twitter.com/kazuho/status/1594543187267198977)と、そもそも JavaScript 1.1（というものがあることすら知らなかったのですが）までは文字列を渡す方法しか存在しなかったようです。なので文字列を渡す方法が当時の主流だったのは歴史的に当然だったのかもしれません。
+
 ## Node.js の Promise 対応
 
 `setTimeout` を素直に Promise 化すると、以下のようなコードになります。これはブラウザでも頻出するコードです。
