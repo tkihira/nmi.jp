@@ -5,7 +5,7 @@ categories:
 - JavaScript
 ---
 
-2023 年、あけましておめでとうございます！私は元旦に次のようなオリジナル・クイズを出しました。
+2023 年、あけましておめでとうございます！私は元旦に次のようなオリジナル・パズルを出しました。
 
 <blockquote class="twitter-tweet"><p lang="ja" dir="ltr">2023年クイズ！<br><br>上の例のように、数字の合間に四則演算（＋−×÷）や括弧を入れることで、2023 を作ってください。<br><br>- 数字の間に必ず演算子を 1 つ入れてください<br>- ただし 9 と 8 の間には既に ÷ が入っています<br>- 括弧は複数重ねて使用できます<br>- 10×(-9 ÷ 8) のようなマイナス記号の使用は禁止です <a href="https://t.co/K0w2miMXJA">pic.twitter.com/K0w2miMXJA</a></p>&mdash; Takuo Kihira (@tkihira) <a href="https://twitter.com/tkihira/status/1609313732034965506?ref_src=twsrc%5Etfw">December 31, 2022</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
@@ -14,13 +14,13 @@ categories:
 
 
 
-# 括弧の数式をプログラムで扱う
+# 括弧の数式をプログラムで扱うには
 
 さて、この問題の一番厄介な点は、<span style="color:red">括弧の絡む数式をプログラムで処理する</span>という点ではないかと思います。この記事でもそこを重点的に解説したいと思います。
 
 ## 中置記法
 
-まず、我々が日常的に使っている数式は、いわゆる「中置記法」と呼ばれる記法です。例えば
+まず、我々が日常的に使っている数式は、いわゆる「[中置記法](https://ja.wikipedia.org/wiki/%E4%B8%AD%E7%BD%AE%E8%A8%98%E6%B3%95)」と呼ばれる記法です。例えば
 
 ```
 (1 + 1 / 9) * 9
@@ -34,7 +34,7 @@ categories:
 
 ## 逆ポーランド記法
 
-数式の二分木を、括弧を使わずに表現する際に広く使われているのが「逆ポーランド記法（Reverse Polish Notation）」とよばれる記法です。頭文字をとって RPN と略されることが多いです。逆ポーランド記法では、あらかじめ演算する数字を書いておき、最後に演算子を記述する形になります。
+数式の二分木を、括弧を使わずに表現する際に広く使われているのが「[逆ポーランド記法（Reverse Polish Notation）](https://ja.wikipedia.org/wiki/%E9%80%86%E3%83%9D%E3%83%BC%E3%83%A9%E3%83%B3%E3%83%89%E8%A8%98%E6%B3%95)」とよばれる記法です。頭文字をとって RPN と略されることが多いです。逆ポーランド記法では、あらかじめ演算する数字を書いておき、最後に演算子を記述する形になります。
 
 例えば、上記の `(1 + 1 / 9) * 9` を逆ポーランド記法で書くと、
 
@@ -49,7 +49,7 @@ categories:
 - 数字の数は、演算子の数より必ず 1 つ多い
 - 数式の途中において、数字の数は演算子の数より常に 1 つ以上多い
 
-余談ですが、慣れると記述しやすいと感じる人が多く、例えばヒューレット・パッカード社の関数電卓には RPN モードが搭載されており、一部の界隈では大変好評でした。私も逆ポーランド記法目的でヒューレット・パッカード社の関数電卓（HP-28C）を愛用していたクチです。
+余談ですが、慣れると記述しやすいと感じる人が多く、例えばヒューレット・パッカード社の関数電卓には RPN モードが搭載されており、一部の界隈では大変好評でした。私も逆ポーランド記法目的でヒューレット・パッカード社の関数電卓（[HP-28C](https://ja.wikipedia.org/wiki/HP-28_%E3%82%B7%E3%83%AA%E3%83%BC%E3%82%BA)）を愛用していたクチです。
 
 ### 逆ポーランド記法のコンピュータによる処理
 
@@ -60,7 +60,7 @@ categories:
 - 演算子が出てきたら、スタックから 2 つ値を取り出し、それらを演算した結果をスタックに格納する
 - 数式が終わると必ずスタックに 1 つ数字が残っているはずなので、その数字が演算結果となる
 
-実は、これはいわゆる「スタックマシン」と同じ演算になります。例えば Java や WebAssembly などのスタックマシン言語においては、バイナリレベルでは大体同じ様な構造を持っています。
+実は、これはいわゆる「[スタックマシン](https://ja.wikipedia.org/wiki/%E3%82%B9%E3%82%BF%E3%83%83%E3%82%AF%E3%83%9E%E3%82%B7%E3%83%B3)」と同じ演算になります。例えば Java や WebAssembly などのスタックマシン言語においては、バイナリレベルでは大体同じ様な構造を持っています。
 
 # パズルを解く戦略
 
@@ -105,7 +105,7 @@ const traverse = (expr, number, opes, nums) => {
     }
 };
 traverse([], 10, 0, 0);
-console.log(counter);
+console.log({counter});
 ```
 
 何も考えずに再帰で書いています。簡単に解説すると、
@@ -160,7 +160,7 @@ const traverse = (expr, number, opes, nums, eightDepth) => {
     }
 };
 traverse([], 10, 0, 0, -1);
-console.log(counter);
+console.log({counter});
 ```
 
 手元では 37 秒、counter は 318,636,032 でした。大体 1/4 程度まで探索量を減らせました。
@@ -189,11 +189,11 @@ const solve = (expr) => {
 };
 ```
 
-数値が来たら stack に push して、演算子が来たら stack から取り出して計算し、演算結果を stack に push しています。最後は必ず stack に 1 つ答えが残っているので、それを 2023 と比較しています。
+数値が来たら stack に push して、演算子が来たら stack から取り出して計算し、演算結果を stack に push しています。最後は必ず stack に 1 つ答えが残っているので、それを 2023 と比較しています。stack には右辺値、左辺値の順番で積まれているので、引き算と割り算ではまず右辺値を扱う必要があることに気をつけましょう。
 
-気をつけなければいけないのは、stack には右辺値、左辺値の順番で積まれているので、引き算と割り算ではまず右辺値を扱う必要があることです。また、result には浮動小数点演算による丸め誤差が含まれている可能性があるので、[epsilon](https://ja.wikipedia.org/wiki/%E8%A8%88%E7%AE%97%E6%A9%9F%E3%82%A4%E3%83%97%E3%82%B7%E3%83%AD%E3%83%B3) を 0.001 として比較しています。
+また、result には浮動小数点演算による丸め誤差が含まれている可能性があるので、[epsilon](https://ja.wikipedia.org/wiki/%E8%A8%88%E7%AE%97%E6%A9%9F%E3%82%A4%E3%83%97%E3%82%B7%E3%83%AD%E3%83%B3) を 0.001 として比較しています。数式的に桁落ちもないので私はこれで十分だと判断しましたが、正確に計算するためには仮想分数を自前で管理する必要があります。特に競プロ界隈ではこういった誤差を適当に処理することを許さない問題が多いので気をつけましょう。
 
-この結果、手元の計算では 530 行の出力を 3 分 33 秒で得られました。Twitter 等では、この結果と同じように全件を 530 件として出していらっしゃる方が多いです。
+このプログラムを実行した結果、手元の計算では 530 行の出力を 3 分 33 秒で得られました。Twitter 等では、この結果と同じように<span style="color:red">全件を 530 件</span>として出していらっしゃる方が多いです。
 
 ## 逆ポーランド記法から中置記法への変換
 
@@ -273,13 +273,11 @@ const prettyPrint = (expr) => {
 };
 ```
 
-優先度を、数字: 1、掛け算・割り算: 2、足し算・引き算: 3 と規定し、それに従った出力をしています。このコードは、先程の結果を次のように同じ形で出力します。
+優先度を、`数字: 1`、`掛け算・割り算: 2`、`足し算・引き算: 3` と規定し、それに従った出力をしています。このコードは、先程の結果を次のように同じ形で出力します。
 
-```
-((10+(9/8+7)*6*5)*4-3)*2-1
-```
+- `((10+(9/8+7)*6*5)*4-3)*2-1`
 
-このコードを手元のコンピュータで実行すると、3 分 37 秒で 81 行の出力になりました。中置記法ならば、全件で 81 件あると言えそうです。
+このコードを手元のコンピュータで実行すると、3 分 37 秒で 81 行の出力になりました。<span style="color:red">中置記法ならば、全件で 81 件あると言えそうです</span>。
 
 ここまでのコードと出力結果を、gist に用意しました。参考にしてみてください。
 
@@ -298,3 +296,11 @@ const prettyPrint = (expr) => {
 [https://gist.github.com/tkihira/5d2add1e73019382bbcc63085c8cf527](https://gist.github.com/tkihira/5d2add1e73019382bbcc63085c8cf527)
 
 10 年以上前はこのような高速化の効果が絶大だったのですが、最近はあまり必要ではありません。今回はあまりに無駄の多いコードだったので大きな効果が見えますが、普段のコーディングでこういった高速化が必要になることはあまりないでしょう。プロダクションでこのような探索コードを書く場合は、そもそも JavaScript を選ばないでしょうしね。
+
+## 余談: 宣伝
+
+私は大学生の時に共著で書いたアルゴリズム本で、逆ポーランド記法について[テンパズル](https://ja.wikipedia.org/wiki/%E3%83%86%E3%83%B3%E3%83%91%E3%82%BA%E3%83%AB)を例に解説しています。かなり古い本で C や Java を前提に書かれているのですが、もし図書館などで出会いがあれば参考にしていただければ嬉しいです！
+
+<a href="https://www.amazon.co.jp/%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0%E3%81%AE%E5%AE%9D%E7%AE%B1-%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0%E3%81%A8%E3%83%87%E3%83%BC%E3%82%BF%E6%A7%8B%E9%80%A0-%E7%AC%AC2%E7%89%88-%E7%B4%80%E5%B9%B3-%E6%8B%93%E7%94%B7/dp/4797363282?__mk_ja_JP=%E3%82%AB%E3%82%BF%E3%82%AB%E3%83%8A&crid=E7GJB3W02H4D&keywords=%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0%E3%81%A8%E3%83%87%E3%83%BC%E3%82%BF%E6%A7%8B%E9%80%A0+%E5%AE%9D%E7%AE%B1&qid=1672713796&sprefix=%E3%82%A2%E3%83%AB%E3%82%B4%E3%83%AA%E3%82%BA%E3%83%A0%E3%81%A8%E3%83%87%E3%83%BC%E3%82%BF%E6%A7%8B%E9%80%A0+%E5%AE%9D%E7%AE%B1%2Caps%2C215&sr=8-1&linkCode=li3&tag=tkihira0e-22&linkId=7b171b23b1de8482d32d26ca7ad0b811&language=ja_JP&ref_=as_li_ss_il" target="_blank"><img border="0" src="//ws-fe.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=4797363282&Format=_SL250_&ID=AsinImage&MarketPlace=JP&ServiceVersion=20070822&WS=1&tag=tkihira0e-22&language=ja_JP" ></a><img src="https://ir-jp.amazon-adsystem.com/e/ir?t=tkihira0e-22&language=ja_JP&l=li3&o=9&a=4797363282" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
+
+<iframe sandbox="allow-popups allow-scripts allow-modals allow-forms allow-same-origin" style="width:120px;height:240px;" marginwidth="0" marginheight="0" scrolling="no" frameborder="0" src="//rcm-fe.amazon-adsystem.com/e/cm?lt1=_blank&bc1=000000&IS2=1&bg1=FFFFFF&fc1=000000&lc1=0000FF&t=tkihira0e-22&language=ja_JP&o=9&p=8&l=as4&m=amazon&f=ifr&ref=as_ss_li_til&asins=4797363282&linkId=b600f6ac270f51ea1162d5eb2ff971ad"></iframe>
