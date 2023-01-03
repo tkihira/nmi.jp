@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 2023 パズルの逆ポーランド記法(RPN)による解き方を解説します
+title: 2023 パズルの逆ポーランド記法(RPN)による解法の解説
 categories:
 - JavaScript
 ---
