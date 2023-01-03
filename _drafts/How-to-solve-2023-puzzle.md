@@ -1,15 +1,22 @@
 ---
 layout: post
-title: 2023 パズルの解き方を解説します
+title: 2023 パズルの逆ポーランド記法(RPN)による解き方を解説します
 categories:
 - JavaScript
 ---
 
 2023 年、あけましておめでとうございます！私は元旦に次のようなオリジナル・パズルを出しました。
 
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">2023年クイズ！<br><br>上の例のように、数字の合間に四則演算（＋−×÷）や括弧を入れることで、2023 を作ってください。<br><br>- 数字の間に必ず演算子を 1 つ入れてください<br>- ただし 9 と 8 の間には既に ÷ が入っています<br>- 括弧は複数重ねて使用できます<br>- 10×(-9 ÷ 8) のようなマイナス記号の使用は禁止です <a href="https://t.co/K0w2miMXJA">pic.twitter.com/K0w2miMXJA</a></p>&mdash; Takuo Kihira (@tkihira) <a href="https://twitter.com/tkihira/status/1609313732034965506?ref_src=twsrc%5Etfw">December 31, 2022</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+![2023 パズル](/img/2023puzzle.png)
 
-この記事では、JavaScript によるこのクイズの解き方をご紹介します。
+上の例のように、数字の合間に四則演算（＋−×÷）や括弧を入れることで、2023 を作ってください。
+
+- 数字の間に必ず演算子を 1 つ入れてください
+- ただし 9 と 8 の間には既に ÷ が入っています
+- 括弧は複数重ねて使用できます
+- 10×(-9 ÷ 8) のようなマイナス記号の使用は禁止です
+
+[オリジナルツイートはこちら](https://twitter.com/tkihira/status/1609313732034965506)です。この記事では、JavaScript によるこのクイズの解き方をご紹介します。
 
 
 
