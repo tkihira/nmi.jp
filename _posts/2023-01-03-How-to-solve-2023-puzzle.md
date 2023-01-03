@@ -290,9 +290,9 @@ const prettyPrint = (expr) => {
 
 [https://gist.github.com/tkihira/e27ba639de5be545f79b8c3decead68d](https://gist.github.com/tkihira/e27ba639de5be545f79b8c3decead68d)
 
-## 余談: JavaScript で雑巾絞り
+## 余談: JavaScript で手作業最適化
 
-ところで、このコードを JavaScript で雑巾絞り的な最適化を施したらどれくらい速くなるでしょうか。
+ところで、このコードを JavaScript で手作業で最適化を施したらどれくらい速くなるでしょうか。
 
 - Stack の push/pop は重いので、配列を直接扱う
 - 配列の中に数字と文字列が両方入らないように、演算子をマイナスで表現する
