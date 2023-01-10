@@ -9,7 +9,7 @@ categories:
 
 <blockquote class="twitter-tweet"><p lang="en" dir="ltr">TIL I discovered that TensorFlow.js uses an interesting trick to sniff your CPU architecture in WebAssembly. <a href="https://t.co/LVyywIM48I">pic.twitter.com/LVyywIM48I</a></p>&mdash; Robert Knight (@robknight_) <a href="https://twitter.com/robknight_/status/1610638557118349317?ref_src=twsrc%5Etfw">January 4, 2023</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
-面白かったのでなぜこうなるのかの解説と、ついでにこのテクニックを使った JIT 検知方法などについて紹介します。
+面白かったので、なぜこうなるのかの解説と、ついでにこのテクニックを使った JIT 検知方法などについて紹介します。
 
 
 
@@ -66,17 +66,17 @@ Intel アーキテクチャの場合は 255 が表示され、それ以外の場
 - 指数部が 255（0xffff）
 - 仮数部が 0 以外 （ゼロの時は ±Infinity）
 
-を満たす場合に、その数は NaN になります。仮数部にデバッグ用等のデータを持たせることが出来る設計なのですが、実際にこの仮数部の情報を使用するコードはほとんどありません。普段は気にする必要がない情報です。
+を満たす場合に、その数は NaN になります。仮数部にデバッグ用等のデータを持たせることが出来る設計なのですが、実際にこの仮数部の情報を使用するコードはほとんどありません。
 
 NaN のビット表現やそれにまつわる処理は結構複雑で、例外を飛ばす signaling NaN、例外を飛ばさない quiet NaN、演算途中で NaN が発生した場合に立つ INVALID flag などなど、実際の演算で NaN が絡む場合の仕様が細かく定められています。興味があれば、[wikipedia の NaN の項](https://ja.wikipedia.org/wiki/NaN)を参考にしてみてください。ただ、JavaScript においてはこれらの NaN の bit 表現の違いが挙動に変化を与えることはなく、NaN は区別なく同一の NaN という概念として扱われます。
 
-今回重要なのは、<span style="font-weight: bold; color:red">NaN にはビット表現において正負の値を持てる</span>、ということです。
+今回重要なのは、<span style="font-weight: bold; color:red">NaN にはビット表現において正負の値を持てる</span>、ということです。NaN 表現に符号ビットは関係ありません。なのでプラスの NaN とマイナスの NaN が存在し得ます。プラスの NaN の場合、上位 8 bit は 0x7f === 127 に、マイナスの NaN の場合は上位 8 bit は 0xff === 255 となります。判別コードにおける 127 と 255 はこの違いを表しています。
 
 ### Intel アーキテクチャの特殊挙動
 
 さて、では具体的に上記コードでなぜ Intel アーキテクチャを判定出来るのかを解説します。この章の執筆には [@teehah さん](https://twitter.com/teehah)の多大なご協力を得ております。ありがとうございます！
 
-Intel のページにある次の PDF シートを見てみてください。
+Intel のサイトにある次の PDF シートを見てみてください。
 
 [https://www.intel.com/content/dam/develop/external/us/en/documents/floating-point-reference-sheet-v2-13.pdf](https://www.intel.com/content/dam/develop/external/us/en/documents/floating-point-reference-sheet-v2-13.pdf)
 
@@ -93,7 +93,7 @@ For each FPU data type, one unique encoding is reserved for representing the spe
 
 Intel 独特の文化だと思うのですが、qNaN の表現のうちの 1 つを「Real Indefinite」という特別な表現として扱い、いくつかの演算（上記シートの他、上の資料の TABLE 7-20 にも同様の内容が記載されています）の返り値として R Ind という特殊な qNaN を返す実装になっているようです。
 
-そのいくつかの演算の 1 つが無限大マイナス無限大であり、上のコードはその結果が R Ind であるかどうかをチェックするコードとなっております（負の符号、かつ下の 8 ビットがすべて立っているため、上位 8 ビットが 255 になります）。Intel 以外のアーキテクチャではこのような特殊な NaN の処理をしていないため、結果としてこのチェックで Intel アーキテクチャであるかどうかがわかる、という話です。
+そのいくつかの演算の 1 つが「無限大マイナス無限大」であり、上のコードはその結果が R Ind であるかどうかをチェックするコードとなっております。Intel 以外のアーキテクチャではこのような特殊な NaN の処理をしていないため、普通の NaN すなわち 上位 8 bit が 127 になる NaN が返ってくるのですが、Intel アーキテクチャでは返り値が R Ind となり上位 8 bit が 255 となるため、結果としてこのチェックで Intel アーキテクチャであるかどうかがわかる、という流れです。
 
 （なお細かい話ですが、FP 例外をマスクしない設定においては R Ind を生成しない可能性が高いので、この判別方法は使えないかもしれません）
 
@@ -110,7 +110,7 @@ f[0] = Infinity - Infinity;
 console.log(u8[3]);
 ```
 
-手元の Intel マシンの Chrome で以下のコードを実行したところ、予想通り 255 が返ってきました。問題なく動作しているように思えるじゃないですか。<span style="color:blue">ところがどっこい、罠があります</span>。次のコードを Chrome もしくは Node.js 等の V8 環境で実行してみてください。
+手元の Intel マシンの Chrome で上記のコードを実行したところ、予想通り 255 が返ってきました。問題なく動作しているように思えるじゃないですか。<span style="color:blue">ところがどっこい、罠があります</span>。次のコードを Chrome もしくは Node.js 等の V8 環境で実行してみてください。
 
 ```javascript
 const func = () => {
@@ -143,7 +143,9 @@ function isInJIT() {
 }
 ```
 
-`f[0] = Infinity; f[0] = f[0] - f[0];` で最適化されていないのは、おそらくたまたまです。もし将来的にこれも JIT 等で最適化されるようになったら、もう少し複雑で最適化しにくいコードに変える必要があるのでしょう。
+もし JIT がかからなかったら、毎回律儀に Infinity - Infinity の計算が行われて R Ind が返ってくるため、上位 8 ビットが 255 になります。JIT がかかり最適化されたら、Infinity - Infinity が普通の NaN に置換され、結果として上位 8 ビットが 127 になります。
+
+`f[0] = Infinity; f[0] = f[0] - f[0];` が JIT で最適化されていないのは、おそらくたまたまです。もし将来的にこれも JIT 等で最適化されるようになったら、もう少し複雑で最適化されにくいコードに変える必要があるのでしょう。
 
 ### ブラウザごとの挙動の違い
 
