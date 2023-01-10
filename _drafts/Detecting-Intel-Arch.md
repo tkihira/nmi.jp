@@ -165,7 +165,7 @@ console.log(u8[3]); // ※2
 
 さて、では Intel だとどうなるでしょうか？本来であれば全部 255 が返ってくるはずなのですが、手元の Intel 環境で試したところ、
 
-- Chrome: ※1 === 127, ※2 === 255
+- Chrome: ※1 === 255, ※2 === 127
 - Safari: ※1 === 255, ※2 === 255
 - Firefox: ※1 === 127, ※2 === 127
 
@@ -192,3 +192,11 @@ function isX86() {
 ```
 
 このコードは、Intel の仕様に基づいたものであり、（false positive の可能性はあるものの）Intel アーキテクチャをほぼ確実に判定することが出来ます。ただし、ブラウザの JavaScript エンジンの最適化の変化などによって、将来機能しなくなる可能性は大いにある点には気をつけましょう。
+
+## 余談: AMD はどうなの？
+
+AMD の一次資料にあたることが出来なかったのですが、AMD は SSE3 までは Intel と同じ実装のはずで、SSE2 において R Ind はドキュメント化されていました。このドキュメントは [@hagat さん](https://twitter.com/hagat)に教えてもらいました。ありがとうございます！
+
+[https://www.intel.co.jp/content/dam/www/public/ijkk/jp/ja/documents/developer/w_fp_precision_j.pdf](https://www.intel.co.jp/content/dam/www/public/ijkk/jp/ja/documents/developer/w_fp_precision_j.pdf)
+
+P.38 の「QNaN 実数不定値」というのが QNaN Real Indefinite、すなわち本記事の R Ind です。おそらく AMD も上記コードで同じように x86 だと判定されると思います。なお、[@hotpepsi さん](https://twitter.com/hotpepsi)の手元の AMD 環境では Intel と同じ挙動だと確認してもらいました。ありがとうございます！
