@@ -38,8 +38,8 @@ console.log(b[0].toString(16)); // 78 or 12
 次のコードによって、Intel アーキテクチャかどうかを判定することが出来る、というのがツイートの主張でした。実際は wasm で書かれているようですが、以下の JavaScript でも判定出来ます。
 
 ```javascript
-var f = new Float32Array(1);
-var u8 = new Uint8Array(f.buffer);
+const f = new Float32Array(1);
+const u8 = new Uint8Array(f.buffer);
 f[0] = Infinity;
 f[0] = f[0] - f[0];
 console.log(u8[3]); // 255 if Intel, 127 otherwise
@@ -63,7 +63,7 @@ Intel アーキテクチャの場合は 255 が表示され、それ以外の場
 
 さて、この仕様において、
 
-- 指数部が 255（0xffff）
+- 指数部が 255（0xFF）
 - 仮数部が 0 以外 （ゼロの時は ±Infinity）
 
 を満たす場合に、その数は NaN になります。仮数部にデバッグ用等のデータを持たせることが出来る設計なのですが、実際にこの仮数部の情報を使用するコードはほとんどありません。
@@ -84,7 +84,7 @@ console.log(u32[0].toString(16));
 
 NaN のビット表現やそれにまつわる処理は結構複雑で、例外を飛ばす signaling NaN、例外を飛ばさない quiet NaN、演算途中で NaN が発生した場合に立つ INVALID flag などなど、実際の演算で NaN が絡む場合の仕様が細かく定められています。興味があれば、[wikipedia の NaN の項](https://ja.wikipedia.org/wiki/NaN)を参考にしてみてください。ただ、JavaScript においてはこれらの NaN の bit 表現の違いが挙動に変化を与えることはなく、NaN は区別なく同一の NaN という概念として扱われます。
 
-今回重要なのは、<span style="font-weight: bold; color:red">NaN にはビット表現において正負の値を持てる</span>、ということです。NaN 表現に符号ビットは関係ありません。なのでプラスの NaN とマイナスの NaN が存在し得ます。プラスの NaN の場合、上位 8 bit は 0x7f === 127 に、マイナスの NaN の場合は上位 8 bit は 0xff === 255 となります。判別コードにおける 127 と 255 はこの違いを表しています。
+今回重要なのは、<span style="font-weight: bold; color:red">NaN にはビット表現において正負の値を持てる</span>、ということです。NaN 表現に符号ビットは関係ありません。なのでプラスの NaN とマイナスの NaN が存在し得ます。プラスの NaN の場合、上位 8 bit は 0x7F === 127 に、マイナスの NaN の場合は上位 8 bit は 0xFF === 255 となります。判別コードにおける 127 と 255 はこの違いを表しています。
 
 ### Intel アーキテクチャの特殊挙動
 
@@ -111,7 +111,7 @@ For each FPU data type, one unique encoding is reserved for representing the spe
 
 Intel 独特の文化だと思うのですが、qNaN の表現のうちの 1 つを「Real Indefinite」という特別な表現として扱い、いくつかの演算（上記シートの他、上の資料の TABLE 7-20 にも同様の内容が記載されています）の返り値として、この R Ind という特殊な表現の qNaN を返す実装になっているようです。
 
-R Ind を返すいくつかの演算の 1 つが「無限大マイナス無限大」であり、Intel アーキテクチャを判断するコードはその演算の結果が R Ind であるかどうかをチェックするコードとなっております。Intel 以外のアーキテクチャではこのような特殊な NaN の処理をしていないため、普通の NaN すなわち 上位 8 bit が 127(0x7F) になる NaN が返ってくるのですが、Intel アーキテクチャでは返り値が R Ind となり上位 8 bit が 255(0xFF) となるため、結果として 255 との比較で Intel アーキテクチャであるかどうかがわかる、という流れです。
+R Ind を返すいくつかの演算の 1 つが「無限大マイナス無限大」であり、Intel アーキテクチャを判断するコードはその演算の結果が R Ind であるかどうかをチェックするコードとなっております。<span style="color:blue">Intel 以外のアーキテクチャではこのような特殊な NaN の処理をしていないため、普通の NaN すなわち 上位 8 bit が 127(0x7F) になる NaN が返ってくるのですが、Intel アーキテクチャでは返り値が R Ind となり上位 8 bit が 255(0xFF) となるため、結果として 255 との比較で Intel アーキテクチャであるかどうかがわかる</span>、という流れです。
 
 （なお細かい話ですが、FP 例外をマスクしない設定においては R Ind を生成しない可能性が高いので、この判別方法は使えないかもしれません）
 
@@ -122,8 +122,8 @@ R Ind を返すいくつかの演算の 1 つが「無限大マイナス無限�
 `f[0]` に代入せず、普通に無限大同士の引き算をしてみましょう。次のようなコードになります。
 
 ```javascript
-var f = new Float32Array(1);
-var u8 = new Uint8Array(f.buffer);
+const f = new Float32Array(1);
+const u8 = new Uint8Array(f.buffer);
 f[0] = Infinity - Infinity;
 console.log(u8[3]);
 ```
@@ -132,8 +132,8 @@ console.log(u8[3]);
 
 ```javascript
 const func = () => {
-    var f = new Float32Array(1);
-    var u8 = new Uint8Array(f.buffer);
+    const f = new Float32Array(1);
+    const u8 = new Uint8Array(f.buffer);
     f[0] = Infinity - Infinity;
     return u8[3] === 255;
 }
@@ -154,10 +154,10 @@ for (let i = 0; i < 100000; i++) {
 
 ```javascript
 function isInJIT() {
-    var f = new Float32Array(1);
-    var u8 = new Uint8Array(f.buffer);
+    const f = new Float32Array(1);
+    const u8 = new Uint8Array(f.buffer);
     f[0] = Infinity - Infinity;
-    return u8[3] == 127;
+    return u8[3] === 127;
 }
 ```
 
@@ -193,7 +193,7 @@ console.log(u8[3]); // ※2
 
 Safari は愚直に 255 を返してくれました。Firefox は 127 が返ってきました。Chrome は、変数同士を割り算したときは 255、リテラルで `0/0` を書いた場合には 127 を返すというトリッキーな結果になりました。おそらく Chrome では `0/0` を構文解析の段階で NaN に置換しているか、それに近い処理が入っているのでしょう。
 
-このように、`f[0] = 0; f[0] = f[0] / f[0]` だと Firefox において結果の NaN に対して何らかの置換が入ってしまい R Ind ではなくなるので、Intel アーキテクチャの判断に利用することが出来ません。オリジナルコードで `f[0] = Infinity; f[0] = f[0] - f[0];` を使っているのは、モダンブラウザ（の JavaScript エンジン）において、<span style="font-weight:bold">たまたま最適化されず</span>にきちんと R Ind を返してくれる演算のひとつがこれだった、という消極的な理由によるものだと思われます。
+このように、`f[0] = 0; f[0] = f[0] / f[0]` だと Firefox において結果の NaN に対して何らかの置換が入ってしまい R Ind ではなくなるので、Intel アーキテクチャの判断に利用することが出来ません。オリジナルコードで `f[0] = Infinity; f[0] = f[0] - f[0];` を使っているのは、モダンブラウザ（の JavaScript エンジン）において、<span style="font-weight:bold">たまたま最適化されず</span>にきちんと R Ind を返してくれる演算のひとつが「無限大マイナス無限大」だった、という消極的な理由によるものだと思われます。
 
 # まとめ
 
@@ -201,15 +201,15 @@ Safari は愚直に 255 を返してくれました。Firefox は 127 が返っ�
 
 ```javascript
 function isX86() {
-    var f = new Float32Array(1);
-    var u8 = new Uint8Array(f.buffer);
+    const f = new Float32Array(1);
+    const u8 = new Uint8Array(f.buffer);
     f[0] = Infinity;
     f[0] = f[0] - f[0];
     return u8[3] === 255;
 }
 ```
 
-このコードは、Intel の仕様に基づいたものであり、（false positive の可能性はあるものの）Intel アーキテクチャをほぼ確実に判定することが出来ます。ただし、ブラウザの JavaScript エンジンの最適化の変化などによって、将来機能しなくなる可能性は大いにある点には気をつけましょう。
+このコードは、Intel の仕様に基づいたものであり、Intel アーキテクチャをほぼ確実に判定することが出来ます。ただし、ブラウザの JavaScript エンジンの最適化の変化などによって、将来機能しなくなる可能性が大いにある点には気をつけましょう。
 
 ## 余談: AMD はどうなの？
 
