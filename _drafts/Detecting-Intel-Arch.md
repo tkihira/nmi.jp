@@ -148,7 +148,9 @@ for (let i = 0; i < 100000; i++) {
 
 この挙動は次のように説明出来ます。JIT がかかる前は `f[0] = Infinity - Infinity` というコードを逐次実行しているために、演算結果として毎回 R Ind の値が f[0] に代入されているのですが、JIT によって `Infinity - Infinity` が定数として事前に演算され、その結果である NaN に最適化で置き換わり、結果として `f[0] = NaN` というコードに最適化されてしまったせいで `R Ind` が発生しなくなった、と考えることが出来ます。
 
-なので、<span style="color:red">Intel アーキテクチャかつ V8 エンジンの場合限定ですが、次のコードによって自分自身が JIT 化されているかどうかを確認出来ます</span>。
+というわけで、`f[0] = Infinity; f[0] = f[0] - f[0];` という冗長なコードは、<span style="font-weight: bold">V8 の JIT による最適化を避ける意図によって書かれていた</span>と考えられます。。
+
+なお、これを利用すると<span style="color:red">Intel アーキテクチャかつ V8 エンジンの場合限定ですが、次のコードによって自分自身が JIT 化されているかどうかを確認出来ます</span>。
 
 ```javascript
 function isInJIT() {
