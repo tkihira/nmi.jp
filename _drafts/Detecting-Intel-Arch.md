@@ -215,4 +215,4 @@ AMD の一次資料にあたることが出来なかったのですが、AMD は
 
 [https://www.intel.co.jp/content/dam/www/public/ijkk/jp/ja/documents/developer/w_fp_precision_j.pdf](https://www.intel.co.jp/content/dam/www/public/ijkk/jp/ja/documents/developer/w_fp_precision_j.pdf)
 
-P.38 の「QNaN 実数不定値」というのが QNaN Real Indefinite、すなわち本記事の R Ind です。おそらく AMD も上記コードで同じように x86 だと判定されると思います。なお、[@hotpepsi さん](https://twitter.com/hotpepsi)の手元の AMD 環境では Intel と同じ挙動だと確認してもらいました。ありがとうございます！
+P.38 の「QNaN 実数不定値」というのが QNaN Real Indefinite、すなわち本記事の R Ind です。というわけで、おそらく SSE2 をサポートする AMD も上記コードで同じように x86 だと判定されると思います。なお、[@hotpepsi さん](https://twitter.com/hotpepsi)の手元の AMD 環境では Intel と同じ挙動だと確認してもらいました。ありがとうございます！
