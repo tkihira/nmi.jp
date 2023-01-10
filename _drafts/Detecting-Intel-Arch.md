@@ -68,6 +68,20 @@ Intel アーキテクチャの場合は 255 が表示され、それ以外の場
 
 を満たす場合に、その数は NaN になります。仮数部にデバッグ用等のデータを持たせることが出来る設計なのですが、実際にこの仮数部の情報を使用するコードはほとんどありません。
 
+32bit 浮動小数点の場合、一般的な NaN のビット表現は次のような形になります。
+
+```javascript
+const f = new Float32Array(1);
+const u32 = new Uint32Array(f.buffer);
+f[0] = NaN;
+console.log(u32[0].toString(16));
+// => 0x7fc00000 === 0b0111_1111_1100_0000_0000_0000_0000_0000
+```
+
+![32bit 浮動小数点における NaN のビット表現](./img/nan-representation.png)
+
+このように、符号は 0 で、指数部には全て 1 が入り、仮数部の最上位ビットのみが 1 になり、残りは 0、というのが一般的な NaN のビット表現です。
+
 NaN のビット表現やそれにまつわる処理は結構複雑で、例外を飛ばす signaling NaN、例外を飛ばさない quiet NaN、演算途中で NaN が発生した場合に立つ INVALID flag などなど、実際の演算で NaN が絡む場合の仕様が細かく定められています。興味があれば、[wikipedia の NaN の項](https://ja.wikipedia.org/wiki/NaN)を参考にしてみてください。ただ、JavaScript においてはこれらの NaN の bit 表現の違いが挙動に変化を与えることはなく、NaN は区別なく同一の NaN という概念として扱われます。
 
 今回重要なのは、<span style="font-weight: bold; color:red">NaN にはビット表現において正負の値を持てる</span>、ということです。NaN 表現に符号ビットは関係ありません。なのでプラスの NaN とマイナスの NaN が存在し得ます。プラスの NaN の場合、上位 8 bit は 0x7f === 127 に、マイナスの NaN の場合は上位 8 bit は 0xff === 255 となります。判別コードにおける 127 と 255 はこの違いを表しています。
@@ -80,7 +94,11 @@ Intel のサイトにある次の PDF シートを見てみてください。
 
 [https://www.intel.com/content/dam/develop/external/us/en/documents/floating-point-reference-sheet-v2-13.pdf](https://www.intel.com/content/dam/develop/external/us/en/documents/floating-point-reference-sheet-v2-13.pdf)
 
-この中の R Ind こと「Real Indefinite」が今回のポイントです。このシートでは、Intel の演算ではいくつかのパターンにおいて Real Indefinite になることが定義されており、そのパターンになった場合は特殊な値（R Ind）を取ることが示されています。その <span style="color:red">R Ind の表現が、ちょうど負の NaN の値になっており、上記のコードではその部分を判定して Intel アーキテクチャと判断しております</span>。
+この中の R Ind こと「Real Indefinite」が今回のポイントです。このシートでは、Intel の演算ではいくつかのパターンにおいて Real Indefinite になることが定義されており、そのパターンになった場合は特殊な値（R Ind）を取ることが示されています。この R Ind のビット表現は次の通りです、
+
+![32bit 浮動小数点における R Ind のビット表現](./img/nan-rind-representation.png)
+
+この <span style="color:red">R Ind の表現は、負の NaN の値になっており、上位 8 ビットが全て 1 になっております</span>。上記のコードではその上位 8 bit を判定して、それがすべて立っている（255）場合に Intel アーキテクチャと判断しております。
 
 この Real Indefinite、すなわち実数不定数とは何ぞや、というのを調べると、次の資料がヒットしました。
 
@@ -91,9 +109,9 @@ Intel のサイトにある次の PDF シートを見てみてください。
 For each FPU data type, one unique encoding is reserved for representing the special value indefinite. For example, when operating on real values, the real indefinite value is a QNaN (see Section 7.4.1., “Real Numbers”). The FPU produces indefinite values as responses to masked floating-point exceptions.
 ```
 
-Intel 独特の文化だと思うのですが、qNaN の表現のうちの 1 つを「Real Indefinite」という特別な表現として扱い、いくつかの演算（上記シートの他、上の資料の TABLE 7-20 にも同様の内容が記載されています）の返り値として R Ind という特殊な qNaN を返す実装になっているようです。
+Intel 独特の文化だと思うのですが、qNaN の表現のうちの 1 つを「Real Indefinite」という特別な表現として扱い、いくつかの演算（上記シートの他、上の資料の TABLE 7-20 にも同様の内容が記載されています）の返り値として、この R Ind という特殊な表現の qNaN を返す実装になっているようです。
 
-そのいくつかの演算の 1 つが「無限大マイナス無限大」であり、上のコードはその結果が R Ind であるかどうかをチェックするコードとなっております。Intel 以外のアーキテクチャではこのような特殊な NaN の処理をしていないため、普通の NaN すなわち 上位 8 bit が 127 になる NaN が返ってくるのですが、Intel アーキテクチャでは返り値が R Ind となり上位 8 bit が 255 となるため、結果としてこのチェックで Intel アーキテクチャであるかどうかがわかる、という流れです。
+R Ind を返すいくつかの演算の 1 つが「無限大マイナス無限大」であり、Intel アーキテクチャを判断するコードはその演算の結果が R Ind であるかどうかをチェックするコードとなっております。Intel 以外のアーキテクチャではこのような特殊な NaN の処理をしていないため、普通の NaN すなわち 上位 8 bit が 127(0x7F) になる NaN が返ってくるのですが、Intel アーキテクチャでは返り値が R Ind となり上位 8 bit が 255(0xFF) となるため、結果として 255 との比較で Intel アーキテクチャであるかどうかがわかる、という流れです。
 
 （なお細かい話ですが、FP 例外をマスクしない設定においては R Ind を生成しない可能性が高いので、この判別方法は使えないかもしれません）
 
@@ -143,7 +161,7 @@ function isInJIT() {
 }
 ```
 
-もし JIT がかからなかったら、毎回律儀に Infinity - Infinity の計算が行われて R Ind が返ってくるため、上位 8 ビットが 255 になります。JIT がかかり最適化されたら、Infinity - Infinity が普通の NaN に置換され、結果として上位 8 ビットが 127 になります。
+もし JIT がかからなかったら、毎回律儀に Infinity - Infinity の計算が行われて毎回 R Ind が返ってくるため、上位 8 ビットが 255 になります。JIT がかかり最適化されたら、Infinity - Infinity が最適化によって普通の NaN に置換され、結果として上位 8 ビットが 127 になります。
 
 `f[0] = Infinity; f[0] = f[0] - f[0];` が JIT で最適化されていないのは、おそらくたまたまです。もし将来的にこれも JIT 等で最適化されるようになったら、もう少し複雑で最適化されにくいコードに変える必要があるのでしょう。
 
@@ -175,7 +193,7 @@ console.log(u8[3]); // ※2
 
 Safari は愚直に 255 を返してくれました。Firefox は 127 が返ってきました。Chrome は、変数同士を割り算したときは 255、リテラルで `0/0` を書いた場合には 127 を返すというトリッキーな結果になりました。おそらく Chrome では `0/0` を構文解析の段階で NaN に置換しているか、それに近い処理が入っているのでしょう。
 
-要するに、オリジナルコードで `f[0] = Infinity; f[0] = f[0] - f[0];` を使っているのは、モダンブラウザ（の JavaScript エンジン）において、<span style="font-weight:bold">たまたま最適化されず</span>にきちんと計算して R Ind を返してくれる演算のひとつがこれだった、という理由によるものだと思われます。
+このように、`f[0] = 0; f[0] = f[0] / f[0]` だと Firefox において結果の NaN に対して何らかの置換が入ってしまい R Ind ではなくなるので、Intel アーキテクチャの判断に利用することが出来ません。オリジナルコードで `f[0] = Infinity; f[0] = f[0] - f[0];` を使っているのは、モダンブラウザ（の JavaScript エンジン）において、<span style="font-weight:bold">たまたま最適化されず</span>にきちんと R Ind を返してくれる演算のひとつがこれだった、という消極的な理由によるものだと思われます。
 
 # まとめ
 
