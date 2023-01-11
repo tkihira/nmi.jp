@@ -31,7 +31,7 @@ console.log(u8[0].toString(16)); // 78 or 12
 
 なお、この記事はリトルエンディアンを前提にしております。
 
-# Intel Archtecture の検知コード
+# Intel Architecture の検知コード
 
 さて本題です。次のコードによって、Intel アーキテクチャかどうかを判定することが出来る、というのがツイートの主張でした。実際は WebAssembly (wasm) で書かれているようですが、以下の JavaScript コードでも判定出来ます。
 
