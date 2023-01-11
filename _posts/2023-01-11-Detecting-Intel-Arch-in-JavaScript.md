@@ -98,7 +98,7 @@ Intel のサイトにある次の PDF シートを見てみてください。
 
 <span style="color:red">この R Ind の表現は、負の NaN の値になっており、上位 8 ビットが全て 1 になっております</span>。上記のコードではその上位 8 bit を判定して、それがすべて立っている（255）場合に Intel アーキテクチャと判断しております。
 
-この Real Indefinite、すなわち実数不定数とは何ぞや、というのを調べると、次の資料がヒットしました。
+この Real Indefinite、すなわち実数不定値とは何ぞや、というのを調べると、次の資料がヒットしました。
 
 [https://www.academia.edu/13572645/inter_basic_arsitecture](https://www.academia.edu/13572645/inter_basic_arsitecture)
 
