@@ -147,7 +147,7 @@ console.log("3");
 
 ## await new Promise(...) が処理を続けるためには、resolve に値を渡す必要がある
 
-`new Promise(...)` は Promise を返します。そして、この Promise から値を取るには `await` を使う必要があるのは上記と同じです。しかし、Promise の引数に渡した関数の返値は使用されないので、`resolve` を呼ばない Promise は永遠に値を返しません。そんな Promise を `await` すると、async 関数のそれ以降の処理は実行されません。
+`new Promise(...)` は Promise オブジェクトを返します。そして、この Promise オブジェクトから値を取るには `await` を使う必要があるのは今までと同じです。しかし、Promise の引数に渡した関数の返値は使用されないので、ただの Promise オブジェクトは永遠に値を返しません（正確には、内部状態が pending のまま変わらない、と表現されます）。そんな Promise を `await` すると、async 関数のそれ以降の処理は実行されません。
 
 ```javascript
 (async () => {
@@ -156,7 +156,7 @@ console.log("3");
 })();
 ```
 
-`new Promise(...)` が await に対して値を返すためには、Promise の引数に渡した関数の第 1 引数（[resolver](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise#resolver_function) と呼ばれます）の関数に対して値を渡す必要があります。引数名は何でもよいのですが、`resolve` もしくは `r` がよく使われます。
+`new Promise(...)` が await に対して値を返すためには（正確には内部状態を fulfill にするためには）、Promise の引数に渡した関数の第 1 引数（[resolver](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise#resolver_function) と呼ばれます）の関数に対して値を渡す必要があります。引数名は何でもよいのですが、`resolve` もしくは `r` がよく使われます。
 
 ```javascript
 (async () => {
@@ -177,6 +177,8 @@ resolver を複数回呼ぶことも出来ますが、2 回目以降の呼び出
     console.log(ret); // 3
 })();
 ```
+
+resolver は値なしで呼び出すことも出来ます。その場合は undefined が返ります。
 
 ## resolver を利用して非同期処理を書く
 
@@ -204,11 +206,11 @@ const sleep = (duration) => {
     });
 };
 
-// const sleep = (duration) => new Promise(r => setTimeout(r, duration));
+// const sleep = duration => new Promise(r => setTimeout(r, duration));
 // と 1 行で書けます
 
 (async () => {
-    for(let i = 10; i > 0; i--) {
+    for (let i = 10; i > 0; i--) {
         console.log(i);
         await sleep(1000);
     }
