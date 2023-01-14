@@ -156,7 +156,7 @@ console.log("3");
 })();
 ```
 
-`new Promise(...)` が await に対して値を返すためには（正確には内部状態を fulfill にするためには）、Promise の引数に渡した関数の第 1 引数（[resolver](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise#resolver_function) と呼ばれます）の関数に対して値を渡す必要があります。引数名は何でもよいのですが、`resolve` もしくは `r` がよく使われます。
+`new Promise(...)` が await に対して値を返すためには（正確には内部状態を fulfilled にするためには）、Promise の引数に渡した関数の第 1 引数（[resolver](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/Promise#resolver_function) と呼ばれます）の関数に対して値を渡す必要があります。引数名は何でもよいのですが、`resolve` もしくは `r` がよく使われます。
 
 ```javascript
 (async () => {
@@ -245,7 +245,7 @@ document.addEventListener("pointerdown", () => {
 - await 構文
 - new Promise による Promise オブジェクトの生成
 
-について簡単に説明しました。だいたいの実務においては、この記事に書かれていた async 関数 await による挙動、また Promise の引数の関数などの実行順序について理解していれば、大体問題ないのではないかなと思います。ここからさらに正確に理解をされたい方は、Promise の 3 つの状態（fulfilled, rejected, pending）、then や catch チェーンならびに thenable、例外処理、タスクキューの内部実装と実行順序、などについて理解を深めていけば良いのではないかと思います。
+について簡単に説明しました。だいたいの実務においては、この記事に書かれていた async 関数、await による挙動、また Promise の引数の関数などの実行順序について理解していれば、大体問題ないのではないかなと思います。ここからさらに正確に理解をされたい方は、Promise の 3 つの状態（fulfilled, rejected, pending）、then や catch チェーンならびに thenable、例外処理、タスクキューの内部実装と実行順序、などについて理解を深めていけば良いのではないかと思います。
 
 以前、Twitter に以下のような Promise クイズを発表したことがあります。驚きの正答率の低さでしたが、この記事をここまで読まれた方は、きっと正解を導けるのではないかと思います！
 
