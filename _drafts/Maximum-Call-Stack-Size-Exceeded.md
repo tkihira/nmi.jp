@@ -247,14 +247,15 @@ f();
 <span style="color:red">なんとわずか 12 回しか呼べませんでした</span>。さすがに 10000 もの引数を持つ関数はない、と思われるかも知れませんが、一昔前の JavaScript では比較的よく使われるテクニックだったりするので油断できません。
 
 ```javascript
-String.fromCharCode.apply(null, binary.slice(pos, pos + length));
+String.fromCharCode(72, 101, 108, 108, 111, 44, 32, 119, 111, 114, 108, 100, 33);
+// "Hello, world!"
 ```
 
-`String.fromCharCode` は、引数で複数の文字コードを与えると、一括で文字列に変換してくれます。なので配列にある charCode を一括で文字列に変換したい場合は、このようなコードを書く必要がありました。このコードは大量のスタック領域を消費する可能性があり、ネストの深い関数でこれが呼ばれた時に Stack Overflow が起こる可能性は否定できません。
+`String.fromCharCode` は、引数で複数の文字コードを与えると、一括で文字列に変換してくれます。なので配列にある charCode を一括で文字列に変換したい場合は、このようなコードを書く必要がありました。このコードは大量のスタック領域を消費する可能性があり、ネストの深い関数で呼ばれた時に Stack Overflow が起こる可能性は否定できません。
 
-例えば Pex という 2011 年当時に作成された Flash Player では、[このようなコード](https://github.com/PexJS/PexJS/blob/72e33c91d0331e0e511a601d7e82ffef701babfb/src/parser/image_manager.js#L296)がありました。このコードでは分割して処理していますが、そうしなかった場合、引数は下手すれば 数 KB から 100KB になることがあります。TypedArray などが整備された現在このようなコードを新規で書くことはないでしょうが、頭の片隅においておくと良いかも知れません。
+例えば Pex という 2011 年当時に作成された Flash Player では、[このようなコード](https://github.com/PexJS/PexJS/blob/72e33c91d0331e0e511a601d7e82ffef701babfb/src/parser/image_manager.js#L296)がありました。このコードでは分割して処理していますが、そうしなかった場合、引数の数は数千個は当然、下手すれば十万個を超える場合すらあります。TypedArray などが整備された現在このようなコードを新規で書くことはないでしょうが、頭の片隅においておくと良いかも知れません。
 
-なお、これを利用すると 1 つの関数呼び出しのみで `Maximum call stack size exceeded` を引き起こせます（[gfx](https://bsky.app/profile/gfx.bsky.social) さんに教えてもらいました！）
+なお、これを利用すると 1 つの関数呼び出しのみで `Maximum call stack size exceeded` を引き起こせます（[gfx](https://bsky.app/profile/gfx.bsky.social) さんに教えてもらいました、ありがとうございます！）
 
 ```javascript
 String.fromCharCode(...new Array(1000000).fill(97));
