@@ -181,10 +181,11 @@ f();
 
 ```javascript
 let counter = 0;
+const args = new Array(10);
+
 const f = () => {
     counter++;
-    const a = new Array(10);
-    f.apply(this, a);
+    f(...args);
 };
 f();
 ```
@@ -193,7 +194,7 @@ f();
 
 ![引数 10 個で無限再帰](./img/stackoverflow006.png)
 
-実行してみた結果がこちらです。ご覧の通り、4596 回まで減りました。
+実行してみた結果がこちらです。ご覧の通り、5013 回まで減りました。
 
 ## ローカル変数を増やす
 
@@ -232,10 +233,11 @@ f();
 
 ```javascript
 let counter = 0;
+const args = new Array(10000);
+
 const f = () => {
     counter++;
-    const a = new Array(10000);
-    f.apply(this, a);
+    f(...args);
 };
 f();
 ```
@@ -321,3 +323,17 @@ console.log(await sum(100000));
 この方法は完全に邪道です。そもそも Stack Overflow の時に例外が投げられる仕様はありませんし、 `Promise.resolve()` の呼び出し時に再度例外が起こってもおかしくないです（もっともこのコードの場合、それでもおそらく動いちゃうのですが）。上記コードの場合、投げられた例外は全部拾ってしまうのですが、どのような例外が投げられるのかはブラウザ依存なので、このようなやり方にせざるを得ません。例外の message もブラウザで違います（Firefox の場合は `InternalError: too much recursion` となります）。
 
 ただ一方で、合法なプログラムでもあるので、こういう逃げ方が出来る、ということを覚えておくと、ちょっとした計算をさせている時などに役に立つかもしれないですね。プロダクションなど大事なプログラムでは、このようなコードは書かないことを強く勧めます。
+
+# 追記: 末尾再帰について
+
+はてブのコメントで指摘されたので、末尾再帰についても書いておきます。
+
+末尾再帰（[Wikipedia のリンク](https://ja.wikipedia.org/wiki/%E6%9C%AB%E5%B0%BE%E5%86%8D%E5%B8%B0)）と呼ばれる、関数の最後で再帰が呼ばれるパターンについては、機械的にループに置き換えられることが知られています。ループに変換してしまえば、Stack Overflow は起こり得ません。一部の処理系では言語仕様レベルで導入されています。
+
+JavaScript では、過去に言語レベルで末尾再帰をループに変換する仕様が議論されたことがあったようですが、残念ながら今のところ実現されていないようです。
+
+<iframe class="speakerdeck-iframe" frameborder="0" src="https://speakerdeck.com/player/b7efe2f944a84c468b77d28f094a3085" title="末尾呼び出し最適化とJavaScript" allowfullscreen="true" style="border: 0px; background: padding-box padding-box rgba(0, 0, 0, 0.1); margin: 0px; padding: 0px; border-radius: 6px; box-shadow: rgba(0, 0, 0, 0.2) 0px 5px 40px; width: 100%; height: auto; aspect-ratio: 560 / 315;" data-ratio="1.7777777777777777"></iframe>
+
+[@kota_yata](https://twitter.com/kota_yata) さんが素晴らしい資料を用意されているので、興味のある方は是非ご一読ください。
+
+<!-- このスライドは、 [@h_sakurai](https://twitter.com/h_sakurai) さんに情報をいただきました！ありがとうございます！ -->
