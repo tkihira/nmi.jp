@@ -336,6 +336,4 @@ JavaScript では、過去に言語レベルで末尾再帰をループに変換
 
 <iframe class="speakerdeck-iframe" frameborder="0" src="https://speakerdeck.com/player/b7efe2f944a84c468b77d28f094a3085" title="末尾呼び出し最適化とJavaScript" allowfullscreen="true" style="border: 0px; background: padding-box padding-box rgba(0, 0, 0, 0.1); margin: 0px; padding: 0px; border-radius: 6px; box-shadow: rgba(0, 0, 0, 0.2) 0px 5px 40px; width: 100%; height: auto; aspect-ratio: 560 / 315;" data-ratio="1.7777777777777777"></iframe>
 
-[@kota_yata](https://twitter.com/kota_yata) さんが素晴らしい資料を用意されているので、興味のある方は是非ご一読ください。
-
-<!-- このスライドは、 [@h_sakurai](https://twitter.com/h_sakurai) さんに情報をいただきました！ありがとうございます！ -->
+[@kota_yata](https://twitter.com/kota_yata) さんが素晴らしい資料を用意されているので、興味のある方は是非ご一読ください。このスライドは、 [@h_sakurai](https://twitter.com/h_sakurai) さんに情報をいただきました！ありがとうございます！
