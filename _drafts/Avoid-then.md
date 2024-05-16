@@ -219,6 +219,46 @@ console.log("3");
 // 1, 2, 3
 ```
 
+## 余談: ES2024 の新機能 `Promise.withResolvers`
+
+「残念ながらどうしても `new Promise` を書かざるを得ない局面があります」と書きましたが、実は書かなくてもよい記法が登場しております。
+
+ES2024 から登場した [Promise.withResolvers](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/withResolvers) という API を利用すると、今まで煩雑だった `new Promise` を書かずに、すっきりと新しい Promise が作れます。
+
+上の、 3 秒待つコードを再掲します。
+
+```js
+const wait3sec = () => {
+    return new Promise((resolve) => {
+        setTimeout(() => resolve("3 seconds"), 3000);
+    });
+};
+
+(async() => {
+    const result = await wait3sec(); // wait 3 seconds
+    console.log(result); // 3 seconds
+})();
+```
+
+これを `Promise.withResolvers` で書くと次のようになります。
+
+```js
+const wait3sec = () => {
+    const { promise, resolve, reject } = Promise.withResolvers();
+    setTimeout(() => resolve("3 seconds"), 3000);
+    return promise;
+};
+
+(async() => {
+    const result = await wait3sec(); // wait 3 seconds
+    console.log(result); // 3 seconds
+})();
+```
+
+すっきりして素晴らしいですね。モダンブラウザや Node 22 では使用可能ですが、古い Android WebView や Node などでは使えないのに注意してください。
+
+この情報は [渋川よしきさん](https://twitter.com/shibu_jp) に教えていただきました。ありがとうございます！
+
 # まとめ
 
 `await` `async` `new Promise` さえ完全に理解すれば、JavaScript で可能な非同期処理は全て表現出来ます。 `then` は可読性に劣る上特に大きなメリットもないので、相当な理由がない限り使わない方が良いでしょう。
