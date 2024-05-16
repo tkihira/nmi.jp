@@ -129,7 +129,7 @@ fetch('https://wttr.in/')
 
 `async` は関数宣言の時につける修飾子で、これがつくとその関数は `async` 関数になります。
 
-<span style="color:blue">`async` 関数は、関数内部で何をやろうとも、必ず Promise を返します。例外はありません。</span>
+<span style="color:blue">`async` 関数は、関数内部で何をやろうとも、必ず返り値として Promise を返します。</span>
 
 上の方で Promise を `「実行が終わっていないかもしれない何らかの関数」を包んだオブジェクト` と説明しましたが、この `async` 関数がその包まれた「何らかの関数」となり、`async` 関数は「その関数を包んだ Promise」を返します。
 
