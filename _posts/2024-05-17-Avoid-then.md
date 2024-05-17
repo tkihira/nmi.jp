@@ -110,7 +110,7 @@ fetch('https://wttr.in/')
     const response1 = await fetch('https://wttr.in/');
     console.log("First fetch's status:", response1.status);
     const response2 = await fetch('https://wttr.in/');
-    console.log("First fetch's status:", response2.status);
+    console.log("Second fetch's status:", response2.status);
 })();
 ```
 
