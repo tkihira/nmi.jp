@@ -93,6 +93,7 @@ Stable Diffusion の API を利用するためには、まず Stability AI の D
 API を利用して絵を描くコードは以下のようになります。
 
 [https://github.com/tkihira/color_painting/blob/main/misc/text2image.mjs](https://github.com/tkihira/color_painting/blob/main/misc/text2image.mjs)
+
 ```js
 import fs from 'node:fs';
 
@@ -176,6 +177,7 @@ a cute rabbit in a field of flowers, white and black, coloring book for kids, si
 API を使うメリットを享受するためにも、今回の絵の生成は全てクラウドのサーバーレス上で完結させました。Vercel の [Serverless Functions](https://vercel.com/docs/functions) を利用しています。Vercel は無料プランでも十分に使えるのでお勧めです。
 
 [https://github.com/tkihira/color_painting/blob/main/api/generate.js](https://github.com/tkihira/color_painting/blob/main/api/generate.js)
+
 ```js
 const generate = async (text) => {
     // call SAI's API to generate an image from text
