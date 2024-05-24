@@ -286,7 +286,6 @@ Your request was flagged by our content moderation system, as a result your requ
 
 以上、[塗り絵 自動生成](https://color-painting.vercel.app/)のサービスの開発記録になります。再度ソースコードを掲示します。非常に短いコードなので、ぜひ見てみてください。
 
-**塗り絵 自動生成**
 [https://github.com/tkihira/color_painting](https://github.com/tkihira/color_painting)
 
 OpenAI の API も驚くほど利用が簡単でしたが、Stability AI の API も大きなトラブルなく利用出来ました。そんなに画像生成 AI を追っているわけではないのですが、最近の AI のレベルの進化は著しく、その高い品質にびっくりします。
