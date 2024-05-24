@@ -9,6 +9,8 @@ Stable Diffusion は、GPU を利用した画像生成 AI の中でも最も有�
 
 [https://color-painting.vercel.app/](https://color-painting.vercel.app/)
 
+![wild tiger in jungle](./img/tiger.png)
+
 子どもたちのために、塗り絵を自動生成するサービスです。この記事では、どのようにこのアプリを作ったのか簡単に紹介しております。コードは全て JavaScript です。
 
 なお免責事項ですが、このブログを公開するにあたり、Stability AI 社からの金銭授与ならびにクレジット授与は一切ありません。ただ Stablity AI Japan 社には仲の良い友人が多くおり、事前に記載が間違いがないかの確認をお願いしております。
