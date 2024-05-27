@@ -1,8 +1,9 @@
 ---
 layout: post
-title: Stable Diffusion を API で使って塗り絵を自動生成する
+title: Stable Diffusion API を使って塗り絵 自動生成アプリを作る
 categories:
 - JavaScript
+- GenAI
 ---
 
 Stable Diffusion は、GPU を利用した画像生成 AI の中でも最も有名なプロダクトだと思います。Stable Diffusion の利用者は一般的にまず GPU を準備し、そこで環境を構築してから画像生成を行うのですが、今回は Stability AI（Stable Diffusion の開発元）の用意している API を利用して、塗り絵の自動生成を作ってみました。
