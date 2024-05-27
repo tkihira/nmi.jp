@@ -13,6 +13,10 @@ Stable Diffusion は、GPU を利用した画像生成 AI の中でも最も有�
 
 子どもたちのために、塗り絵を自動生成するサービスです。この記事では、どのようにこのアプリを作ったのか簡単に紹介しております。コードは全て JavaScript です。
 
+ソースコードも github で公開しています。Stability AI Developer Platform, Vercel, Google reCAPTCHA に依存しています。
+
+[https://github.com/tkihira/color_painting](https://github.com/tkihira/color_painting)
+
 なお免責事項として、私は Stablity AI Japan 社には仲の良い友人が多数おりますが、このブログを公開するにあたり Stability AI 社からの金銭授与ならびにクレジット授与は一切ありません。 **また、AI の業界は変化が激しいので、ここに書かれている内容はすぐに時代遅れになる** でしょう。提供されている機能や料金などは、必ず自分でお調べ頂くようにお願いします。
 
 
@@ -59,7 +63,7 @@ Stable Diffusion は、一般に「オープンな AI」と呼ばれており、
 | SDXL 1.0        | 画像生成のための標準ベースモデル              | 0.2-0.6                     |
 | SD 1.6          | 解像度が調整可能なベースモデル                | 0.2-1.0                    |
 
-**この表は記事執筆時点での情報です。最新情報は上記リンクからご確認ください** 。1 ドル 150 円換算すると、大体 1 クレジットが 1.5 円になります。SD3 だと 1 枚で約 10 円弱かかる計算ですね。
+**この表は記事執筆時点（2024/05/27）での情報です。最新情報は上記リンクからご確認ください** 。1 ドル 150 円換算すると、大体 1 クレジットが 1.5 円になります。SD3 だと 1 枚で約 10 円弱かかる計算です。
 
 どのエンジンを利用するかによって大きく金額が変わります。良いモデルは高額な分、良いクオリティの出力を出す傾向があります。サービス設計の肝になるので、それぞれのエンジンを試してみて、ベストなエンジンを探しましょう。
 
@@ -90,7 +94,7 @@ Stable Diffusion の API を利用するためには、まず Stability AI の D
 
 ## 実際にローカルで画像を作ってみる
 
-発行した API Key を使って、Node.js で絵を書いてみましょう。<span style="color:red">API は v1 系列と v2beta 系列で違うので注意しましょう。</span>今回利用するのは [Version 1 の Text-to-image API](https://platform.stability.ai/docs/api-reference#tag/Text-to-Image) になります。
+発行した API Key を使って、手元の Node.js で絵を書いてみましょう。<span style="color:red">API は v1 系列と v2beta 系列で違うので注意しましょう。</span>今回利用するのは [Version 1 の Text-to-image API](https://platform.stability.ai/docs/api-reference#tag/Text-to-Image) になります。
 
 API を利用して絵を描くコードは以下のようになります。
 
@@ -143,11 +147,11 @@ responseJSON.artifacts.forEach((image, index) => {
 $ export STABILITY_API_KEY="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ```
 
-API に投げている body に入っている `text_prompt` が、いわゆるプロンプトです。試しに「電気羊」を描いてみました。これをローカルで実行してみると、十分に良い絵が描けました。
+API に投げている body に入っている `text_prompt` が、いわゆるプロンプトです。試しに「電気羊」を描いてみました。プロンプトは短く、`'an electric sheep, electric, sheep, blue and yellow, night city, illustration'` だけです。これを自分のターミナルで実行してみると、十分に良い絵が描けました。
 
 ![Electric Sheep◊](./img/electric_sheep.png)
 
-実行時間は平均して 7.5 秒前後でした。
+シードを指定していないので、実行するたびに結果が変わります。実行時間は平均して 7.5 秒前後でした。
 
 ## プロンプトのチューニング
 
@@ -209,6 +213,8 @@ const generate = async (text) => {
 ```
 
 生成部分の抜粋ですが、コードはローカルで動かしていたものからほとんど変更がありません。Vercel のサーバーレスは無料プランだと最大 60 秒でタイムアウトしますが、絵の生成は大体 10 秒弱で終わるので、余裕をもって制限時間内に終了するでしょう。
+
+なお、ユーザー入力の `text` を直接プロンプトに渡しているので、ここで<span style="color:blue">プロンプト・インジェクションの可能性</span>が発生している点には留意しましょう。今回は大きな問題がないと判断して対処しておりませんが、意識をしておくのは大切です。
 
 ## いたずら防止に reCAPTCHA v2 を導入
 
@@ -280,7 +286,6 @@ Your request was flagged by our content moderation system, as a result your requ
 
 これはサービス提供者としては本当に安心です。私はこのメリットを非常に高く評価しております。
 
-ただ一方で、Stable Diffusion はオープンである故、歴史的にアダルトコンテンツにも広く使われている現実があります。そういったサービスを提供している人にとっては、自分の責任で自分専用のモデレーションシステムを注入するようなオプションがあると喜ぶのかもしれないな、とは思いました。言うまでもなく、一般的な利用方法においては Stablity AI のモデレーションは全く問題がないでしょう。
 
 # まとめ
 
