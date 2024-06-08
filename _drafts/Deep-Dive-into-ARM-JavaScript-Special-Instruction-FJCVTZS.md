@@ -24,7 +24,7 @@ FJCVTZS 命令は、Arm v8.3 から導入された JSCVT 命令の一つで、Ja
 
 `Floating-point Javascript Convert to Signed fixed-point, rounding toward Zero.` と、公式の説明に思いっきり「Javascript」の文字がありますね。JavaScript（ECMAScript）の仕様にある [[[ToInt32]]](https://tc39.es/ecma262/#sec-toint32) という内部関数の挙動を、そのままチップ上で行うのを目的に設計されています。
 
-**[[ToInt32]]** は内部の仮想関数であり JavaScript の関数として表に出てくることはないのですが、ビット演算系の数値処理をするとほぼ確実に呼ばれます。一言で説明すると、浮動小数点に対して小数点以下を切り捨てることで整数に変換する挙動です。
+**[[ToInt32]]** は言語処理系内部の仮想関数であり JavaScript の関数として表に出てくることはないのですが、ビット演算系の数値処理をするとほぼ確実に呼ばれます。一言で説明すると、浮動小数点に対して小数点以下を切り捨てることで整数に変換する挙動です。
 
 ```js
 const x = 1.23 >> 0;
