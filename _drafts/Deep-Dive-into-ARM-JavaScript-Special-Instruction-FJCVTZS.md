@@ -7,7 +7,7 @@ categories:
 
 [前回の記事](http://nmi.jp/2024-06-03-Exploring-V8-JIT-Outputs)では、JavaScript の実行エンジン V8 の JIT 出力コードを読んでみました。記事は M1 Mac 上で動かした結果でしたので、ARM アーキテクチャのアセンブラを読むことになりました。
 
-さてそんな ARM アーキテクチャですが、最近の ARM には **FJCVTZS** という JavaScript 専用の機械語命令があるのをご存知でしょうか？CPU に、特定の言語（それもコンパイラを持たない JavaScript）専用の命令があると知ったとき、私は大いに驚きました。
+さてそんな ARM アーキテクチャですが、最近の ARM には **FJCVTZS** という JavaScript 専用の機械語命令があるのをご存知でしょうか？CPU に、特定の言語（それもコンパイラを持たない JavaScript）専用の命令があると知ったとき、私は大いに驚きました（過去にも [Jazelle](https://en.wikipedia.org/wiki/Jazelle) みたいなものはありましたが）
 
 今回は、この **FJCVTZS** 命令について、実際にどれだけ効果があるのか、<span style="color:blue">V8 をビルドしながら調べてみましょう</span>。
 
@@ -90,6 +90,8 @@ $ node --print-opt-code test.js
 ```
 
 M1 以降の Mac であれば確認できると思います。確かに **FJCVTZS** 命令が使われているようですね！
+
+というわけで、次の目的は、この **FJCVTZS** を使わない V8 を用意することです。
 
 # V8 をビルドする
 
@@ -193,7 +195,7 @@ $ cp ./out/arm64.release/d8 ./out/arm64.release/d8_with_fjcvtzs
 
 ### V8 で FJCVTZS を無効化するように書き換えてビルドする
 
-さて、次に **FJCVTZS** を無効化した d8 をビルドしましょう。grep すればわかるのですが、FJCVTZS を扱っているソースコードはわずかしかないので、無効化する部分を特定するのは簡単です。手元で pull したソースでは 2 箇所見つかりました
+さて、次に本命の **FJCVTZS** を無効化した d8 をビルドしましょう。grep すればわかるのですが、FJCVTZS を扱っているソースコードはわずかしかないので、無効化する部分を特定するのは簡単です。手元で pull したソースでは 2 箇所見つかりました
 
 [src/codegen/arm64/macro-assembler-arm64.cc](https://github.com/v8/v8/blob/f0ada6d1dc6208472c1b736f82019e90edee29fb/src/codegen/arm64/macro-assembler-arm64.cc#L2932-L2935)
 
@@ -483,8 +485,91 @@ ARM の JavaScript 専用命令、みたいなニッチで特殊な内容が、�
 0x150001c2c   18c  54000482       b.hs #+0x90 (addr 0x150001cbc)
 ```
 
-命令数でいうと 10 命令も増えているように見えますが、大抵の場合はオーバーフローがないので b.vc 命令でジャンプするため、正味増えている命令数は 4 命令といったところです。もちろん大きな速度向上に寄与するのですが、コード量で見るほどの速度差は生まれていない点に注意です。
+命令数的にはとても増えているように見えますが、条件分岐が入っているので実際には全て実行される訳ではありません。**FJCVTZS** と同等のコードだけ抜き出すとこうなります。
 
-これらの **FJCVTZS** 命令の代替命令の配置のされ方は、[ソースコードで記述されている構造ものそのもの](https://github.com/v8/v8/blob/f0ada6d1dc6208472c1b736f82019e90edee29fb/src/codegen/arm64/macro-assembler-arm64.cc#L2926-L2975)なのが、当たり前とはいえ面白いですね。
+```
+0x150001bf4   154  9e78000a       fcvtzs x10, d0
+0x150001bf8   158  f100055f       cmp x10, #0x1 (1)
+0x150001bfc   15c  ba417941       ccmn x10, #1, #nzcV, vc
+0x150001c00   160  540000e7       b.vc #+0x1c (addr 0x150001c1c)
+0x150001c04   164  fc1f0fe0       str d0, [sp, #-16]!
+0x150001c08   168  f90007ff       str xzr, [sp, #8]
+0x150001c0c   16c  58001370       ldr x16, pc+620 (addr 0x0000000150001e78)    ;; off heap target
+0x150001c10   170  d63f0200       blr x16
+0x150001c14   174  f94003ea       ldr x10, [sp]
+0x150001c18   178  910043ff       add sp, sp, #0x10 (16)
+0x150001c1c   17c  53007d4a       lsr w10, w10, #0
+```
 
-上記コードを見てもわかる通り **FJCVTZS** 命令には何ら副作用がないため、V8 の最適化の文脈においては **FJCVTZS** 命令を使えるなら使った方が常に速くなることは間違いないかと思われます。なので、今回のベンチマークで **FJCVTZS** の方が遅くなっているのは環境要因の誤差であろうと推測しています。
+余談ですが、この **FJCVTZS** 命令の代替命令の配置のされ方は、[ソースコードで記述されている構造ものそのもの](https://github.com/v8/v8/blob/f0ada6d1dc6208472c1b736f82019e90edee29fb/src/codegen/arm64/macro-assembler-arm64.cc#L2926-L2975)なのが、当たり前とはいえ面白いですね。
+
+2 行目 3 行目の`cmp` と　`ccmn` で 64bit のオーバーフローを判定し、64bit のオーバーフローが発生していなかったら一番最後の `lsr` まで飛びます。すなわち、オーバーフローしない場合は `fjcvtzs` の  1命令が `fcvtzs` + `cmp` + `ccmn` + `b.vc` + `lsr` の 5 命令に増えており、オーバーフローする場合は 11 命令に増えることになります。
+
+なお、[Wikipedia の RISC](https://ja.wikipedia.org/wiki/RISC#%E7%89%B9%E5%BE%B4) の特徴の項に「全ての演算は 1 クロックで実行する」とありますが、RISC の思想を汲む ARM ですが実際のサイクル数（この場合はレイテンシ）は大きく異なります。こちらに [Apple M1 chip を対象にしたレイテンシ・スループットの野良ベンチマークがありますが](https://github.com/ocxtal/insn_bench_aarch64/blob/master/results/apple_m1_firestorm.md)、fjcvtzs は 10 clock と記載されています。スループット分の並列実行もあれば投機実行もあり、近年の CPU において命令数とサイクル数は必ずしも一致しないのは抑えておきましょう（とはいえ、大抵の場合は命令数と実効速度には相関関係が出ます）。この資料は [@teehah](https://x.com/teehah) さんに教えて頂きました。ありがとうございます！
+
+さて、上で紹介したテストコードは決してオーバーフローを起こさないコードでした。実際に 64bit をオーバーフローさせるとさらに重くなることを確認してみましょう。
+
+```js
+const arr = [];
+for (let i = 0; i < 1_000_000; i++) {
+    arr.push(2 ** 64 + Math.random() * 2 ** 31);
+}
+
+const f = () => {
+    let acc = 0;
+    const len = arr.length;
+    for (let i = 0; i < len; i++) {
+        acc ^= arr[i] | 0;
+    }
+};
+
+for (let i = 0; i < 5000; i++) {
+    f();
+}
+```
+
+上のテストコードを `test_overflow.js` に保存して、`test.js` との差分を確認してみましょう。
+
+```
+$ time ../../v8/out/arm64.release/d8_without_fjcvtzs test.js 
+
+real	0m4.554s
+user	0m4.490s
+sys	0m0.040s
+$ time ../../v8/out/arm64.release/d8_without_fjcvtzs test_overflow.js 
+
+real	0m11.920s
+user	0m11.838s
+sys	0m0.049s
+```
+
+オーバーフローなしだと 4.490s でしたが、オーバーフローありだと 11.838s と大幅に遅くなっているのが確認できます。 どちらのテストコードも **FJCVTZS** を使うと、当然ながら有意な差は出ません。
+
+```
+$ time ../../v8/out/arm64.release/d8_with_fjcvtzs test.js 
+
+real	0m3.958s
+user	0m3.893s
+sys	0m0.040s
+$ time ../../v8/out/arm64.release/d8_with_fjcvtzs test_overflow.js 
+
+real	0m3.901s
+user	0m3.867s
+sys	0m0.035s
+```
+
+3.867s と 11.838s だと 3 倍超もの高速化が達成されていることになります。**FJCVTZS** は普段でも速いですが、オーバーフローが発生するタイミングだと断然速くなることがわかりました。**FJCVTZS** 命令は、JavaScript の JIT においてはデメリットなく高速化できるので、私は **FJCVTZS** は使えるのであれば絶対に使ったほうが良い命令であるという理解をしています。
+
+これらの検証は [@hotpepsi](https://x.com/hotpepsi) さんにも手伝って頂きました。ありがとうございます！
+
+そして、これが原因で、`JetStream2.2` の `stanford-crypto-aes` のベンチマークで大幅な速度改善につながっている可能性があります。`stanford-crypto-aes` のベンチマークの中で大量の **FJCVTZS** が使われているコードは、`sjcl.cipher.aes` 関数の中のこのコードです。
+
+```js
+(a){this.s[0][0][0]||this.O();var b,c,d,e,f=this.s[0][4],g=this.s[1];b=a.length;var h=1;if(4!==b&&6!==b&&8!==b)throw new sjcl.exception.invalid("invalid aes key size");this.b=[d=a.slice(0),e=[]];for(a=b;a<4*b+28;a++){c=d[a-1];if(0===a%b||8===b&&4===a%b)c=f[c>>>24]<<24^f[c>>16&255]<<16^f[c>>8&255]<<8^f[c&255],0===a%b&&(c=c<<8^c>>>24^h<<24,h=h<<1^283*(h>>7));d[a]=d[a-b]^c}for(b=0;a;b++,a--)c=d[b&3?a:a-4],e[b]=4>=a||4>b?c:g[0][f[c>>>24]]^g[1][f[c>>16&255]]^g[2][f[c>>8&255]]^g[3][f[c&255]]};
+```
+
+このコードの中で、特に `h<<1^283*(h>>7)` のところで 64 bit のオーバーフローが起きている可能性が高いです。JIT の出力を見ると他の部分でもふんだんに **FJCVTZS** を使っているので、この部分がなくても十分に高速化にはつながっているのですが、この部分でさらに大きな速度差が出て、結果として 11% を超える高速化が実現されたのではないかと推測しています。
+
+このコードにおいて `b.vc` の分岐予測をミスって投機実行の速度ロスも出ているのではないかと少し考えたのですが、色々と検討した結果、このベンチマークに限っては分岐予測は関係なさそうと考えております。
+
+ここの検証は [@kazuho](https://x.com/kazuho) さんにも手伝って頂きました。kazuho さんには他にも助言をいくつか頂きました。ありがとうございます！
