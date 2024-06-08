@@ -505,7 +505,7 @@ ARM の JavaScript 専用命令、みたいなニッチで特殊な内容が、�
 
 2 行目 3 行目の`cmp` と　`ccmn` で 64bit のオーバーフローを判定し、64bit のオーバーフローが発生していなかったら一番最後の `lsr` まで飛びます。すなわち、オーバーフローしない場合は `fjcvtzs` の  1命令が `fcvtzs` + `cmp` + `ccmn` + `b.vc` + `lsr` の 5 命令に増えており、オーバーフローする場合は 11 命令に増えることになります。
 
-なお、[Wikipedia の RISC](https://ja.wikipedia.org/wiki/RISC#%E7%89%B9%E5%BE%B4) の特徴の項に「全ての演算は 1 クロックで実行する」とありますが、RISC の思想を汲む ARM ですが実際のサイクル数（この場合はレイテンシ）は大きく異なります。こちらに [Apple M1 chip を対象にしたレイテンシ・スループットの野良ベンチマークがありますが](https://github.com/ocxtal/insn_bench_aarch64/blob/master/results/apple_m1_firestorm.md)、fjcvtzs は 10 clock と記載されています。スループット分の並列実行もあれば投機実行もあり、近年の CPU において命令数とサイクル数は必ずしも一致しないのは抑えておきましょう（とはいえ、大抵の場合は命令数と実効速度には相関関係が出ます）。この資料は [@teehah](https://x.com/teehah) さんに教えて頂きました。ありがとうございます！
+なお、[Wikipedia の RISC](https://ja.wikipedia.org/wiki/RISC#%E7%89%B9%E5%BE%B4) の特徴の項に「全ての演算は 1 クロックで実行する」とありますが、RISC の思想を汲む ARM ですが実際のサイクル数（この場合はレイテンシ）は大きく異なります。こちらに [Apple M1 chip を対象にしたレイテンシ・スループットの野良ベンチマークがありますが](https://github.com/ocxtal/insn_bench_aarch64/blob/master/results/apple_m1_firestorm.md)、fjcvtzs は 10.00 (clock cycles) と記載されています。スループット分の並列実行もあれば投機実行もあり、近年の CPU において命令数とサイクル数は必ずしも一致しないのは抑えておきましょう（とはいえ、大抵の場合は命令数と実効速度には相関関係が出ます）。この資料は [@teehah](https://x.com/teehah) さんに教えて頂きました。ありがとうございます！
 
 さて、上で紹介したテストコードは決してオーバーフローを起こさないコードでした。実際に 64bit をオーバーフローさせるとさらに重くなることを確認してみましょう。
 
