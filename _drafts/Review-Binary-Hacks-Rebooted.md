@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 書評: "Binary Hacks Rebooted"
+title: 書評 "Binary Hacks Rebooted"
 ---
 
 先日、「Binary Hacks Rebooted」をご恵贈賜りました。通して読んでみたところ、私の心の琴線に触れる内容が多くあり、ブログ記事で紹介させてもらいます。
