@@ -181,21 +181,21 @@
 
 <div class="entry fix" style="overflow:hidden;">
     <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
-				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/2019-06-09-The-reason-you-should-avoid-new-array-100&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+				<iframe src="//www.facebook.com/plugins/like.php?href=http://nmi.jp/2019-06-09-The-reason-you-should-avoid-new-array-100&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
 					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
 			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
-				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+				<a href="//twitter.com/share" class="twitter-share-button" data-count="horizontal" 
 					data-text="高速化の観点から new Array(100) を使わない方が良い理由" data-url="http://nmi.jp/2019-06-09-The-reason-you-should-avoid-new-array-100">Tweet</a> 
 			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
-					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/2019-06-09-The-reason-you-should-avoid-new-array-100" class="hatena-bookmark-button"
+					<a href="//b.hatena.ne.jp/entry/http://nmi.jp/2019-06-09-The-reason-you-should-avoid-new-array-100" class="hatena-bookmark-button"
 					data-hatena-bookmark-layout="standard" title="高速化の観点から new Array(100) を使わない方が良い理由"
-					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="高速化の観点から new Array(100) を使わない方が良い理由" width="20"
-					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					><img src="//b.st-hatena.com/images/entry-button/button-only.gif" alt="高速化の観点から new Array(100) を使わない方が良い理由" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="//b.st-hatena.com/js/bookmark_button.js"
 					charset="utf-8" async="async"></script>
 				</div>
 </div>
 </div>
-        <article itemscope itemtype="http://schema.org/BlogPosting">
+        <article itemscope itemtype="//schema.org/BlogPosting">
         <p>別件で V8 の JIT コードの逆アセンブルを眺めている時に気づいたのですが、JavaScriptで <code class="language-plaintext highlighter-rouge">new Array(100)</code> という形で配列を作るのは、高速化の観点から言うと V8 においては避けるべき書き方です。</p>
 
 <p>高速化を求める方は、 <code class="language-plaintext highlighter-rouge">new Array()</code> や <code class="language-plaintext highlighter-rouge">[]</code> で作成して <code class="language-plaintext highlighter-rouge">Array#push</code> で追加していくのが良いでしょう。この記事では、その理由を説明します。</p>
@@ -331,16 +331,16 @@ d8&gt;
 
 <div class="entry fix" style="overflow:hidden;">
     <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
-				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/2019-06-09-The-reason-you-should-avoid-new-array-100&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+				<iframe src="//www.facebook.com/plugins/like.php?href=http://nmi.jp/2019-06-09-The-reason-you-should-avoid-new-array-100&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
 					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
 			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
-				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+				<a href="//twitter.com/share" class="twitter-share-button" data-count="horizontal" 
 					data-text="高速化の観点から new Array(100) を使わない方が良い理由" data-url="http://nmi.jp/2019-06-09-The-reason-you-should-avoid-new-array-100">Tweet</a> 
 			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
-					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/2019-06-09-The-reason-you-should-avoid-new-array-100" class="hatena-bookmark-button"
+					<a href="//b.hatena.ne.jp/entry/http://nmi.jp/2019-06-09-The-reason-you-should-avoid-new-array-100" class="hatena-bookmark-button"
 					data-hatena-bookmark-layout="standard" title="高速化の観点から new Array(100) を使わない方が良い理由"
-					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="高速化の観点から new Array(100) を使わない方が良い理由" width="20"
-					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					><img src="//b.st-hatena.com/images/entry-button/button-only.gif" alt="高速化の観点から new Array(100) を使わない方が良い理由" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="//b.st-hatena.com/js/bookmark_button.js"
 					charset="utf-8" async="async"></script>
 				</div>
 </div>
