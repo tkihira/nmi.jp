@@ -3,10 +3,10 @@
   <channel>
     <title>nmi.jp</title>
     <description></description>
-    <link>http://nmi.jp/</link>
-    <atom:link href="http://nmi.jp/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 04 Jun 2025 12:48:38 +0000</pubDate>
-    <lastBuildDate>Wed, 04 Jun 2025 12:48:38 +0000</lastBuildDate>
+    <link>https://nmi.jp/</link>
+    <atom:link href="https://nmi.jp/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Wed, 04 Jun 2025 12:52:15 +0000</pubDate>
+    <lastBuildDate>Wed, 04 Jun 2025 12:52:15 +0000</lastBuildDate>
     <generator>Jekyll v4.4.1</generator>
     
       <item>
@@ -60,8 +60,8 @@
 &lt;p&gt;読後感として、今まで概念だけ理解して深入りしていなかった数多くの分野について、具体的な理解が深まったのに大変感謝しています。JavaScript を専門としている私であっても、JIT のメモリ展開の問題やサンドボックスのオーバーヘッドなどは今すぐ役に立つ話でした。低レイヤーに興味を持つ皆様にとって、お勧め出来る一冊になります。&lt;/p&gt;
 </description>
         <pubDate>Wed, 28 Aug 2024 00:00:00 +0000</pubDate>
-        <link>http://nmi.jp/2024-08-28-Review-Binary-Hacks-Rebooted</link>
-        <guid isPermaLink="true">http://nmi.jp/2024-08-28-Review-Binary-Hacks-Rebooted</guid>
+        <link>https://nmi.jp/2024-08-28-Review-Binary-Hacks-Rebooted</link>
+        <guid isPermaLink="true">https://nmi.jp/2024-08-28-Review-Binary-Hacks-Rebooted</guid>
         
         
       </item>
@@ -928,8 +928,8 @@ sys	0m0.035s
 &lt;p&gt;ここの検証は &lt;a href=&quot;https://x.com/kazuho&quot;&gt;@kazuho&lt;/a&gt; さんにも手伝って頂きました。kazuho さんには他にも助言をいくつか頂きました。ありがとうございます！&lt;/p&gt;
 </description>
         <pubDate>Mon, 10 Jun 2024 00:00:00 +0000</pubDate>
-        <link>http://nmi.jp/2024-06-10-Deep-Dive-into-ARM-JavaScript-Special-Instruction-FJCVTZS</link>
-        <guid isPermaLink="true">http://nmi.jp/2024-06-10-Deep-Dive-into-ARM-JavaScript-Special-Instruction-FJCVTZS</guid>
+        <link>https://nmi.jp/2024-06-10-Deep-Dive-into-ARM-JavaScript-Special-Instruction-FJCVTZS</link>
+        <guid isPermaLink="true">https://nmi.jp/2024-06-10-Deep-Dive-into-ARM-JavaScript-Special-Instruction-FJCVTZS</guid>
         
         
         <category>JavaScript</category>
@@ -1250,8 +1250,8 @@ sys	0m0.071s
 &lt;p&gt;やはり同じように境界値チェックですね。&lt;/p&gt;
 </description>
         <pubDate>Mon, 03 Jun 2024 00:00:00 +0000</pubDate>
-        <link>http://nmi.jp/2024-06-03-Exploring-V8-JIT-Outputs</link>
-        <guid isPermaLink="true">http://nmi.jp/2024-06-03-Exploring-V8-JIT-Outputs</guid>
+        <link>https://nmi.jp/2024-06-03-Exploring-V8-JIT-Outputs</link>
+        <guid isPermaLink="true">https://nmi.jp/2024-06-03-Exploring-V8-JIT-Outputs</guid>
         
         
         <category>JavaScript</category>
@@ -1582,8 +1582,8 @@ sys	0m0.071s
 &lt;p&gt;本当に簡単に作れるので、ちょっと興味のある人はぜひ試してみてください。手元でちょっと実行するだけでも楽しいと思いますし、きっと創造力を刺激されることでしょう。そしてぜひ、AI を組み込んだクオリティの高いサービスを世の中に提供してください！&lt;/p&gt;
 </description>
         <pubDate>Mon, 27 May 2024 00:00:00 +0000</pubDate>
-        <link>http://nmi.jp/2024-05-27-Color-Painting-app-with-Stable-Diffusion-API</link>
-        <guid isPermaLink="true">http://nmi.jp/2024-05-27-Color-Painting-app-with-Stable-Diffusion-API</guid>
+        <link>https://nmi.jp/2024-05-27-Color-Painting-app-with-Stable-Diffusion-API</link>
+        <guid isPermaLink="true">https://nmi.jp/2024-05-27-Color-Painting-app-with-Stable-Diffusion-API</guid>
         
         
         <category>JavaScript</category>
@@ -1959,8 +1959,8 @@ sys	0m0.071s
 &lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;then&lt;/code&gt; と &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;async&lt;/code&gt;/&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;await&lt;/code&gt; も、所詮はシンタックスシュガーではあるのですが、両者の記法の混在が初学者に与えるコストは無視できないものだと考えております。もはや JavaScript 非同期処理の過渡期という暗黒時代は終わった、と言えるでしょう。中上級者の皆さまも &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;async&lt;/code&gt;/&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;await&lt;/code&gt; に記法を寄せていくメリットに目を向ける価値は大きいと思います。ぜひご一考をお願いします。&lt;/p&gt;
 </description>
         <pubDate>Fri, 17 May 2024 00:00:00 +0000</pubDate>
-        <link>http://nmi.jp/2024-05-17-Avoid-then</link>
-        <guid isPermaLink="true">http://nmi.jp/2024-05-17-Avoid-then</guid>
+        <link>https://nmi.jp/2024-05-17-Avoid-then</link>
+        <guid isPermaLink="true">https://nmi.jp/2024-05-17-Avoid-then</guid>
         
         
         <category>JavaScript</category>
@@ -2297,8 +2297,8 @@ sys	0m0.071s
 &lt;p&gt;&lt;a href=&quot;https://twitter.com/kota_yata&quot;&gt;@kota_yata&lt;/a&gt; さんが素晴らしい資料を用意されているので、興味のある方は是非ご一読ください。このスライドは、 &lt;a href=&quot;https://twitter.com/h_sakurai&quot;&gt;@h_sakurai&lt;/a&gt; さんに情報をいただきました！ありがとうございます！&lt;/p&gt;
 </description>
         <pubDate>Mon, 04 Dec 2023 00:00:00 +0000</pubDate>
-        <link>http://nmi.jp/2023-12-04-Maximm-Call-Stack-Size-Exceeded</link>
-        <guid isPermaLink="true">http://nmi.jp/2023-12-04-Maximm-Call-Stack-Size-Exceeded</guid>
+        <link>https://nmi.jp/2023-12-04-Maximm-Call-Stack-Size-Exceeded</link>
+        <guid isPermaLink="true">https://nmi.jp/2023-12-04-Maximm-Call-Stack-Size-Exceeded</guid>
         
         
         <category>JavaScript</category>
@@ -2515,8 +2515,8 @@ For each FPU data type, one unique encoding is reserved for representing the spe
 &lt;p&gt;P.38 の「QNaN 実数不定値」というのが QNaN Real Indefinite、すなわち本記事の R Ind です。というわけで、おそらく SSE2 をサポートする AMD も上記コードで同じように Intel アーキテクチャだと判定されると思います。なお、&lt;a href=&quot;https://twitter.com/hotpepsi&quot;&gt;@hotpepsi さん&lt;/a&gt;の手元の AMD 環境では Intel と同じ挙動だと確認してもらいました。ありがとうございます！&lt;/p&gt;
 </description>
         <pubDate>Wed, 11 Jan 2023 00:00:00 +0000</pubDate>
-        <link>http://nmi.jp/2023-01-11-Detecting-Intel-Arch-in-JavaScript</link>
-        <guid isPermaLink="true">http://nmi.jp/2023-01-11-Detecting-Intel-Arch-in-JavaScript</guid>
+        <link>https://nmi.jp/2023-01-11-Detecting-Intel-Arch-in-JavaScript</link>
+        <guid isPermaLink="true">https://nmi.jp/2023-01-11-Detecting-Intel-Arch-in-JavaScript</guid>
         
         
         <category>JavaScript</category>
@@ -2839,8 +2839,8 @@ For each FPU data type, one unique encoding is reserved for representing the spe
 &lt;iframe sandbox=&quot;allow-popups allow-scripts allow-modals allow-forms allow-same-origin&quot; style=&quot;width:120px;height:240px;&quot; marginwidth=&quot;0&quot; marginheight=&quot;0&quot; scrolling=&quot;no&quot; frameborder=&quot;0&quot; src=&quot;//rcm-fe.amazon-adsystem.com/e/cm?lt1=_blank&amp;amp;bc1=000000&amp;amp;IS2=1&amp;amp;bg1=FFFFFF&amp;amp;fc1=000000&amp;amp;lc1=0000FF&amp;amp;t=tkihira0e-22&amp;amp;language=ja_JP&amp;amp;o=9&amp;amp;p=8&amp;amp;l=as4&amp;amp;m=amazon&amp;amp;f=ifr&amp;amp;ref=as_ss_li_til&amp;amp;asins=4797363282&amp;amp;linkId=b600f6ac270f51ea1162d5eb2ff971ad&quot;&gt;&lt;/iframe&gt;
 </description>
         <pubDate>Tue, 03 Jan 2023 00:00:00 +0000</pubDate>
-        <link>http://nmi.jp/2023-01-03-How-to-solve-2023-puzzle</link>
-        <guid isPermaLink="true">http://nmi.jp/2023-01-03-How-to-solve-2023-puzzle</guid>
+        <link>https://nmi.jp/2023-01-03-How-to-solve-2023-puzzle</link>
+        <guid isPermaLink="true">https://nmi.jp/2023-01-03-How-to-solve-2023-puzzle</guid>
         
         
         <category>JavaScript</category>
@@ -3254,8 +3254,8 @@ immediate
 &lt;/blockquote&gt;
 </description>
         <pubDate>Mon, 21 Nov 2022 00:00:00 +0000</pubDate>
-        <link>http://nmi.jp/2022-11-21-Understanding-setTimeout-completely</link>
-        <guid isPermaLink="true">http://nmi.jp/2022-11-21-Understanding-setTimeout-completely</guid>
+        <link>https://nmi.jp/2022-11-21-Understanding-setTimeout-completely</link>
+        <guid isPermaLink="true">https://nmi.jp/2022-11-21-Understanding-setTimeout-completely</guid>
         
         
         <category>JavaScript</category>
@@ -3436,8 +3436,8 @@ The printer operation is implementation-defined.
 &lt;p&gt;&lt;img src=&quot;/img/console-log-6.png&quot; alt=&quot;Console Log DevTools&quot; /&gt;&lt;/p&gt;
 </description>
         <pubDate>Mon, 14 Nov 2022 00:00:00 +0000</pubDate>
-        <link>http://nmi.jp/2022-11-14-Be-careful-about-console-log-in-chrome</link>
-        <guid isPermaLink="true">http://nmi.jp/2022-11-14-Be-careful-about-console-log-in-chrome</guid>
+        <link>https://nmi.jp/2022-11-14-Be-careful-about-console-log-in-chrome</link>
+        <guid isPermaLink="true">https://nmi.jp/2022-11-14-Be-careful-about-console-log-in-chrome</guid>
         
         
         <category>JavaScript</category>
