@@ -1,0 +1,1804 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Stable Diffusion API を使って塗り絵 自動生成アプリを作る</title>
+    <meta name="description" content="Stable Diffusion は、GPU を利用した画像生成 AI の中でも最も有名なプロダクトだと思います。Stable Diffusion の利用者は一般的にまず GPU を準備し、そこで環境を構築してから画像生成を行うのですが、今回は Stability AI（Stable Diffusion の開発元...">
+
+    <link rel="stylesheet" href=" /css/fontawesome/css/font-awesome.min.css ">
+    <link rel="stylesheet" href=" /css/main.css ">
+    <link rel="canonical" href="http://nmi.jp/2024-05-27-Color-Painting-app-with-Stable-Diffusion-API">
+    <link rel="alternate" type="application/rss+xml" title="nmi.jp" href="http://nmi.jp/feed.xml">
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=3.0'></script>
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=1.1'></script>
+    <script>
+        if(location.href.match(/\.html$/)) {
+            location.href = location.href.match(/(.+)\.html/)[1];
+        }
+    </script>
+
+
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-229769-8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-229769-8');
+</script>
+</head>
+
+
+  <body>
+
+    <header id="top">
+    <div class="wrapper">
+        <a href="/" class="brand">nmi.jp</a>
+        <small>Twitter → <a href="https://twitter.com/tkihira" target="_blank">@tkihira</a></small>
+        <button id="headerMenu" class="menu"><i class="fa fa-bars"></i></button>
+        <nav id="headerNav">
+            <ul>
+                <li>
+                    
+                    <a href="/">
+                    
+                        <i class="fa fa-home"></i>Home
+                    </a>
+                </li>
+
+                
+                    
+                    <li>
+                        
+                        <a href="/archive/">
+                        
+                            <i class="fa fa-archive"></i>Archives
+                        </a>
+                    </li>
+                    
+                
+                    
+                    <li>
+                        
+                        <a href="/category/">
+                        
+                            <i class="fa fa-th-list"></i>Categories
+                        </a>
+                    </li>
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            </ul>
+        </nav>
+    </div>
+</header>
+
+
+        <div class="page clearfix" post>
+    <div class="left">
+        <div class="post-recent">
+    <table style="width:100%;border:0;padding:0;"><tbody><tr style="padding:0">
+        <td class="toppre" style="padding:0">
+        
+        <a href="/2024-05-17-Avoid-then">JavaScript で then を使うのは避けよう（await / async の初級者まとめ）</a>
+        
+        </td><td class="topnex" style="text-align:right;padding:0">
+        
+        <a href="/2024-06-03-Exploring-V8-JIT-Outputs">JavaScript 実行エンジン V8 の JIT 出力コードを読んでみよう</a>
+        
+        </td>
+    </tr></tbody></table>
+</div>
+
+        <hr style="margin:0"/>
+        <h1 style="margin-top:10px">Stable Diffusion API を使って塗り絵 自動生成アプリを作る</h1>
+<hr />
+        <div class="label">
+
+            <div class="label-card">
+                <i class="fa fa-calendar"></i>2024-05-27
+            </div>
+
+            <div class="label-card">
+                <i class="fa fa-user"></i>Takuo Kihira
+                
+            </div>
+
+            <div class="label-card">
+                
+            </div>
+
+            <div class="label-card">
+            
+
+
+<!-- <span class="point">•</span> -->
+<span class="categories">
+  <i class="fa fa-th-list"></i>
+  
+    
+        <a href="/category/#JavaScript" title="Category: JavaScript" rel="category">JavaScript</a>&nbsp;
+    
+        <a href="/category/#GenAI" title="Category: GenAI" rel="category">GenAI</a>
+    
+  
+
+  <!-- <span class="point">•</span> -->
+</span>
+
+
+            </div>
+
+            <div class="label-card">
+                <a href="https://github.com/tkihira/nmi.jp/blob/master/_posts/2024-05-27-Color-Painting-app-with-Stable-Diffusion-API.md" target="_blank"><i class="fa fa-github"></i></a>
+            </div>
+
+        </div>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/2024-05-27-Color-Painting-app-with-Stable-Diffusion-API&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="Stable Diffusion API を使って塗り絵 自動生成アプリを作る" data-url="http://nmi.jp/2024-05-27-Color-Painting-app-with-Stable-Diffusion-API">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/2024-05-27-Color-Painting-app-with-Stable-Diffusion-API" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="Stable Diffusion API を使って塗り絵 自動生成アプリを作る"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="Stable Diffusion API を使って塗り絵 自動生成アプリを作る" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+        <article itemscope itemtype="http://schema.org/BlogPosting">
+        <p>Stable Diffusion は、GPU を利用した画像生成 AI の中でも最も有名なプロダクトだと思います。Stable Diffusion の利用者は一般的にまず GPU を準備し、そこで環境を構築してから画像生成を行うのですが、今回は Stability AI（Stable Diffusion の開発元）の用意している API を利用して、塗り絵の自動生成を作ってみました。</p>
+
+<p><span style="font-size:20px;font-weight:bold">塗り絵 自動生成</span>: <a href="https://color-painting.vercel.app/">https://color-painting.vercel.app/</a></p>
+
+<p><img src="./img/tiger.png" alt="wild tiger in jungle" /></p>
+
+<p>子どもたちのために、塗り絵を自動生成するサービスです。この記事では、どのようにこのアプリを作ったのか簡単に紹介しております。コードは全て JavaScript です。</p>
+
+<p>ソースコードも github で公開しています。Stability AI Developer Platform, Vercel, Google reCAPTCHA に依存しています。</p>
+
+<p><a href="https://github.com/tkihira/color_painting">https://github.com/tkihira/color_painting</a></p>
+
+<p>なお免責事項として、私は Stablity AI Japan 社には仲の良い友人が多数おりますが、このブログを公開するにあたり Stability AI 社からの金銭授与ならびにクレジット授与は一切ありません。 <strong>また、AI の業界は変化が激しいので、ここに書かれている内容はすぐに時代遅れになる</strong> でしょう。提供されている機能や料金などは、必ず自分でお調べ頂くようにお願いします。</p>
+
+<h1 id="なぜ-stability-ai-の-api-を利用するのか">なぜ Stability AI の API を利用するのか</h1>
+
+<p>Stable Diffusion は、一般に「オープンな AI」と呼ばれており、モデルを手元に用意することが出来ます。一般的には、まず自分の家やクラウドサービス上で GPU を用意して、そこで環境を準備してから画像生成を行うのが一般的な使われ方です。自分のコンピュータでいろいろな画像生成を経験された方も多いと思います。</p>
+
+<p>それと比較して、「クローズドな AI」と呼ばれるモデルもあります。クローズドなモデルは公開されておりません。画像生成系 AI ならば、例えば DALL･E や Midjourney、NovelAI などが有名です。クローズドな AI は手元に環境を用意することができず、API や bot コマンドなど、提供されているサービスを通じて絵を生成します。</p>
+
+<p>今回利用するのは、Stable Diffusion の開発元である Stability AI が提供している API です。「オープンな AI」をクローズドな AI と同じ様に API で利用する形になりますが、これにはメリットが多数あります。</p>
+
+<ul>
+  <li>生成系の AI は、一般的に環境の準備に最低でも数分程度の時間がかかります。クラウドサービスで実現しようと思っても、ユーザーのアクセスのたびに毎回数分待ってもらうのは現実的ではありません</li>
+  <li>GPU を準備するのも高コストです。ひっきりなしにアクセスのあるサービスであればよいのですが、そうでなければ遊んでいる間の GPU の維持にもコストがかかります。多重化などを考えた場合、そのコストはさらに高くなります</li>
+</ul>
+
+<p>サービスを提供するための体験としては API を利用する方が断然良いのですが、今度はサービスが大きくヒットした時に API の利用料金が高くなってしまう問題があります。API が料金改定で急に値上がりする可能性もあります。これはクローズドな AI の大きな問題点です。しかし Stable Diffusion は「オープンな AI」の API 提供ですので、簡単ではないものの、利用料金が高くなれば自前でホスティングをするなど、別の手段での解決策を探ることが出来ます。サービスにロックインされてしまうクローズドな AI と比較すると、オープンな AI の大きな強みです。</p>
+
+<p>まずはスモールスタートして、サービスのスケールに従ってより優れた構成を探っていける、そういったメリットを「オープンな AI」の API サービスは持っています。</p>
+
+<h1 id="stability-ai-developer-platform">Stability AI Developer Platform</h1>
+
+<p>今回利用するのは <a href="https://platform.stability.ai/">Stability AI Developer Platform</a> の提供している API 群のうち、 <em>Image Generate</em> を利用します。記事執筆時点では、</p>
+
+<ul>
+  <li>Stable Diffusion 3</li>
+  <li>Stable Diffusion 3 Turbo</li>
+  <li>Stable Image Core</li>
+  <li>SDXL 1.0, SD 1.6</li>
+</ul>
+
+<p>の 4 つの分類があります。それぞれ、API の利用 1 回につき利用料金がかかります。Stability AI Platform では、それを「クレジット」という形で表現しています。</p>
+
+<p>現在、アカウントを作ると最初からある程度のクレジットが付与されています。$10 で 1000 クレジットを購入出来て、各 API を呼び出すと、そのクレジットを消費します。</p>
+
+<p><a href="https://platform.stability.ai/pricing">https://platform.stability.ai/pricing</a></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>サービス (モデル名)</th>
+      <th>説明</th>
+      <th>価格 (1回あたりの消費クレジット)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>SD3</td>
+      <td>Stability AIの最新かつ最先端の画像生成モデル</td>
+      <td>6.5</td>
+    </tr>
+    <tr>
+      <td>SD3 Turbo</td>
+      <td>最先端で高速なモデル</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <td>Core</td>
+      <td>マーケットで最高レベルの画像生成サービス</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <td>SDXL 1.0</td>
+      <td>画像生成のための標準ベースモデル</td>
+      <td>0.2-0.6</td>
+    </tr>
+    <tr>
+      <td>SD 1.6</td>
+      <td>解像度が調整可能なベースモデル</td>
+      <td>0.2-1.0</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>この表は記事執筆時点（2024/05/27）での情報です。最新情報は上記リンクからご確認ください</strong> 。1 ドル 150 円換算すると、大体 1 クレジットが 1.5 円になります。SD3 だと 1 枚で約 10 円弱かかる計算です。</p>
+
+<p>どのエンジンを利用するかによって大きく金額が変わります。良いモデルは高額な分、良いクオリティの出力を出す傾向があります。サービス設計の肝になるので、それぞれのエンジンを試してみて、ベストなエンジンを探しましょう。</p>
+
+<p><a href="https://platform.stability.ai/docs/getting-started/stable-image">https://platform.stability.ai/docs/getting-started/stable-image</a></p>
+
+<p>こちらのページに Google Colab 上で API を叩くための Notebook が公開されていますので、手軽に試したい場合は利用してみてください。</p>
+
+<p>今回は、子どもたちのために無限に塗り絵を作りたかったので、安いモデルを使うことにしました。SD 1.6 はローカルで使ったこともあり慣れていたので、これを選びました。1 枚 1 円前後ですね。</p>
+
+<h1 id="開発の話">開発の話</h1>
+
+<p>今回のソースコードはこちらで公開しています。</p>
+
+<p><a href="https://github.com/tkihira/color_painting">https://github.com/tkihira/color_painting</a></p>
+
+<p>全体のビルドやデプロイ方法も README に書いておりますので、参照してください。</p>
+
+<p>ここでは大まかな解説をします。</p>
+
+<h2 id="stability-ai-developer-platform-で-api-key-を発行">Stability AI Developer Platform で API Key を発行</h2>
+
+<p>Stable Diffusion の API を利用するためには、まず Stability AI の Developer Platform でアカウントを作成する必要があります。</p>
+
+<p><a href="https://platform.stability.ai/account/keys">https://platform.stability.ai/account/keys</a></p>
+
+<p>作成後、上記のページから <code class="language-plaintext highlighter-rouge">API Key</code> を発行します。</p>
+
+<h2 id="実際にローカルで画像を作ってみる">実際にローカルで画像を作ってみる</h2>
+
+<p>発行した API Key を使って、手元の Node.js で絵を書いてみましょう。<span style="color:red">API は v1 系列と v2beta 系列で違うので注意しましょう。</span>今回利用するのは <a href="https://platform.stability.ai/docs/api-reference#tag/Text-to-Image">Version 1 の Text-to-image API</a> になります。</p>
+
+<p>API を利用して絵を描くコードは以下のようになります。</p>
+
+<p><a href="https://github.com/tkihira/color_painting/blob/main/misc/text2image.mjs">https://github.com/tkihira/color_painting/blob/main/misc/text2image.mjs</a></p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">fs</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">node:fs</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">engineId</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">stable-diffusion-v1-6</span><span class="dl">'</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">apiHost</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">API_HOST</span> <span class="o">??</span> <span class="dl">'</span><span class="s1">https://api.stability.ai</span><span class="dl">'</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">apiKey</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">STABILITY_API_KEY</span><span class="p">;</span>
+
+<span class="k">if </span><span class="p">(</span><span class="o">!</span><span class="nx">apiKey</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="nc">Error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Missing Stability API key.</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="k">await</span> <span class="nf">fetch</span><span class="p">(</span><span class="s2">`</span><span class="p">${</span><span class="nx">apiHost</span><span class="p">}</span><span class="s2">/v1/generation/</span><span class="p">${</span><span class="nx">engineId</span><span class="p">}</span><span class="s2">/text-to-image`</span><span class="p">,</span> <span class="p">{</span>
+    <span class="na">method</span><span class="p">:</span> <span class="dl">'</span><span class="s1">POST</span><span class="dl">'</span><span class="p">,</span>
+    <span class="na">headers</span><span class="p">:</span> <span class="p">{</span>
+        <span class="dl">'</span><span class="s1">Content-Type</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">application/json</span><span class="dl">'</span><span class="p">,</span>
+        <span class="na">Accept</span><span class="p">:</span> <span class="dl">'</span><span class="s1">application/json</span><span class="dl">'</span><span class="p">,</span>
+        <span class="na">Authorization</span><span class="p">:</span> <span class="s2">`Bearer </span><span class="p">${</span><span class="nx">apiKey</span><span class="p">}</span><span class="s2">`</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="na">body</span><span class="p">:</span> <span class="nx">JSON</span><span class="p">.</span><span class="nf">stringify</span><span class="p">({</span>
+        <span class="na">text_prompts</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span> <span class="na">text</span><span class="p">:</span> <span class="dl">'</span><span class="s1">an electric sheep, electric, sheep, blue and yellow, night city, illustration</span><span class="dl">'</span><span class="p">,</span> <span class="p">},</span>
+        <span class="p">],</span>
+        <span class="na">cfg_scale</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="na">height</span><span class="p">:</span> <span class="mi">1024</span><span class="p">,</span> <span class="na">width</span><span class="p">:</span> <span class="mi">1024</span><span class="p">,</span> <span class="na">steps</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span> <span class="na">samples</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="p">}),</span>
+<span class="p">});</span>
+
+<span class="k">if </span><span class="p">(</span><span class="o">!</span><span class="nx">response</span><span class="p">.</span><span class="nx">ok</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="nc">Error</span><span class="p">(</span><span class="s2">`</span><span class="p">${</span><span class="nx">response</span><span class="p">.</span><span class="nx">status</span><span class="p">}</span><span class="s2"> response: </span><span class="p">${</span><span class="k">await</span> <span class="nx">response</span><span class="p">.</span><span class="nf">text</span><span class="p">()}</span><span class="s2">`</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">const</span> <span class="nx">responseJSON</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">response</span><span class="p">.</span><span class="nf">json</span><span class="p">();</span>
+
+<span class="k">if </span><span class="p">(</span><span class="o">!</span><span class="nx">fs</span><span class="p">.</span><span class="nf">existsSync</span><span class="p">(</span><span class="dl">'</span><span class="s1">./out</span><span class="dl">'</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nx">fs</span><span class="p">.</span><span class="nf">mkdirSync</span><span class="p">(</span><span class="dl">'</span><span class="s1">./out</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">responseJSON</span><span class="p">.</span><span class="nx">artifacts</span><span class="p">.</span><span class="nf">forEach</span><span class="p">((</span><span class="nx">image</span><span class="p">,</span> <span class="nx">index</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">fs</span><span class="p">.</span><span class="nf">writeFileSync</span><span class="p">(</span><span class="s2">`./out/v1_txt2img_</span><span class="p">${</span><span class="nx">index</span><span class="p">}</span><span class="s2">.png`</span><span class="p">,</span> <span class="nx">Buffer</span><span class="p">.</span><span class="k">from</span><span class="p">(</span><span class="nx">image</span><span class="p">.</span><span class="nx">base64</span><span class="p">,</span> <span class="dl">'</span><span class="s1">base64</span><span class="dl">'</span><span class="p">));</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<p>実行前に環境変数に <code class="language-plaintext highlighter-rouge">STABILITY_API_KEY</code> を保存しておきましょう。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ export STABILITY_API_KEY="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+</code></pre></div></div>
+
+<p>API に投げている body に入っている <code class="language-plaintext highlighter-rouge">text_prompt</code> が、いわゆるプロンプトです。試しに「電気羊」を描いてみました。プロンプトは短く、<code class="language-plaintext highlighter-rouge">'an electric sheep, electric, sheep, blue and yellow, night city, illustration'</code> だけです。これを自分のターミナルで実行してみると、十分に良い絵が描けました。</p>
+
+<p><img src="./img/electric_sheep.png" alt="Electric Sheep◊" /></p>
+
+<p>シードを指定していないので、実行するたびに結果が変わります。実行時間は平均して 7.5 秒前後でした。</p>
+
+<h2 id="プロンプトのチューニング">プロンプトのチューニング</h2>
+
+<p>今回は塗り絵風の絵を描くために、次のようなプロンプトを用意しました。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>a cute rabbit in a field of flowers, white and black, coloring book for kids, simple, adult coloring book, no detail, outline no color, fill frame, edge to edge, clipart white background
+</code></pre></div></div>
+
+<p>先頭の <code class="language-plaintext highlighter-rouge">a cute rabbit in a field of flowers</code> が描きたい絵で、それ以降はスタイルの指定です。いわゆる呪文と呼ばれる内容ですね。<a href="https://www.instantaiprompt.com/ja/prompts/midjourney/coloring-book/">このページ</a>を参考にしました。これで描いてみた絵がこちらです。</p>
+
+<p><img src="./img/rabbit.png" alt="a cute rabbit in a field of flowers" /></p>
+
+<p>プロンプトを変えて他にも何枚か色々と出力してみたところ、このプロンプトは大変よい品質の塗り絵を出力することがわかって満足しました。<span style="color:blue">本番サービスにこれを使うことを決めました</span>。</p>
+
+<p>試行錯誤でお金がかかるのが気になりますか？ <strong>AI を使った開発やサービスは、今までの開発と比べて、よりコスト（原価）が高くなることに留意する必要があります</strong> 。とはいえ今回は 100 回試行錯誤しても 100 円程度、まだまだ安いものです。</p>
+
+<p>他のパラメータの説明を簡単にすると、</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">cfg_scale</code>: プロンプトにどの程度寄せるかを指定します。高すぎると破綻することが多く、7 前後がおすすめです</li>
+  <li><code class="language-plaintext highlighter-rouge">width</code>/<code class="language-plaintext highlighter-rouge">height</code>: 画像の大きさです。<a href="https://platform.stability.ai/docs/api-reference#tag/Text-to-Image">モデルによって制限がある</a>ので気をつけましょう</li>
+  <li><code class="language-plaintext highlighter-rouge">steps</code>: 何度描き直すかを指定します。小さいと破綻しますが大きすぎても破綻します。大きくすると時間がかかります。20〜30 が良いでしょう</li>
+  <li><code class="language-plaintext highlighter-rouge">samples</code>: 一度に何枚生成するか指定します。生成された画像は配列で返ってきます</li>
+</ul>
+
+<p>という感じです。</p>
+
+<h2 id="サーバーレス上で画像生成">サーバーレス上で画像生成</h2>
+
+<p>API を使うメリットを享受するためにも、今回の絵の生成は全てクラウドのサーバーレス上で完結させました。Vercel の <a href="https://vercel.com/docs/functions">Serverless Functions</a> を利用しています。Vercel は無料プランでも十分に使えるのでお勧めです。</p>
+
+<p><a href="https://github.com/tkihira/color_painting/blob/main/api/generate.js">https://github.com/tkihira/color_painting/blob/main/api/generate.js</a></p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">generate</span> <span class="o">=</span> <span class="k">async </span><span class="p">(</span><span class="nx">text</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="c1">// call SAI's API to generate an image from text</span>
+    <span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="k">await</span> <span class="nf">fetch</span><span class="p">(</span><span class="s2">`</span><span class="p">${</span><span class="nx">apiHost</span><span class="p">}</span><span class="s2">/v1/generation/</span><span class="p">${</span><span class="nx">engineId</span><span class="p">}</span><span class="s2">/text-to-image`</span><span class="p">,</span> <span class="p">{</span>
+        <span class="na">method</span><span class="p">:</span> <span class="dl">'</span><span class="s1">POST</span><span class="dl">'</span><span class="p">,</span>
+        <span class="na">headers</span><span class="p">:</span> <span class="p">{</span>
+            <span class="dl">'</span><span class="s1">Content-Type</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">application/json</span><span class="dl">'</span><span class="p">,</span>
+            <span class="na">Accept</span><span class="p">:</span> <span class="dl">'</span><span class="s1">application/json</span><span class="dl">'</span><span class="p">,</span>
+            <span class="na">Authorization</span><span class="p">:</span> <span class="s2">`Bearer </span><span class="p">${</span><span class="nx">apiKey</span><span class="p">}</span><span class="s2">`</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="na">body</span><span class="p">:</span> <span class="nx">JSON</span><span class="p">.</span><span class="nf">stringify</span><span class="p">({</span>
+            <span class="na">text_prompts</span><span class="p">:</span> <span class="p">[{</span> <span class="na">text</span><span class="p">:</span> <span class="nx">text</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">, white and black, coloring book for kids, simple, adult coloring book, no detail, outline no color, fill frame, edge to edge, clipart white background</span><span class="dl">'</span> <span class="p">}],</span>
+            <span class="na">cfg_scale</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="na">height</span><span class="p">:</span> <span class="mi">1024</span><span class="p">,</span> <span class="na">width</span><span class="p">:</span> <span class="mi">1024</span><span class="p">,</span> <span class="na">steps</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span> <span class="na">samples</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="p">}),</span>
+    <span class="p">});</span>
+
+    <span class="k">if </span><span class="p">(</span><span class="o">!</span><span class="nx">response</span><span class="p">.</span><span class="nx">ok</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">const</span> <span class="nx">json</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">response</span><span class="p">.</span><span class="nf">json</span><span class="p">();</span>
+        <span class="k">throw</span> <span class="s2">`</span><span class="p">${</span><span class="nx">json</span><span class="p">.</span><span class="nx">name</span><span class="p">}</span><span class="s2">: </span><span class="p">${</span><span class="nx">json</span><span class="p">.</span><span class="nx">message</span><span class="p">}</span><span class="s2">`</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kd">const</span> <span class="nx">responseJSON</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">response</span><span class="p">.</span><span class="nf">json</span><span class="p">();</span>
+
+    <span class="kd">const</span> <span class="nx">image</span> <span class="o">=</span> <span class="nx">responseJSON</span><span class="p">.</span><span class="nx">artifacts</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+    <span class="k">return</span> <span class="nx">Buffer</span><span class="p">.</span><span class="k">from</span><span class="p">(</span><span class="nx">image</span><span class="p">.</span><span class="nx">base64</span><span class="p">,</span> <span class="dl">'</span><span class="s1">base64</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>生成部分の抜粋ですが、コードはローカルで動かしていたものからほとんど変更がありません。Vercel のサーバーレスは無料プランだと最大 60 秒でタイムアウトしますが、絵の生成は大体 10 秒弱で終わるので、余裕をもって制限時間内に終了するでしょう。</p>
+
+<p>なお、ユーザー入力の <code class="language-plaintext highlighter-rouge">text</code> を直接プロンプトに渡しているので、ここで<span style="color:blue">プロンプト・インジェクションの可能性</span>が発生している点には留意しましょう。今回は大きな問題がないと判断して対処しておりませんが、意識をしておくのは大切です。</p>
+
+<h2 id="いたずら防止に-recaptcha-v2-を導入">いたずら防止に reCAPTCHA v2 を導入</h2>
+
+<p>先述した通り、AI を使ったサービスは高コストになりがちです。今回、悪意をもった人から API を外部から叩かれたりしないように、Google の reCAPTCHA v2 を導入しました。いわゆる「私はロボットではありません」というアレですね。</p>
+
+<p><a href="https://www.google.com/recaptcha">https://www.google.com/recaptcha</a></p>
+
+<p>AI の API を利用したサービス提供では、コストが高い分、悪意をもった攻撃への対策が大切になります。次のような対策をしましょう</p>
+
+<ul>
+  <li>想定外の利用を弾く: DoS 攻撃や愉快犯などの悪意を想定し、何らかの防御策を最初から導入しておきましょう</li>
+  <li>利用金額にキャップを設定する: 突破された場合の被害額が無制限にならないように、利用金額に必ずキャップを設定しましょう</li>
+  <li>モニタリング: おかしな挙動をなるべく早く察知するため、各種のモニタリングを導入して定期的に監視しましょう</li>
+</ul>
+
+<p>今回のようなサービスでは、絵を描くたびに Captcha を要求するのはそこまでユーザー体験を悪くしないと思いますが、例えばゲームのキャラクターに LLM で会話させる、といった利用の場合、ユーザー体験とセキュリティのトレードオフの設計は非常に難しいものとなります。AI を（無料で公開する）サービスに導入する際の大きなハードルになることが多いでしょう。</p>
+
+<h1 id="感想">感想</h1>
+
+<p>このように Stability AI の API を利用することで、相当短いソースコードにもかかわらず、しっかりしたサービスを開発出来ました。API の利点ですね。</p>
+
+<p>製作において、いくつか気になった点についてまとめます。</p>
+
+<h2 id="性能">性能</h2>
+
+<p>Stability AI Developer Platform を使うのは初めてでしたが、性能には満足しています。高価なモデルも試しましたが、適当なプロンプトでもかなり綺麗な画像を生成してくれるので、プロンプトをひたすら極める作業（呪文とよばれることがあります）はそこまで必要なさそうに思えました。そういう意味で生産性は高そうです。</p>
+
+<p>また、今回のサービスでは Text-to-image の API を利用しましたが、画像生成に限っても Image-to-image や Inpaint の API も公開されており、他の画像生成系 AI のサービスでは出来ないようなサービスを作る余地があるのが魅力でした。特に Inpaint は個人的に大好きな機能なので、これが API で利用できるのは嬉しいです。</p>
+
+<p>Image Generate 以外にも、<a href="https://platform.stability.ai/docs/getting-started/stable-image">Upscale や Edit</a> などの機能があるのも良いですね。これらの機能単体でサービスになってしまう程です。有料でユーザーに付加価値を提供するような設計で効力を発揮しそうです。Coming Soon になっている Control にも期待ですね</p>
+
+<p>Google の Colab の Notebook を見ると、その色々な API を実際の呼び出しコード付きで確認出来ます。ぜひ見てみてください。</p>
+
+<p><a href="https://colab.research.google.com/github/stability-ai/stability-sdk/blob/main/nbs/Stable_Image_API_Public.ipynb?hl=ja">https://colab.research.google.com/github/stability-ai/stability-sdk/blob/main/nbs/Stable_Image_API_Public.ipynb?hl=ja</a></p>
+
+<p>一方で、私の想像だと、提供されているモデルは相当にチューニングされている気がします。仮に API からオンプレミスに移行しようと思った場合に、同じ Stable Diffusion だとしてもはたして同等の出力を得ることが簡単に出来るのだろうか、そのリスクが高いかもしれない、と考えております。</p>
+
+<h2 id="価格">価格</h2>
+
+<p>今回の SD1.6 は、1 枚 1 円程度で非常に良いクオリティでした。競合他社と比較しても安いと思います。<a href="https://openai.com/api/pricing/">DALL･E で同じ 1024x1024 の絵を書こうとする</a>と、DALL･E 3 だと 1 枚 6 円、DALL･E 2 を利用しても 1 枚 3 円ほどかかってしまいます。</p>
+
+<p>1 枚 1 円程度とはいえ、ユーザー 1,000 人が 10 枚作成すると 10,000 円になるわけで、馬鹿に出来る金額ではありません。サービス設計時に、いかにコストを抑えるデザインにするかがとても大切になります。例えば、</p>
+
+<ul>
+  <li>過去に生成した絵をキャッシュして利用する</li>
+  <li>1 日に一定枚数をバッチで作成し、それを使い回す</li>
+</ul>
+
+<p>といったような対策が考えられます。ゲームなどでは、あらかじめバッチで処理するような設計が良い効果を発揮しそうな印象があります。</p>
+
+<p>ただ、個人的には<span style="color:red">バッチで処理するならば、API を使うべきではない</span>と考えています。API のメリットは、</p>
+
+<ul>
+  <li>安定して運用出来る</li>
+  <li>事前の環境構築の時間が必要なく、いつでも即座に使える</li>
+  <li>アクセスのない時間のコストはかからない</li>
+</ul>
+
+<p>といったところにあると思いますが、バッチ処理においてはこれらのメリットは必要なくなります。GPU インスタンスをクラウドで借りて、スタートアップに数分かけて、一気に必要枚数を生成して、インスタンスを落とす、というような運用をするほうが間違いなく安上がりでしょう。もちろん最初のプロトタイピングに API を利用するのは良いと思うのですが、バッチ処理がメインになりそうであれば、最初から GPU を自前で確保して一括生成する設計を考えておくことをオススメします。</p>
+
+<h2 id="モデレーション">モデレーション</h2>
+
+<p><span style="color:red;font-weight:bold">自動生成系のサービスを提供する時に非常に大きな問題になるのは、卑猥な絵を生成するような倫理に反する指示をユーザーがした場合に、それを検知して弾く必要がある</span>点です。自社のサービスを利用してそのような画像を大量に生成されるのは、サービス自体の評判を落とすことにも繋がりかねない大きなリスクです。</p>
+
+<p>その点、Stability AI の API は標準で非常に強いモデレーション・システムを持っていて、そう簡単に卑猥な絵を出力出来ません。私が試した限りでは（私は卑猥な絵を出力させる才能がそんなにないと思うのですが）全く出力させることが出来ませんでした。これは、 <strong>実サービスに画像生成 AI を投入する場合に、大きな大きなメリットになります</strong> 。</p>
+
+<p>例えば、今回の<a href="https://color-painting.vercel.app/">塗り絵 自動生成</a>サービスで、<code class="language-plaintext highlighter-rouge">naked girl</code> といったプロンプトを入れると、次のようなエラーメッセージが出て失敗します。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Your request was flagged by our content moderation system, as a result your request was denied and you were not charged.
+</code></pre></div></div>
+
+<p>（モデレーションで弾かれた時に料金が請求されないのは地味に嬉しくて、絵を生成せずにデバッグしたい場合（reCAPTCHA のテストとか）にはこれを利用しておりました…ｗ）</p>
+
+<p>これはサービス提供者としては本当に安心です。私はこのメリットを非常に高く評価しております。</p>
+
+<h1 id="まとめ">まとめ</h1>
+
+<p>以上、<a href="https://color-painting.vercel.app/">塗り絵 自動生成</a>のサービスの開発記録になります。再度ソースコードを掲示します。非常に短いコードなので、ぜひ見てみてください。</p>
+
+<p><a href="https://github.com/tkihira/color_painting">https://github.com/tkihira/color_painting</a></p>
+
+<p>OpenAI の API も驚くほど利用が簡単でしたが、Stability AI の API も大きなトラブルなく利用出来ました。そんなに画像生成 AI を追っているわけではないのですが、最近の AI のレベルの進化は著しく、その高い品質にびっくりします。</p>
+
+<p>ブログのサムネイルの自動生成、広告のクリエイティブの自動生成、ゲームの素材の自動生成などなど、画像生成はひときわ応用範囲の広い技術です。Stable Diffusion はそのオープンさ、クオリティ、ならびにカスタマイズ性の高さから爆発的な勢いで世界中で普及し、今やオープンな画像生成 AI のデファクトスタンダードになった感があります。一方で複雑になりすぎて、今や Stable Diffusion を素人が触ってきれいな絵を生成するには高いハードルが存在する側面も生まれていました。制作元である Stability AI の提供する API を利用することで、そのハードルが大きく下がるのは開発者にとって喜ばしいことです。</p>
+
+<p>本当に簡単に作れるので、ちょっと興味のある人はぜひ試してみてください。手元でちょっと実行するだけでも楽しいと思いますし、きっと創造力を刺激されることでしょう。そしてぜひ、AI を組み込んだクオリティの高いサービスを世の中に提供してください！</p>
+
+        </article>
+        <hr>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/2024-05-27-Color-Painting-app-with-Stable-Diffusion-API&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="Stable Diffusion API を使って塗り絵 自動生成アプリを作る" data-url="http://nmi.jp/2024-05-27-Color-Painting-app-with-Stable-Diffusion-API">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/2024-05-27-Color-Painting-app-with-Stable-Diffusion-API" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="Stable Diffusion API を使って塗り絵 自動生成アプリを作る"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="Stable Diffusion API を使って塗り絵 自動生成アプリを作る" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+
+        
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+        
+
+        <div class="post-recent">
+    <div class="pre">
+
+    
+        <p><strong>前の投稿</strong> <a href="/2024-05-17-Avoid-then">JavaScript で then を使うのは避けよう（await / async の初級者まとめ）</a></p>
+    
+    </div>
+    <div class="nex">
+
+        
+        <p><strong>次の投稿</strong> <a href="/2024-06-03-Exploring-V8-JIT-Outputs">JavaScript 実行エンジン V8 の JIT 出力コードを読んでみよう</a></p>
+        
+    </div>
+</div>
+
+
+    </div>
+    <button class="anchor"><i class="fa fa-anchor"></i></button>
+
+
+    <div class="right">
+        <div class="wrap">
+            <div class="side">
+                <div>
+                    <i class="fa fa-tags"></i>
+                    Top Popular Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2016-07-23-stock-strategy-for-early-startup-employee">スタートアップに転職する時に最低限知っておくべき株の話</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/582">生WebGL入門:初音ミクの美麗3Dモデルを表示する(前編)</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2017-10-06-Making_a-business_plan">事業計画書の作り方、新規ビジネスの考え方</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/902">Convertible Note / Convertible Equity とは？</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/488">JavaScript イディオム集</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/465">ExGameの製作で感じたこと</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                </ul>
+            </div>
+
+            <div class="side">
+                <div>
+                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                    Recent Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        <li><a href="/2024-08-28-Review-Binary-Hacks-Rebooted">書評 "Binary Hacks Rebooted"</a></li>
+                    
+                        <li><a href="/2024-06-10-Deep-Dive-into-ARM-JavaScript-Special-Instruction-FJCVTZS">ARM に存在する JavaScript 専用命令「FJCVTZS」を追う（ついでに V8 をビルドする）</a></li>
+                    
+                        <li><a href="/2024-06-03-Exploring-V8-JIT-Outputs">JavaScript 実行エンジン V8 の JIT 出力コードを読んでみよう</a></li>
+                    
+                </ul>
+            </div>
+
+            <!-- <div class="side">
+                <div>
+                    <i class="fa fa-external-link"></i>
+                    Links
+                </div>
+                <ul  class="content-ul">
+
+                </ul>
+            </div> -->
+        </div>
+    </div>
+
+
+
+</div>
+<script>
+/**
+ * target _blank
+ */
+(function() {
+    var aTags = document.querySelectorAll('article a:not([id])')
+    for (var i = 0; i < aTags.length; i++) {
+        aTags[i].setAttribute('target', '_blank')
+    }
+}());
+</script>
+<script src="/js/pageContent.js " charset="utf-8"></script>
+
+
+    <footer class="site-footer">
+
+
+    <div class="wrapper">
+
+        <p class="description">
+             Takuo Kihira 
+        </p>
+        <p class="contact">
+            Contact me at: 
+            <a href="https://github.com/tkihira" title="GitHub"><i class="fa fa-github" aria-hidden="true"></i></a>     
+            <a href="https://twitter.com/tkihira" title="Twitter"><i class="fa fa-twitter" aria-hidden="true"></i></a>  
+            <a href="https://www.facebook.com/takuo.kihira" title="Facebook"><i class="fa fa-facebook-official" aria-hidden="true"></i></a>    
+        </p>
+        <p class="power">
+            <span>
+                Site powered by <a href="https://jekyllrb.com/">Jekyll</a>.
+            </span>
+            <span>
+                Theme designed by <a href="https://github.com/Gaohaoyang">HyG</a>.
+            </span>
+        </p>
+    </div>
+</footer>
+
+    <div class="back-to-top">
+    <a href="#top" class="scroll">
+        <i class="fa fa-arrow-up" aria-hidden="true"></i>
+    </a>
+</div>
+
+    <script src=" /js/main.js " charset="utf-8"></script>
+    <script src=" /js/scroll.min.js " charset="utf-8"></script>
+  </body>
+
+</html>

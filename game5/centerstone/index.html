@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html><head><title>Center Stone</title>
+<meta name="viewport" content="width=320,user-scalable=no"></script>
+<link rel="apple-touch-icon" href="icon.png" />
+</head>
+<body style="margin:0;padding:0;background-color:#000;color:#fff;font-size:20px;font-family:Times New Roman">
+	<span id="level"></span><br>
+	<canvas id="canvas"></canvas><br>
+	<span id="message"></span>
+	<div id="controller" style="display:none">
+		<span id="retry" style="border:#fff 1px solid;border-radius:15px">&nbsp; retry &nbsp;</span>
+		<span id="top" style="border:#fff 1px solid;border-radius:15px">&nbsp; top &nbsp;</span>
+		<span id="prev" style="border:#fff 1px solid;border-radius:15px">&nbsp; prev &nbsp;</span>
+		<span id="next" style="border:#fff 1px solid;border-radius:15px">&nbsp; next &nbsp;</span>
+	</div><br><br><br>
+<script>
+(function() {
+	var config = {		// 設定
+		cellSize: 64,			// 画像の1マスの大きさ
+		flickDetect: 30,		// フリックと判断する距離
+		animationStep: 4,		// アニメーションのコマ数
+		animationDelay: 0,		// アニメーション間隔
+		storageKey: "jp.nmi.centerstone.clearStage",	// ストレージのキー名
+		clearedStage: {}		// クリアしたステージ一覧
+	};
+	var status = {};	// ゲーム状態
+	var stageData = [			// ステージ情報、1つめの石がセンターストーン
+		{norm: 1, stones: [[2, 4], [2, 0], [2, 1]]},
+		{norm: 2, stones: [[2, 1], [2, 2], [2, 3]]},
+		{norm: 3, stones: [[1, 1], [1, 2], [1, 3], [2, 1], [2, 3], [3, 1], [3, 2], [3, 3]]},
+		{norm: 3, stones: [[0, 0], [3, 4], [2, 3]]},
+		{norm: 3, stones: [[0, 2], [1, 2], [2, 2], [3, 2], [4, 2]]},
+		
+		{norm: 4, stones: [[2, 1], [0, 2], [1, 2], [2, 2], [3, 2], [4, 2]]},
+		{norm: 3, stones: [[1, 1], [1, 3], [3, 1], [3, 3]]},
+		{norm: 3, stones: [[2, 2], [2, 0], [2, 4], [4, 2], [0, 2]]},
+		{norm: 5, stones: [[2, 1], [0, 2], [1, 2], [3, 2]]},
+		{norm: 3, stones: [[0, 1], [4, 3], [3, 1], [1, 3]]},
+		
+		{norm: 4, stones: [[2, 4], [1, 0], [2, 0], [3, 0]]},
+		{norm: 6, stones: [[2, 0], [1, 0], [0, 0], [3, 0], [4, 0]]},
+		{norm: 6, stones: [[1, 0], [2, 0], [0, 0], [3, 0], [4, 0]]},
+		{norm: 5, stones: [[3, 1], [0, 0], [0, 2], [0, 4], [2, 0], [2, 4], [4, 0], [4, 2], [4, 4]]},
+		{norm: 6, stones: [[0, 0], [1, 1], [2, 2], [3, 3], [4, 4]]},
+		
+		{norm: 6, stones: [[4, 2], [2, 0], [0, 2], [2, 4]]},
+		{norm: 7, stones: [[4, 0], [0, 1], [0, 3], [1, 4], [3, 4]]},
+		{norm: 7, stones: [[3, 3], [0, 0], [1, 1], [4, 4]]},
+		{norm: 7, stones: [[0, 4], [4, 4], [1, 0], [3, 0]]},
+		{norm: 8, stones: [[2, 1], [1, 2], [3, 2]]},
+		
+		{norm: 9, stones: [[4, 2], [0, 0], [0, 4]]},
+		{norm: 9, stones: [[2, 2], [0, 0], [4, 4]]},
+		{norm: 9, stones: [[4, 4], [3, 4], [3, 3], [4, 3]]},
+		{norm: 10, stones: [[4, 4], [0, 0], [0, 4], [4, 0]]},
+		{norm: 13, stones: [[4, 4], [3, 4], [4, 3]]},
+	];
+	var ctx;			// Canvasのコンテキスト
+	var elements = {};	// idをキーとしたDOM要素のエレメント
+	
+	var Stone = function(x, y, centerStone) {	// 石の情報を扱うクラス
+		this.x = x;		// X座標（0～4）
+		this.y = y;		// Y座標（0～4）
+		this.px = x * config.cellSize;		// Canvasの中でのX座標
+		this.py = y * config.cellSize;		// Canvasの中でのY座標
+		this.centerStone = centerStone;		// センターストーンかどうか
+		this.toX = x;						// 移動先X座標
+		this.toY = y;						// 移動先Y座標
+		
+		this.draw = function() {			// Canvasのpx,py位置に自分の石を描画する
+			var sy = (centerStone? 3: 2) * config.cellSize;
+			ctx.drawImage(elements.stoneImage, 0, sy, config.cellSize, config.cellSize, this.px, this.py, config.cellSize, config.cellSize);
+		};
+		this.processAnimation = function(ratio) {	// アニメーションの処理をする
+			if(this.toX != this.x || this.toY != this.y) {
+				// 移動先が現在地と違う場合、ratioの割合の位置まで移動する
+				this.px = ((this.toX - this.x) * ratio + this.x) * config.cellSize;
+				this.py = ((this.toY - this.y) * ratio + this.y) * config.cellSize;
+				if(ratio == 1) {
+					// 移動先についたので、内部情報を書き換える
+					status.board[this.x][this.y] = false;
+					this.x = this.toX;
+					this.y = this.toY;
+					status.board[this.x][this.y] = true;
+					status.times++;
+					if(this.x == 2 && this.y == 2 && this.centerStone) {
+						// センターストーンが中心についたのでクリア
+						if(status.times <= status.norm) {
+							status.state = "clear";
+							config.clearedStage[status.level] = true;
+							saveStorage();
+						}
+					} else {
+						if(status.times >= status.norm) {
+							// ノルマ内に達成できなかったのでミス
+							status.state = "failure";
+						}
+					}
+				}
+			}
+		};
+		this.move = function(toX, toY) {
+			if(this.x != toX || this.y != toY) {
+				// アニメーションをスタートさせる
+				this.toX = toX;
+				this.toY = toY;
+				startAnimation();
+			}
+		};
+		this.makeMove = function(dx, dy) {
+			// 今の位置からdx,dy方向にずっと移動し、外壁か別の石にぶつかるまで移動させる
+			var x = this.x;
+			var y = this.y;
+			while(true) {
+				if(x + dx < 0 || x + dx >= 5 || y + dy < 0 || y + dy >= 5 || status.board[x + dx][y + dy]) {
+					// 外壁にぶつかるか、ほかの石があればそこで終了
+					break;
+				}
+				x += dx;
+				y += dy;
+			}
+			// 新しい位置に移動させる
+			this.move(x, y);
+		};
+	};
+	
+	var startAnimation = function() {
+		// アニメーションをスタートさせる
+		if(status.state == "normal") {
+			status.state = "animation";		// アニメーション状態を設定する
+			var step = 0;
+			(function animation() {
+				step++;
+				if(step == config.animationStep) {
+					var ratio = 1;			// アニメーション終了の際には確実に1を送る
+				} else {
+					// 心もちイージング処理をかける
+					ratio = Math.sin(step / config.animationStep * Math.PI / 2);
+				}
+				for(var i = 0; i < status.stoneList.length; i++) {
+					// 新しい割合を石クラスに送り、新しい位置を確定させる
+					status.stoneList[i].processAnimation(ratio);
+				}
+				draw();		// 描画
+				if(step < config.animationStep) {
+					// アニメーション中なら、setTimeoutで自分を呼び出す
+					setTimeout(animation, config.animationDelay);
+				} else {
+					// アニメーションが終わった場合、stateがclear/failureになっていることがあるので注意
+					status.state = (status.state == "animation")? "normal": status;
+				}
+			})();	// 即座に1回目を実行
+		}
+	};
+	
+	var draw = function() {
+		// まずはcanvasに書かれている情報をすべて消す
+		ctx.clearRect(0, 0, config.cellSize * 5, config.cellSize * 5);
+		if(status.state == "normal" || status.state == "animation" || status.state == "clear" || status.state == "failure") {
+			// ゲーム画面であれば、まずはマスを描画する
+			for(var y = 0; y < 5; y++) {
+				for(var x = 0; x < 5; x++) {
+					var sy = (x == 2 && y == 2)? config.cellSize: 0;
+					ctx.drawImage(elements.stoneImage, 0, sy, config.cellSize, config.cellSize, x * config.cellSize, y * config.cellSize, config.cellSize, config.cellSize);
+				}
+			}
+			// 次に石を描画する
+			for(var i = 0; i < status.stoneList.length; i++) {
+				status.stoneList[i].draw();
+			}
+			// レベルと回数／ノルマのメッセージをDOMに表示
+			elements.level.innerHTML = "Level " + (status.level + 1);
+			elements.message.innerHTML = status.times + "/" + status.norm;
+			
+			// 文字の描画の準備
+			ctx.font = config.cellSize * 5 / 8 + "px 'Times New Roman'";
+			ctx.textAlign = "center";		// 文字の描画はセンタリングされる
+			ctx.textBaseline = "middle";	// ベースラインは中心に
+			if(status.state == "clear") {
+				ctx.fillStyle = "#ff0";
+				ctx.fillText("CLEAR!", 5 * config.cellSize / 2, 5 * config.cellSize / 2);
+			} else if(status.state == "failure") {
+				ctx.fillStyle = "#b00";
+				ctx.fillText("failure....", 5 * config.cellSize / 2, 5 * config.cellSize / 2);
+			}
+			elements.controller.style.display = "block";	// コントローラーを表示する
+		} else if(status.state == "select") {
+			// 画面セレクトの場合は、レベル表示は消す	
+			elements.level.innerHTML = "";
+			// マス目の描画
+			for(var y = 0; y < 5; y++) {
+				for(var x = 0; x < 5; x++) {
+					var num = x + y * 5;
+					// すでにクリアしている面は水色の枠にする
+					var sy = config.clearedStage[num]? config.cellSize: 0;
+					ctx.drawImage(elements.stoneImage, 0, sy, config.cellSize, config.cellSize, x * config.cellSize, y * config.cellSize, config.cellSize, config.cellSize);
+					ctx.font = config.cellSize * 0.8 + "px 'Times New Roman'";
+					ctx.textAlign = "center";
+					ctx.textBaseline = "middle";
+					ctx.fillStyle = "#fff";
+					ctx.fillText((num + 1), x * config.cellSize + config.cellSize / 2, y * config.cellSize + config.cellSize / 2);
+					elements.message.innerHTML = "Select Stage";
+					elements.controller.style.display = "none";
+				}
+			}
+		} else if(status.state == "opening" || status.state == "ready") {
+			// オープニングの描画はここ
+			ctx.font = config.cellSize * 5 / 6 + "px 'Times New Roman'";
+			ctx.textAlign = "center";
+			ctx.textBaseline = "middle";
+			ctx.fillStyle = "#fff";
+			ctx.fillText("Center Stone", 5 * config.cellSize / 2, 5 * config.cellSize / 2);
+		}
+	};
+	
+	var init = function(l) {
+		// レベルlで初期化する
+		status.level = l;
+		var stage = stageData[status.level];
+		status.norm = stage.norm;	// ノルマ設定
+		status.times = 0;			// 現在の試行回数
+		status.stoneList = [];
+		status.board = [[], [], [], [], []];
+		for(var i = 0; i < stage.stones.length; i++) {
+			status.stoneList.push(new Stone(stage.stones[i][0], stage.stones[i][1], i == 0));	// 石クラスを作成
+			status.board[stage.stones[i][0]][stage.stones[i][1]] = true;	// 石の場所を記録する
+		}
+		status.state = "normal";	// 状態を通常に変える
+		draw();
+	};
+	
+	var makeEventListener = function(canvas) {		// canvasにイベントリスナーを設定する
+		var touchInfo;		// 内部で利用する変数をスコープ内に作成
+		canvas.ontouchstart = function(e) {
+			touchInfo = null;
+			var touch = e.touches[0];
+			var x = Math.floor((touch.clientX - canvas.offsetLeft) / config.cellSize);
+			var y = Math.floor((touch.clientY - canvas.offsetTop) / config.cellSize);
+			if(status.state == "normal") {
+				for(var i = 0; i < status.stoneList.length; i++) {
+					if(status.stoneList[i].x == x && status.stoneList[i].y == y) {
+						// タッチされた場所に石があれば、その石のindexとx/y座標を記録
+						touchInfo = {x: touch.clientX, y: touch.clientY, index: i};
+						break;
+					}
+				}
+			} else if(status.state == "select") {
+				// ステージセレクトの場合は、タッチされた面で初期化
+				init(x + y * 5);
+			}
+			e.preventDefault();
+		};
+		canvas.ontouchmove = function(e) {
+			if(touchInfo) {
+				var touch = e.touches[0];
+				var x = touch.clientX;
+				var y = touch.clientY;
+				var dx = 0, dy = 0;
+				if((touchInfo.x - x) * (touchInfo.x - x) + (touchInfo.y - y) * (touchInfo.y - y) > config.flickDetect * config.flickDetect) {
+					// フリックされたので移動方向を算出する
+					if(Math.abs(touchInfo.x - x) > Math.abs(touchInfo.y - y)) {
+						dx = (touchInfo.x - x < 0)? 1: -1;
+					} else {
+						dy = (touchInfo.y - y < 0)? 1: -1;
+					}
+					// 石クラスのmakeMove関数に移動方向を伝える
+					status.stoneList[touchInfo.index].makeMove(dx, dy);
+					touchInfo = null;
+				}
+			}
+		};
+	};
+	
+	var saveStorage = function() {	// localStorageにクリアした面を記録
+		if(window.localStorage) {
+			var a = [];
+			for(var stage in config.clearedStage) {
+				if(config.clearedStage[stage]) {
+					a.push(stage);
+				}
+			}
+			window.localStorage.setItem(config.storageKey, a.join(","));
+		}
+	};
+	
+	window.onload = function() {
+		var clearStageList = ((window.localStorage && window.localStorage.getItem(config.storageKey)) || "").split(",");
+		for(var i = 0; i < clearStageList.length; i++) {
+			// ストレージからクリアした面を取得する
+			config.clearedStage[clearStageList[i]] = true;
+		}
+		
+		var elementsList = document.getElementsByTagName("*");
+		for(var i = 0; i < elementsList.length; i++) {
+			if(elementsList[i].id) {
+				// idのあるエレメントがあれば、そのIDの名前でエレメントを保存しておく
+				elements[elementsList[i].id] = elementsList[i];
+			};
+		}
+		
+		elements.canvas.width = elements.canvas.height = config.cellSize * 5;	// canvasの大きさ設定
+		makeEventListener(elements.canvas);
+		ctx = elements.canvas.getContext("2d");		// canvasのコンテキストを取得
+		
+		elements.retry.ontouchend = function() {
+			if(status.state != "animation") {
+				init(status.level);			// 現在の面で再度初期化
+			}
+		};
+		elements.top.ontouchend = function() {
+			if(status.state != "animation") {
+				status.state = "select";	// ステージセレクト
+				draw();
+			}
+		};
+		elements.prev.ontouchend = function() {
+			if(status.state != "animation") {
+				init((status.level + 24) % 25);		// 前の面で初期化
+			}
+		};
+		elements.next.ontouchend = function() {
+			if(status.state != "animation") {
+				init((status.level + 1) % 25);		// 次の面で初期化
+			}
+		};
+		
+		status.state = "opening";		// 最初の状態はオープニング
+		setTimeout(function() {
+			// 2秒経って、状態がオープニングならレディ状態に、レディ状態ならステージセレクトに
+			status.state = (status.state == "opening")? "ready": "select";
+			draw();
+		}, 2000);
+		draw();
+		
+		elements.stoneImage = document.createElement("img");
+		elements.stoneImage.onload = function() {
+			setTimeout(function() {scrollTo(0, 0);}, 200);
+			// 画像が読み込まれたときに、状態がオープニングならレディ状態に、レディ状態ならステージセレクトに
+			status.state = (status.state == "opening")? "ready": "select";
+			draw();
+		};
+		elements.stoneImage.src = "stones.png";		// 動的に画像を読み込む
+	};
+})();
+</script></body></html>

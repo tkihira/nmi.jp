@@ -1,0 +1,1885 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>setTimeout を完璧に理解する</title>
+    <meta name="description" content="setTimeout は、指定された時間以降に指定されたコードを実行する JavaScript の API です。ブラウザでも Node.js でも広く使われているのですが、実装はまちまちで、色々と特殊な条件も多く、挙動を完璧に理解している人は少ないと思います。この記事では、そんな setTimeout を可能な...">
+
+    <link rel="stylesheet" href=" /css/fontawesome/css/font-awesome.min.css ">
+    <link rel="stylesheet" href=" /css/main.css ">
+    <link rel="canonical" href="http://nmi.jp/2022-11-21-Understanding-setTimeout-completely">
+    <link rel="alternate" type="application/rss+xml" title="nmi.jp" href="http://nmi.jp/feed.xml">
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=3.0'></script>
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=1.1'></script>
+    <script>
+        if(location.href.match(/\.html$/)) {
+            location.href = location.href.match(/(.+)\.html/)[1];
+        }
+    </script>
+
+
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-229769-8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-229769-8');
+</script>
+</head>
+
+
+  <body>
+
+    <header id="top">
+    <div class="wrapper">
+        <a href="/" class="brand">nmi.jp</a>
+        <small>Twitter → <a href="https://twitter.com/tkihira" target="_blank">@tkihira</a></small>
+        <button id="headerMenu" class="menu"><i class="fa fa-bars"></i></button>
+        <nav id="headerNav">
+            <ul>
+                <li>
+                    
+                    <a href="/">
+                    
+                        <i class="fa fa-home"></i>Home
+                    </a>
+                </li>
+
+                
+                    
+                    <li>
+                        
+                        <a href="/archive/">
+                        
+                            <i class="fa fa-archive"></i>Archives
+                        </a>
+                    </li>
+                    
+                
+                    
+                    <li>
+                        
+                        <a href="/category/">
+                        
+                            <i class="fa fa-th-list"></i>Categories
+                        </a>
+                    </li>
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            </ul>
+        </nav>
+    </div>
+</header>
+
+
+        <div class="page clearfix" post>
+    <div class="left">
+        <div class="post-recent">
+    <table style="width:100%;border:0;padding:0;"><tbody><tr style="padding:0">
+        <td class="toppre" style="padding:0">
+        
+        <a href="/2022-11-14-Be-careful-about-console-log-in-chrome">Chrome の console.log でハマらないために</a>
+        
+        </td><td class="topnex" style="text-align:right;padding:0">
+        
+        <a href="/2023-01-03-How-to-solve-2023-puzzle">2023 パズルの逆ポーランド記法(RPN)による解法の解説</a>
+        
+        </td>
+    </tr></tbody></table>
+</div>
+
+        <hr style="margin:0"/>
+        <h1 style="margin-top:10px">setTimeout を完璧に理解する</h1>
+<hr />
+        <div class="label">
+
+            <div class="label-card">
+                <i class="fa fa-calendar"></i>2022-11-21
+            </div>
+
+            <div class="label-card">
+                <i class="fa fa-user"></i>Takuo Kihira
+                
+            </div>
+
+            <div class="label-card">
+                
+            </div>
+
+            <div class="label-card">
+            
+
+
+<!-- <span class="point">•</span> -->
+<span class="categories">
+  <i class="fa fa-th-list"></i>
+  
+    
+        <a href="/category/#JavaScript" title="Category: JavaScript" rel="category">JavaScript</a>
+    
+  
+
+  <!-- <span class="point">•</span> -->
+</span>
+
+
+            </div>
+
+            <div class="label-card">
+                <a href="https://github.com/tkihira/nmi.jp/blob/master/_posts/2022-11-21-Understanding-setTimeout-completely.md" target="_blank"><i class="fa fa-github"></i></a>
+            </div>
+
+        </div>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/2022-11-21-Understanding-setTimeout-completely&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="setTimeout を完璧に理解する" data-url="http://nmi.jp/2022-11-21-Understanding-setTimeout-completely">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/2022-11-21-Understanding-setTimeout-completely" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="setTimeout を完璧に理解する"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="setTimeout を完璧に理解する" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+        <article itemscope itemtype="http://schema.org/BlogPosting">
+        <p><code class="language-plaintext highlighter-rouge">setTimeout</code> は、指定された時間以降に指定されたコードを実行する JavaScript の API です。ブラウザでも Node.js でも広く使われているのですが、実装はまちまちで、色々と特殊な条件も多く、挙動を完璧に理解している人は少ないと思います。この記事では、そんな <code class="language-plaintext highlighter-rouge">setTimeout</code> を可能な限り深堀りしてみようと思います。</p>
+
+<p>先に書いておきますが、ものすごくニッチで細かい話ばかり並びます。突然私が、ただ純粋に <code class="language-plaintext highlighter-rouge">setTimeout</code> について調べたくなったので、その結果をまとめただけのものです。普通に開発している人には必要のない情報が多くなるでしょう。この記事は基礎から <code class="language-plaintext highlighter-rouge">setTimeout</code> を学ぼう、という方には全然向かないと思います。</p>
+
+<p>また、JavaScript のイベントループについてある程度理解していることを前提とします。その詳しい理解には、<a href="https://twitter.com/pd1xx">@PADAone</a> さんの書かれた「<a href="https://zenn.dev/estra/books/js-async-promise-chain-event-loop">イベントループとプロミスチェーンで学ぶJavaScriptの非同期処理</a>」という本の中の「<a href="https://zenn.dev/estra/books/js-async-promise-chain-event-loop/viewer/c-epasync-what-event-loop">それぞれのイベントループ</a>」を読んで頂けると良いかと思います。</p>
+
+<p>本文中で、<strong>microtask</strong> という言葉と <strong>(macro)task</strong> という言葉を使い分けております。microtask はいわゆる Promise 等で指定される次のイベントループの前に処理されるもの、(macro)task はいわゆる setTimeout 等で指定される次回以降のイベントループで処理されるものです。この記事では主に (macro)task について言及しております。字面が似ているのでご注意ください。</p>
+
+<h1 id="settimeout-のおさらい"><code class="language-plaintext highlighter-rouge">setTimeout</code> のおさらい</h1>
+
+<p><code class="language-plaintext highlighter-rouge">setTimeout</code> は JavaScript の言語仕様である ECMAScript では定義されておりません。<a href="https://html.spec.whatwg.org/multipage/timers-and-user-prompts.html">whatwg で仕様が定義されております</a>が、後述しますが仕様通りの実装ではないブラウザが多いです。Node.js でも利用可能です。</p>
+
+<p>基本的には関数を引数と取り、その内容を第 2 引数で指定されたミリ秒以降に実行する API です。第 2 引数を省略するとゼロが指定されたものとして動作します。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">id</span> <span class="o">=</span> <span class="nf">setTimeout</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">3 seconds</span><span class="dl">"</span><span class="p">),</span> <span class="mi">3000</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>確実に 3000 ミリ秒後に発火するわけではありません。だいたい 3000 ミリ秒ちょうどかちょっと後くらいに実行されます。後述しますがスロットリングなどの影響で、たまに長時間実行されずに放置されることもあります。</p>
+
+<p>ブラウザの場合、返り値として timeoutId と呼ばれるゼロより大きい整数値が返ってきます。この id を <code class="language-plaintext highlighter-rouge">clearTimeout</code> に渡すことによって、発火前にキャンセルすることが出来ます。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">clearTimeout</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>大抵のブラウザでは timeoutId は連番なので、</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="mi">65536</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nf">clearTimeout</span><span class="p">(</span><span class="nx">i</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>とかやることでページの中にある <code class="language-plaintext highlighter-rouge">setTimeout</code> の発火をだいたい止めることが出来ます（本気で止めたい場合は 2 ** 31 - 1 まで回す必要がありますが、まあ大抵は 65535 くらいまで回せば全部止まります）。デバッグ目的でたまに使ったりするテクニックです。</p>
+
+<p>Node.js の場合、返り値としては Timeout クラスが返ってきます。それをそのまま <code class="language-plaintext highlighter-rouge">clearTimeout</code> に送ると <code class="language-plaintext highlighter-rouge">setTimeout</code> の発火を止められます。</p>
+
+<p>同様の API に <code class="language-plaintext highlighter-rouge">setInterval</code> があります。<code class="language-plaintext highlighter-rouge">setTimeout</code> は 1 回のみ発火しますが、<code class="language-plaintext highlighter-rouge">setInterval</code> は同じミリ秒（以降）間隔で定期的に発火します。<code class="language-plaintext highlighter-rouge">setInterval</code> は呼び出した直後は発火しません。また、<code class="language-plaintext highlighter-rouge">setInterval</code> も timeoutId を返し、それを <code class="language-plaintext highlighter-rouge">clearInverval</code> に渡すことで定期的な発火を止めることが出来ます。なお whatwg の仕様上、timeoutId は <code class="language-plaintext highlighter-rouge">setTimeout</code> と <code class="language-plaintext highlighter-rouge">setInterval</code> の間で差がないので、<code class="language-plaintext highlighter-rouge">setTimeout</code> で返ってきた timeoutId を <code class="language-plaintext highlighter-rouge">clearInterval</code> に渡すことで発火を止めることが出来ますし、その逆も可能です。Node.js でも同様の挙動です。しかし可読性の観点からそのようなコードは書かないようにしましょう。</p>
+
+<p>余談ですが、<code class="language-plaintext highlighter-rouge">setInterval</code> の <code class="language-plaintext highlighter-rouge">clearInterval</code> 忘れはよくあるメモリリークの原因です。個人的にはそれが嫌なので毎回 <code class="language-plaintext highlighter-rouge">setTimeout</code> で呼ぶのが好みです。</p>
+
+<p><code class="language-plaintext highlighter-rouge">setTimeout</code> で渡されたコードが実行されるのは、現在の実行コンテキストが終わった次以降のイベントループになります。</p>
+
+<p><code class="language-plaintext highlighter-rouge">setTimeout</code> や <code class="language-plaintext highlighter-rouge">setInterval</code>、また Node.js にしかないですが <code class="language-plaintext highlighter-rouge">setImmediate</code> に渡されたコードは「(macro)task」として実行されます。microtask ではありませんので、コールバック内から再度これらの関数を登録して即座に呼んでも、イベントループをブロックする心配はありません。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">tick</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nf">setTimeout</span><span class="p">(</span><span class="nx">tick</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="p">};</span>
+<span class="nf">tick</span><span class="p">();</span> <span class="c1">// ブロックしない</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">queueMicrotask</code> や <code class="language-plaintext highlighter-rouge">Promise.resolve().then</code>、また Node.js にしかないですが <code class="language-plaintext highlighter-rouge">process.nextTick</code> に渡されたコードは「microtask」として処理されます。コールバック内部で自分自身を登録して即座に呼ぶと、イベントループをブロックしてしまいます。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">tick</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nf">queueMicrotask</span><span class="p">(</span><span class="nx">tick</span><span class="p">);</span>
+<span class="p">};</span>
+<span class="nf">tick</span><span class="p">();</span> <span class="c1">// ブロックする。このコンテキストが終了したら、以降一切他のコードは実行されない。ブラウザなら UI も固まってしまう</span>
+</code></pre></div></div>
+
+<p>なお Node.js の <code class="language-plaintext highlighter-rouge">process.nextTick</code> は厳密には microtask とも違うキューで管理されており、他の microtask よりも先に処理されます。microtask が V8 で管理されているのに対して、<code class="language-plaintext highlighter-rouge">process.nextTick</code> は Node.js 独自に管理しているタスクキューになります。そもそも <code class="language-plaintext highlighter-rouge">process.nextTick</code> は Promise の登場前に必要に応じて作られた機能なのですが、既に Node.js 内部処理でこれを多用しているため、今さら microtask 等に一本化出来ない、という歴史的事情によるものだと聞いております。</p>
+
+<p>ここらへんまでが前提です。では本編行ってみましょう！</p>
+
+<h1 id="ブラウザのみで発生する-settimeout-のスロットリング">ブラウザのみで発生する <code class="language-plaintext highlighter-rouge">setTimeout</code> のスロットリング</h1>
+
+<p>ブラウザでは、状況に応じてスロットリング（実行の抑制）が行われます。</p>
+
+<h2 id="ページが別のタブの裏に隠れたりした場合">ページが別のタブの裏に隠れたりした場合</h2>
+
+<p>最近のブラウザはタブブラウザが大前提になっておりますが、実行中のウィンドウタブが後ろに隠れたりした場合、<code class="language-plaintext highlighter-rouge">setTimeout</code> の間隔が 1000ms 程度に抑制されます。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">last</span> <span class="o">=</span> <span class="nb">Date</span><span class="p">.</span><span class="nf">now</span><span class="p">();</span>
+<span class="kd">const</span> <span class="nx">tick</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nf">setTimeout</span><span class="p">(</span><span class="nx">tick</span><span class="p">,</span> <span class="mi">100</span><span class="p">);</span>
+    <span class="kd">const</span> <span class="nx">elapsedTime</span> <span class="o">=</span> <span class="nb">Date</span><span class="p">.</span><span class="nf">now</span><span class="p">()</span> <span class="o">-</span> <span class="nx">last</span><span class="p">;</span>
+    <span class="k">if</span><span class="p">(</span><span class="nx">elapsedTime</span> <span class="o">&lt;</span> <span class="mi">150</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">setTimeout fired normally</span><span class="dl">"</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">setTimeout is throttled:</span><span class="dl">"</span><span class="p">,</span> <span class="nx">elapsedTime</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="nx">last</span> <span class="o">=</span> <span class="nb">Date</span><span class="p">.</span><span class="nf">now</span><span class="p">();</span>
+<span class="p">};</span>
+<span class="nf">tick</span><span class="p">();</span>
+</code></pre></div></div>
+
+<p>これを実行して、実行したタブを数秒裏側に隠してまた戻すと、実際にスロットリングされている様子を確認することが出来ます。</p>
+
+<p><img src="/img/setTimeout-1.png" alt="setTimeout-1.png" /></p>
+
+<p>これはアクティブでないアプリケーションの実行を抑制することで、無駄に CPU を使わないようにするための機能です。ゲームなどで FPS 調整をやっている場合には鬼門となる機能ですので、しっかり存在を覚えておきましょう。</p>
+
+<p>なお、<code class="language-plaintext highlighter-rouge">requestAnimationFrame</code> でも似たような状況は発生します。ただ最低でも 1 秒に 1 回くらいは実行される <code class="language-plaintext highlighter-rouge">setTimeout</code> とは違い、<code class="language-plaintext highlighter-rouge">requestAnimationFrame</code> は描画の必要が無い時には一切発火されませんので、定期的な実行を前提にする場合には向いていません。お気をつけください。</p>
+
+<h2 id="極小時間を指定した場合のスロットリング">極小時間を指定した場合のスロットリング</h2>
+
+<p>ブラウザのパフォーマンス改善のため、あまりに短い時間を指定した場合にもスロットリングが行われます。<a href="https://html.spec.whatwg.org/multipage/timers-and-user-prompts.html">この挙動は仕様にも書かれております</a>。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>5. If nesting level is greater than 5, and timeout is less than 4, then set timeout to 4.
+</code></pre></div></div>
+
+<p>簡単に説明すると、<code class="language-plaintext highlighter-rouge">setTimeout</code> の中で <code class="language-plaintext highlighter-rouge">setTimeout</code> が 5 回より多く呼ばれ、かつ timeout 指定が 4 ミリ秒未満だった場合には、強制的に 4 ミリ秒に設定されます。適当なユーザーコードによって CPU を無駄に消費されないように負荷対策をしているのです。</p>
+
+<p>実験してみましょう。以下のようなコードを書いてみます。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">times</span> <span class="o">=</span> <span class="p">[];</span>
+<span class="kd">const</span> <span class="nx">tick</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">times</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="nb">Date</span><span class="p">.</span><span class="nf">now</span><span class="p">()</span> <span class="o">-</span> <span class="nx">last</span><span class="p">);</span>
+    <span class="nx">last</span> <span class="o">=</span> <span class="nb">Date</span><span class="p">.</span><span class="nf">now</span><span class="p">();</span>
+    <span class="k">if</span><span class="p">(</span><span class="nx">times</span><span class="p">.</span><span class="nx">length</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nf">setTimeout</span><span class="p">(</span><span class="nx">tick</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">times</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+<span class="kd">let</span> <span class="nx">last</span> <span class="o">=</span> <span class="nb">Date</span><span class="p">.</span><span class="nf">now</span><span class="p">();</span>
+<span class="nf">setTimeout</span><span class="p">(</span><span class="nx">tick</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>Chrome での結果は以下の通りでした。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[0, 0, 0, 0, 5, 4, 4, 4, 4, 5]
+</code></pre></div></div>
+
+<p>仕様では 6 回目から発生するはずなのですが、4 回目から発生しています。仕様違反ですね！まあ、なにはともあれ数回目からはスロットリングが発生していることが確認出来ました。Firefox でも同様の仕様違反があるように見受けられました。Safari は仕様通りのスロットリングがかかっているようです。</p>
+
+<p>なお <a href="https://source.chromium.org/chromium/chromium/src/+/main:third_party/blink/renderer/core/frame/dom_timer.cc;l=96-100;drc=d9b81bd5e8768064e3ad258115c960d08fe32b55">Chromium のソースコードを確認</a>したところ、彼らは<a href="https://bugs.chromium.org/p/chromium/issues/detail?id=1108877">これが仕様違反であるのはわかっている</a>ようです。個人的にはこの回数の差に意味があるように思えないのですが、しかし既に動いているコードを触りたくない気持ちもよくわかります。たいした違反でもないですしね。</p>
+
+<p>なお最初の数回だけでも 0ms が受け入れられたのは比較的最近で、一昔前は最初の 1 回目からスロットリングが発生しておりました。後述しますが、ブラウザにおいて <code class="language-plaintext highlighter-rouge">postMessage</code> を利用することでこのスロットリング制限を抜けることが出来ますが、そもそもスロットリングはユーザーの CPU を過負荷にさせないための機能ですので、あまり多用しないようにしましょう。</p>
+
+<h1 id="巨大な数値の扱い">巨大な数値の扱い</h1>
+
+<p><code class="language-plaintext highlighter-rouge">setTimeout</code> の timeout にとんでもなく大きな値を指定した場合、どのように処理されるかご存知でしょうか？</p>
+
+<h2 id="ブラウザの挙動">ブラウザの挙動</h2>
+
+<p>ブラウザにおいて大きな値を指定した場合、32bit int に変換して処理されます。わかりやすく言うと、0 以上の数値が指定されたとして</p>
+
+<ul>
+  <li>0 から 2 ** 31 - 1 までの場合、普通に処理される（最長の timeout 指定は 2 ** 31 - 1 ミリ秒 すなわち 24 日 20 時間 31 分 23.647 秒）</li>
+  <li>2 ** 31 から 2 ** 32 までの場合、32bit int に変換されるとマイナス（もしくはゼロ）になるため、即座に実行される</li>
+  <li>2 ** 32 から 2 ** 32 + 2 ** 31 - 1 までの場合、2 ** 32 で割った余りの数値として処理される</li>
+</ul>
+
+<p>というような感じになります。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">setTimeout</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">3 seconds</span><span class="dl">'</span><span class="p">),</span> <span class="mi">2</span> <span class="o">**</span> <span class="mi">32</span> <span class="o">+</span> <span class="mi">3000</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>なお、<span style="color:red">この挙動は仕様です</span>。追ってみましょう。まず whatwg における <a href="https://html.spec.whatwg.org/multipage/webappapis.html#windoworworkerglobalscope-mixin">Web API の定義（IDL）</a>を見てみましょう。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>long setTimeout(TimerHandler handler, optional long timeout = 0, any... arguments);
+</code></pre></div></div>
+
+<p>このように timeout は long 型で定義されていることがわかります。では、<a href="https://webidl.spec.whatwg.org/#es-long">long 型はどのように JavaScript (ECMAScript) に変換されるのか</a>見てみましょう。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>An ECMAScript value V is converted to an IDL long value by running the following algorithm:
+
+1. Let x be ? ConvertToInt(V, 32, "signed").
+
+2. Return the IDL long value that represents the same numeric value as x.
+
+The result of converting an IDL long value to an ECMAScript value is a Number that represents the same numeric value as the IDL long value. The Number value will be an integer in the range [−2147483648, 2147483647].
+</code></pre></div></div>
+
+<p>このように、signed 32bit int に変換されることが仕様に明記されております。すなわち、上記の挙動は whatwg の仕様に従ったものであり、それ故に Chrome、Firefox、Safari 全てのブラウザで同じ挙動になります。</p>
+
+<h2 id="nodejs-の挙動">Node.js の挙動</h2>
+
+<p>Node.js はブラウザの事情に合わせる必要が全く無いので、独自の実装になっています。一応ブラウザに気をつかったのか、2 ** 31 以上の場合は警告を出しつつ timeout を 1 にして即座に実行させるようなコードになっております。<a href="https://github.com/nodejs/node/blob/main/lib/internal/timers.js#L167-L173">その部分の Node.js のソースコードはこちら</a>で確認出来ます。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ node
+Welcome to Node.js v18.12.1.
+Type ".help" for more information.
+&gt; void setTimeout(() =&gt; console.log('immediate'), 2 ** 32 + 3000);
+undefined
+&gt; (node:84162) TimeoutOverflowWarning: 4294970296 does not fit into a 32-bit signed integer.
+Timeout duration was set to 1.
+(Use `node --trace-warnings ...` to show where the warning was created)
+immediate
+</code></pre></div></div>
+
+<h1 id="ゼロを指定した場合の挙動">ゼロを指定した場合の挙動</h1>
+
+<p><code class="language-plaintext highlighter-rouge">setTimeout</code> でゼロを指定した場合、どのような挙動になるのでしょうか。これは実装によって大きく異なります。</p>
+
+<h2 id="chrome-と-firefox-の場合">Chrome と Firefox の場合</h2>
+
+<p>Chrome と Firefox は、イベントループ 1 回ごとに各種類の (macro)task を 1 回ずつ律儀に回しているため、スロットリングが始まるまでの数回位はイベントループにおいて毎回実行されることが確認出来ます。実際に見てみましょう。</p>
+
+<p>JavaScript には <code class="language-plaintext highlighter-rouge">setImmediate</code> がありませんので、毎イベントループに確実にタスクをキューイングするために <code class="language-plaintext highlighter-rouge">postMessage</code> を利用しています。前述した通りこれは <code class="language-plaintext highlighter-rouge">setTimeout</code> の 4ms のスロットリング制限を抜けるための有用なテクニックですが、ユーザー環境に負荷をかける可能性があるのであまり多用しないようにしましょう。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">count</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">timeout</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="o">--</span><span class="nx">count</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nf">setTimeout</span><span class="p">(</span><span class="nx">timeout</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">timeout</span><span class="dl">"</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+<span class="nx">onmessage</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="nx">count</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nf">postMessage</span><span class="p">(</span><span class="dl">""</span><span class="p">);</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">message</span><span class="dl">"</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+<span class="nf">setTimeout</span><span class="p">(</span><span class="nx">timeout</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="nf">postMessage</span><span class="p">(</span><span class="dl">""</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>上記を実行すると、以下のような結果が得られます。</p>
+
+<p><img src="/img/setTimeout-2.png" alt="setTimeout-2.png" /></p>
+
+<p>スロットリングが始まるまでは、キレイに timeout と message が並んでいることが確認出来ます。<code class="language-plaintext highlighter-rouge">setTimeout</code> をゼロ秒で呼ぶと、毎回のイベントループで実行されているようです。一番下の <code class="language-plaintext highlighter-rouge">setTimeout</code> と <code class="language-plaintext highlighter-rouge">postMessage</code> を呼ぶ順番を逆にすると結果も反転しますので、同じ (macro)task として優先度なしにキューイングされていることも確認出来ます。</p>
+
+<h2 id="safari-の場合">Safari の場合</h2>
+
+<p>Safari は結果が大きく異なります。スロットリングが始まる前でも、message が少し多めに呼ばれているようです。</p>
+
+<p><img src="/img/setTimeout-3.png" alt="setTimeout-3.png" /></p>
+
+<p>WebKit のコードを少し追ってみたのですが、<a href="https://github.com/WebKit/WebKit/blob/main/Source/WebCore/page/DOMWindow.cpp#L943">postMessage は呼ばれた直後に task の enqueue をしているようです</a>が、一方で<a href="https://github.com/WebKit/WebKit/blob/main/Source/WebCore/platform/Timer.cpp#L483-L486">Timer 系の処理は負荷軽減のための align が入っていたり</a>と色々と手が加わっているようで、そこらが環境と一緒に影響しているように見受けられました。少なくともこれらのコードを読む限り、こちらも <code class="language-plaintext highlighter-rouge">postMessage</code> は毎回のイベントループで実行されているのは間違いなさそうです。</p>
+
+<h2 id="nodejs-の場合">Node.js の場合</h2>
+
+<p>Node.js の場合は <code class="language-plaintext highlighter-rouge">postMessage</code> がない代わりに <code class="language-plaintext highlighter-rouge">setImmediate</code> が存在します。これを使ってコードを書き直してみました。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">count</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+    <span class="kd">const</span> <span class="nx">timeout</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="k">if</span><span class="p">(</span><span class="o">--</span><span class="nx">count</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nf">setTimeout</span><span class="p">(</span><span class="nx">timeout</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+            <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">timeout</span><span class="dl">"</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">};</span>
+    <span class="kd">const</span> <span class="nx">immediate</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">count</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nf">setImmediate</span><span class="p">(</span><span class="nx">immediate</span><span class="p">);</span>
+            <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">immediate</span><span class="dl">"</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">};</span>
+    <span class="k">void</span> <span class="nf">setTimeout</span><span class="p">(</span><span class="nx">timeout</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="k">void</span> <span class="nf">setImmediate</span><span class="p">(</span><span class="nx">immediate</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>結果は以下の通りです。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>immediate
+timeout
+immediate
+immediate
+timeout
+immediate
+immediate
+immediate
+immediate
+timeout
+immediate
+immediate
+immediate
+immediate
+timeout
+immediate
+immediate
+immediate
+immediate
+immediate
+</code></pre></div></div>
+
+<p>これは、実は Node.js の <code class="language-plaintext highlighter-rouge">setTimeout</code> は <a href="https://nodejs.org/api/timers.html#settimeoutcallback-delay-args">timeout に 0ms を指定できない仕様</a>のためです。<a href="https://github.com/nodejs/node/blob/main/lib/internal/timers.js#L166">0ms を指定すると 1ms に設定されます</a>。そして、1ms の間に <code class="language-plaintext highlighter-rouge">setImmediate</code> の (macro)task が複数回走るためです。</p>
+
+<p><code class="language-plaintext highlighter-rouge">setImmediate</code> と <code class="language-plaintext highlighter-rouge">setTimeout</code> の差は、主にここにあります。覚えておいて損はないかもしれません。</p>
+
+<h1 id="正確なタイミング測定にはどうすればいいのか">正確なタイミング測定にはどうすればいいのか？</h1>
+
+<p>（この節は <a href="https://twitter.com/bad_at_math">@bad_at_math</a> さんからの情報提供を元に書いております。ありがとうございます！）</p>
+
+<p><span style="color:red; font-weight: bold">結論から言うと、正確なタイミング計測は諦めるのが一番良い選択肢です</span>。ただ、ビジネス要件として可能な限り正確な測定を求められることがあるかもしれません。そんな時には、 <strong>cross-domain Iframe の Web Worker の中で setTimeout を作成する</strong> のが最もマシな選択肢になるでしょう。</p>
+
+<p><a href="https://medium.com/teads-engineering/the-most-accurate-way-to-schedule-a-function-in-a-web-browser-eadcd164da12">The most accurate way to schedule a function in a web browser</a></p>
+
+<p>2020 年 10 月に発表されたこのブログは、何億もの実機で計測したログを元にそう結論づけております。この記事中では Web Worker を生成するコストまで計測していて、とんでもなく参考になりました。記事中でも言及がありますが、Android の成績が一様に悪いのは、iOS と違って低スペックな端末の混入率が非常にたかいことが大きな要因の 1 つになっている点には留意しましょう。</p>
+
+<p>些細な問題点として <code class="language-plaintext highlighter-rouge">requestAnimationFrame</code> の実装がおかしかったり（毎フレームコールバック関数を生成しているのは明らかにおかしい）、最も正確に測れるであろう <code class="language-plaintext highlighter-rouge">postMessage</code> の計測をしていなかったり（ただしこれは意図的かもしれません。<code class="language-plaintext highlighter-rouge">postMessage</code> は非常に端末に負担をかけるので…）、といったことがありますが、結論には全く異論がないので素晴らしい記事です。長いですが興味のある方はぜひ読んでみてください。</p>
+
+<h1 id="他の小ネタ">他の小ネタ</h1>
+
+<h2 id="必ず時間順登録順に発火するか">必ず時間順・登録順に発火するか？</h2>
+
+<p><code class="language-plaintext highlighter-rouge">setTimeout</code> が時間順・登録順に発火するかどうかについて気になりますが、仕様的には両者ともに保証されていないと捉えて良いと思います。<a href="https://html.spec.whatwg.org/multipage/timers-and-user-prompts.html#map-of-active-timers">仕様 5.2</a> に以下のような記載があり、保証されているように見えます。</p>
+
+<blockquote>
+  <p>Wait until any invocations of this algorithm that had the same global and orderingIdentifier, that started before this one, and whose milliseconds is equal to or less than this one’s, have completed.</p>
+</blockquote>
+
+<p>しかしこの部分は <code class="language-plaintext highlighter-rouge">Run the following steps in parallel:</code> の中にあり、この <a href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">in parallel の定義</a>を読むと、</p>
+
+<blockquote>
+  <p>To run steps in parallel means those steps are to be run, one after another, at the same time as other logic in the standard (e.g., at the same time as the event loop). This standard does not define the precise mechanism by which this is achieved, be it time-sharing cooperative multitasking, fibers, threads, processes, using different hyperthreads, cores, CPUs, machines, etc.</p>
+</blockquote>
+
+<p>とあります。すなわち、parallel に実行するための実装は一切規定されていないので、5.2 で保証されているのはあくまでも「前に実行（invocation）されている処理が終わるのを待つ」だけだと捉えられ、結果としてどのような実行順になるのかは仕様で明確に定義されていないと考えて良いと思います（ただ、invocation の定義次第で両者とも保証されていると言ってもよいかもしれません。ここは少し不明瞭です）。</p>
+
+<p>なお、モダンブラウザならびに Node.js の実装では「時間順・（同じ時間の場合は）登録順」の発火になります。<span style="color:blue">しかしその実装に依存したコードを書かないほうが良いでしょう</span>。</p>
+
+<h2 id="文字列による関数の指定">文字列による関数の指定</h2>
+
+<p>信じられないかもしれませんが、今から 20 年前は、<code class="language-plaintext highlighter-rouge">setTimeout</code> のコールバックを文字列で指定するのが一般的でした。HTML のハンドラを文字列で指定しているのと同じような感覚でやっておりました。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">setTimeout</span><span class="p">(</span><span class="dl">"</span><span class="s2">console.log('3 seconds')</span><span class="dl">"</span><span class="p">,</span> <span class="mi">3000</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>今のブラウザでも利用可能ですが、言うまでもなく、現在では忌むべき書き方です。Node.js では対応すらされておりません。</p>
+
+<p>なお Chrome は、なぜか空文字列を渡すと 0 が返ってきます。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nf">setTimeout</span><span class="p">(</span><span class="dl">""</span><span class="p">,</span> <span class="mi">3000</span><span class="p">));</span> <span class="c1">// =&gt; 0</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nf">setTimeout</span><span class="p">(</span><span class="dl">"</span><span class="s2"> </span><span class="dl">"</span><span class="p">,</span> <span class="mi">3000</span><span class="p">));</span> <span class="c1">// =&gt; non-zero</span>
+</code></pre></div></div>
+
+<p>そもそも <a href="https://html.spec.whatwg.org/multipage/timers-and-user-prompts.html">setTimeout が 0 を返すのは仕様違反</a>なのですが、実務上なんの問題もない仕様違反ではあります。<a href="https://source.chromium.org/chromium/chromium/src/+/main:third_party/blink/renderer/core/frame/window_or_worker_global_scope.cc;l=171-174">Chromium のソースコードではこの部分</a>です。コメントには “historically a performance issue” って書いてあるけれど、出典等がないために詳細は全く不明です。これがパフォーマンスに影響を与えるとは思えないのですが、一体どんな事情であったのか気になりますね。</p>
+
+<p>他にも Chrome は eval が実行出来ない環境でこの形式の呼び出しをすると、DevTools に警告を出した上で登録を失敗させ 0 を返してきます。</p>
+
+<p><img src="/img/setTimeout-4.png" alt="setTimeout-4.png" /></p>
+
+<p>まあ eval なんて使うなってことですね。</p>
+
+<h2 id="ie-で使えない第三引数">IE で使えない第三引数</h2>
+
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">IEでは使えないsetTimeoutの第3引数のこと以外は完璧に理解できた！ / setTimeout を完璧に理解する <a href="https://t.co/ISdXVsj0dt">https://t.co/ISdXVsj0dt</a></p>&mdash; Yosuke HASEGAWA (@hasegawayosuke) <a href="https://twitter.com/hasegawayosuke/status/1594529176354054144?ref_src=twsrc%5Etfw">November 21, 2022</a></blockquote>
+<script async="" src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<p><a href="https://twitter.com/hasegawayosuke">@hasegawayosuke</a> さんから教えていただいたのですが、IE では setTimeout の第三引数（arguments）が使えなかったそうです。なので文字列による関数の指定が流行っていた可能性がある、と。なるほど・・・。</p>
+
+<p>当時でも関数式を使えば自由に引数を渡すことは出来たのですが、2000 年代前半は関数式という考え方がほとんど普及していなかったので、引数が書けないとどうしていいのかわからない人が多かったのかもしれません。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">setTimeout</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="nf">func</span><span class="p">(</span><span class="nx">arg1</span><span class="p">,</span> <span class="nx">arg2</span><span class="p">,</span> <span class="nx">arg3</span><span class="p">);</span> <span class="p">},</span> <span class="mi">1000</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>追記:</p>
+
+<p><a href="https://twitter.com/kazuho/status/1594543187267198977">@kazuho さんによる</a>と、そもそも JavaScript 1.1（というものがあることすら知らなかったのですが）までは文字列を渡す方法しか存在しなかったようです。なので文字列を渡す方法が当時の主流だったのは歴史的に当然だったのかもしれません。</p>
+
+<h2 id="nodejs-の-promise-対応">Node.js の Promise 対応</h2>
+
+<p><code class="language-plaintext highlighter-rouge">setTimeout</code> を素直に Promise 化すると、以下のようなコードになります。これはブラウザでも頻出するコードです。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">await</span> <span class="k">new</span> <span class="nc">Promise</span><span class="p">(</span><span class="nx">r</span> <span class="o">=&gt;</span> <span class="nf">setTimeout</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span> <span class="mi">3000</span><span class="p">));</span> <span class="c1">// wait 3 seconds</span>
+</code></pre></div></div>
+
+<p>Node.js では、promisify を利用して <code class="language-plaintext highlighter-rouge">setTimeout</code> を Promise 化して使う用途もあるようです。</p>
+
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">Nodeの場合だけ自分は、await util.promisify(setTimeout)(1000) で時間停止させるコード書くこと多い気がする</p>&mdash; 蝉丸ファン (@about_hiroppy) <a href="https://twitter.com/about_hiroppy/status/1551926207784296449?ref_src=twsrc%5Etfw">July 26, 2022</a></blockquote>
+<script async="" src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<p>本来の <code class="language-plaintext highlighter-rouge">setTimeout</code> の構文は promisify とは相容れないのですが、Node.js は <code class="language-plaintext highlighter-rouge">util.promisify.custom</code> シンボルを使って<a href="https://nodejs.org/dist/latest-v12.x/docs/api/util.html#util_custom_promisified_functions">例外処理の指定が出来る</a>ようで、これを使って対応されているようです。</p>
+
+<p>なお、<a href="https://twitter.com/yosuke_furukawa">@yosuke_furukawa</a> さんに教えていただいたのですが、Node.js v15 以降では <code class="language-plaintext highlighter-rouge">timers/promises</code> より Promise に対応した <code class="language-plaintext highlighter-rouge">setTimeout</code> をそのまま利用出来るようです。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">setTimeout</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">timers/promises</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="k">await</span> <span class="nf">setTimeout</span><span class="p">(</span><span class="mi">3000</span><span class="p">,</span> <span class="dl">'</span><span class="s1">3 seconds</span><span class="dl">'</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">response</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>名前空間は違うものの関数シグネチャが違うのに同じ関数名であることに個人的には危機感を覚えるのですが（後述する WinterCG の文脈ではアウトな気がする）、Promise native な setTimeout が標準で準備されたので、上記のような Promisify の対応は Node.js においては必要なくなっております。promisify の利用は過去の書き方として覚えておきましょう。</p>
+
+<h2 id="setinterval-と-settimeout-の使い分け"><code class="language-plaintext highlighter-rouge">setInterval</code> と <code class="language-plaintext highlighter-rouge">setTimeout</code> の使い分け</h2>
+
+<p>個人的な意見ですが、<code class="language-plaintext highlighter-rouge">setInterval</code> を使いたくなることはまずありません。<code class="language-plaintext highlighter-rouge">setInterval</code> は発火を止めるために id を保持してそれを後に <code class="language-plaintext highlighter-rouge">clearInterval</code> に渡してやる必要がありますが、そのデザインが個人的に気に入りません。そしてそれを忘れてメモリリーク等を作り込んでしまいやすい問題もあり、可能であれば使わない方が良いと個人的に思っています。</p>
+
+<p>では繰り返し処理をどう書くかというと、私は以下のように書いています。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">tick</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="nx">終了条件</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nf">setTimeout</span><span class="p">(</span><span class="nx">tick</span><span class="p">,</span> <span class="mi">100</span><span class="p">);</span>
+    <span class="nx">実際の処理</span>
+<span class="p">};</span>
+<span class="nf">tick</span><span class="p">();</span>
+</code></pre></div></div>
+
+<p>この書き方だと <code class="language-plaintext highlighter-rouge">tick</code> 内部で終了条件を確認しているため、timeoutId を持ち回すことなく発火を止めることが出来ます。</p>
+
+<p>ここで重要なポイントは、「実際の処理」の前に <code class="language-plaintext highlighter-rouge">setTimeout</code> を書くことです。一番最後に <code class="language-plaintext highlighter-rouge">setTimeout</code> を書くと、この例だと「処理にかかった実行時間＋100ms」に次の <code class="language-plaintext highlighter-rouge">tick</code> が呼ばれることになってしまい、処理にかかった実行時間が大きくなればなるほど定期的な実行の誤差が生じます。気をつけてください。</p>
+
+<h2 id="wintercg-による標準化">WinterCG による標準化</h2>
+
+<p>先日の <a href="http://nmi.jp/2022-11-14-Be-careful-about-console-log-in-chrome">console.log のブログ記事</a>を書いた際に <a href="https://twitter.com/petamoriken">@petamoriken</a> さんにご指摘を受けたのですが、現在こういった「ECMAScript に入っていないけれど、ほぼ標準になっている便利な API」の標準化作業が <a href="https://wintercg.org/">WinterCG</a> によって進められています。</p>
+
+<p>JavaScript は様々な理由から、ブラウザと直接の関係がない場所でも使われるようになってきました。Node.js や deno のみならず、Cloudflare の edge computing などにおいても JavaScript は広く使われています。そういった環境で標準化されていない API をサポートするときには各所それぞれが独自の実装をしていました（今回の記事の Node.js の <code class="language-plaintext highlighter-rouge">setTimeout</code> 実装がよい例になっていると思います）。この状態が続くと、例えば Node.js で書いたコードが deno や他の非ブラウザー環境で動かなくなる、というような事態が懸念されます。それを防ぐために Cloudflare などが中心となって <a href="https://wintercg.org/">WinterCG</a> という団体を作って活動しています。</p>
+
+<p><a href="https://blog.cloudflare.com/ja-jp/introducing-the-wintercg-ja-jp/">こちらの日本語記事</a> に詳しいのですが、</p>
+
+<blockquote>
+  <p>WinterCGが独立して、独自の標準APIセットを公開することを意図しているわけではありません。WinterCGから生まれる新しい仕様のアイデアは、まずW3CとWHATWGの既存のワークストリームで検討され、できるだけ幅広い意見の一致を得ることを目指します。</p>
+</blockquote>
+
+<p>という形で、既存の仕様と協力しながら良い設計を探求していくスタイルのようです。まだ活動が始まったばかりですが、良いアウトプットが出ることを期待しております。なお <code class="language-plaintext highlighter-rouge">setTimeout</code> についてはこのように書かれています。</p>
+
+<blockquote>
+  <p>いずれかの環境が標準化APIの定義と異なる場合(例えば、setTimeout()およびsetInterval()のNode.js実装)、その違いを説明した明確な文書が用意されます。このような差異は既存コードとの後方互換性のためにのみ存在する必要があります。</p>
+</blockquote>
+
+        </article>
+        <hr>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/2022-11-21-Understanding-setTimeout-completely&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="setTimeout を完璧に理解する" data-url="http://nmi.jp/2022-11-21-Understanding-setTimeout-completely">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/2022-11-21-Understanding-setTimeout-completely" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="setTimeout を完璧に理解する"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="setTimeout を完璧に理解する" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+
+        
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+        
+
+        <div class="post-recent">
+    <div class="pre">
+
+    
+        <p><strong>前の投稿</strong> <a href="/2022-11-14-Be-careful-about-console-log-in-chrome">Chrome の console.log でハマらないために</a></p>
+    
+    </div>
+    <div class="nex">
+
+        
+        <p><strong>次の投稿</strong> <a href="/2023-01-03-How-to-solve-2023-puzzle">2023 パズルの逆ポーランド記法(RPN)による解法の解説</a></p>
+        
+    </div>
+</div>
+
+
+    </div>
+    <button class="anchor"><i class="fa fa-anchor"></i></button>
+
+
+    <div class="right">
+        <div class="wrap">
+            <div class="side">
+                <div>
+                    <i class="fa fa-tags"></i>
+                    Top Popular Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2016-07-23-stock-strategy-for-early-startup-employee">スタートアップに転職する時に最低限知っておくべき株の話</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/582">生WebGL入門:初音ミクの美麗3Dモデルを表示する(前編)</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2017-10-06-Making_a-business_plan">事業計画書の作り方、新規ビジネスの考え方</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/902">Convertible Note / Convertible Equity とは？</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/488">JavaScript イディオム集</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/465">ExGameの製作で感じたこと</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                </ul>
+            </div>
+
+            <div class="side">
+                <div>
+                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                    Recent Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        <li><a href="/2024-08-28-Review-Binary-Hacks-Rebooted">書評 "Binary Hacks Rebooted"</a></li>
+                    
+                        <li><a href="/2024-06-10-Deep-Dive-into-ARM-JavaScript-Special-Instruction-FJCVTZS">ARM に存在する JavaScript 専用命令「FJCVTZS」を追う（ついでに V8 をビルドする）</a></li>
+                    
+                        <li><a href="/2024-06-03-Exploring-V8-JIT-Outputs">JavaScript 実行エンジン V8 の JIT 出力コードを読んでみよう</a></li>
+                    
+                </ul>
+            </div>
+
+            <!-- <div class="side">
+                <div>
+                    <i class="fa fa-external-link"></i>
+                    Links
+                </div>
+                <ul  class="content-ul">
+
+                </ul>
+            </div> -->
+        </div>
+    </div>
+
+
+
+</div>
+<script>
+/**
+ * target _blank
+ */
+(function() {
+    var aTags = document.querySelectorAll('article a:not([id])')
+    for (var i = 0; i < aTags.length; i++) {
+        aTags[i].setAttribute('target', '_blank')
+    }
+}());
+</script>
+<script src="/js/pageContent.js " charset="utf-8"></script>
+
+
+    <footer class="site-footer">
+
+
+    <div class="wrapper">
+
+        <p class="description">
+             Takuo Kihira 
+        </p>
+        <p class="contact">
+            Contact me at: 
+            <a href="https://github.com/tkihira" title="GitHub"><i class="fa fa-github" aria-hidden="true"></i></a>     
+            <a href="https://twitter.com/tkihira" title="Twitter"><i class="fa fa-twitter" aria-hidden="true"></i></a>  
+            <a href="https://www.facebook.com/takuo.kihira" title="Facebook"><i class="fa fa-facebook-official" aria-hidden="true"></i></a>    
+        </p>
+        <p class="power">
+            <span>
+                Site powered by <a href="https://jekyllrb.com/">Jekyll</a>.
+            </span>
+            <span>
+                Theme designed by <a href="https://github.com/Gaohaoyang">HyG</a>.
+            </span>
+        </p>
+    </div>
+</footer>
+
+    <div class="back-to-top">
+    <a href="#top" class="scroll">
+        <i class="fa fa-arrow-up" aria-hidden="true"></i>
+    </a>
+</div>
+
+    <script src=" /js/main.js " charset="utf-8"></script>
+    <script src=" /js/scroll.min.js " charset="utf-8"></script>
+  </body>
+
+</html>

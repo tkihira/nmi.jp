@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html><head><title>SVGをCanvasで利用する</title>
+<script>
+var svg = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n' + 
+			'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">' +
+			'<g transform="matrix(0.0298614501953125,-0.0054168701171875,0.0054168701171875,0.0298614501953125,79.8,32.25)">' +
+			'<path stroke="none" fill="rgb(0,0,0)" d="M -2782.7569658689836 608.6833301566228 L 84.893028645503 1128.8753322274672 ' +
+			'L 1683.7664050978372 132.97224006629114 L -858.0511140648059 -328.1137176765489 L 181.5633642527544 -1047.0521235003948 ' +
+			'L -275.57473549460883 -1129.9770215128187 L -2782.7569658689836 608.6833301566228 M -1951.5829286777084 429.60166597823917 ' +
+			'L -1237.2442827046566 -65.36827816052792 L 795.561309788937 303.38286406493205 L 19.622494346381792 787.1785311665641 ' +
+			'L -1951.5829286777084 429.60166597823917 "/></g></svg>';
+
+window.onload = function() {
+	var img = new Image();
+	img.onload = function() {
+		var ctx = document.getElementById("canvas").getContext("2d");
+		ctx.drawImage(img, 0, 0);
+	};
+	img.src = "data:image/svg+xml;base64," + btoa(svg);
+};
+</script></head><body><canvas id="canvas" width="150" height="100"></canvas></body></html>

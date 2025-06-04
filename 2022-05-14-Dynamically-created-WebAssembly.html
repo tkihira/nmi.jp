@@ -1,0 +1,1753 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>WebAssembly を動的生成した場合のパフォーマンスについて</title>
+    <meta name="description" content="本日 TechFeed Conference 2022 で発表した「JavaScript による動的 WebAssembly 生成」についての詳解記事です。JavaScript を動的に生成することで高速化を図るテクニックについては以前「JavaScript における VM の高速化手法」でご紹介しましたが、その...">
+
+    <link rel="stylesheet" href=" /css/fontawesome/css/font-awesome.min.css ">
+    <link rel="stylesheet" href=" /css/main.css ">
+    <link rel="canonical" href="http://nmi.jp/2022-05-14-Dynamically-created-WebAssembly">
+    <link rel="alternate" type="application/rss+xml" title="nmi.jp" href="http://nmi.jp/feed.xml">
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=3.0'></script>
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=1.1'></script>
+    <script>
+        if(location.href.match(/\.html$/)) {
+            location.href = location.href.match(/(.+)\.html/)[1];
+        }
+    </script>
+
+
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-229769-8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-229769-8');
+</script>
+</head>
+
+
+  <body>
+
+    <header id="top">
+    <div class="wrapper">
+        <a href="/" class="brand">nmi.jp</a>
+        <small>Twitter → <a href="https://twitter.com/tkihira" target="_blank">@tkihira</a></small>
+        <button id="headerMenu" class="menu"><i class="fa fa-bars"></i></button>
+        <nav id="headerNav">
+            <ul>
+                <li>
+                    
+                    <a href="/">
+                    
+                        <i class="fa fa-home"></i>Home
+                    </a>
+                </li>
+
+                
+                    
+                    <li>
+                        
+                        <a href="/archive/">
+                        
+                            <i class="fa fa-archive"></i>Archives
+                        </a>
+                    </li>
+                    
+                
+                    
+                    <li>
+                        
+                        <a href="/category/">
+                        
+                            <i class="fa fa-th-list"></i>Categories
+                        </a>
+                    </li>
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            </ul>
+        </nav>
+    </div>
+</header>
+
+
+        <div class="page clearfix" post>
+    <div class="left">
+        <div class="post-recent">
+    <table style="width:100%;border:0;padding:0;"><tbody><tr style="padding:0">
+        <td class="toppre" style="padding:0">
+        
+        <a href="/2022-02-18-Understanding-ReDoS">正規表現の脆弱性 (ReDoS) を JavaScript で学ぶ</a>
+        
+        </td><td class="topnex" style="text-align:right;padding:0">
+        
+        <a href="/2022-08-01-Becoming-YouTuber">YouTube チャンネル「ニコニコプログラミング」を開設しました</a>
+        
+        </td>
+    </tr></tbody></table>
+</div>
+
+        <hr style="margin:0"/>
+        <h1 style="margin-top:10px">WebAssembly を動的生成した場合のパフォーマンスについて</h1>
+<hr />
+        <div class="label">
+
+            <div class="label-card">
+                <i class="fa fa-calendar"></i>2022-05-14
+            </div>
+
+            <div class="label-card">
+                <i class="fa fa-user"></i>Takuo Kihira
+                
+            </div>
+
+            <div class="label-card">
+                
+            </div>
+
+            <div class="label-card">
+            
+
+
+<!-- <span class="point">•</span> -->
+<span class="categories">
+  <i class="fa fa-th-list"></i>
+  
+    
+        <a href="/category/#JavaScript" title="Category: JavaScript" rel="category">JavaScript</a>
+    
+  
+
+  <!-- <span class="point">•</span> -->
+</span>
+
+
+            </div>
+
+            <div class="label-card">
+                <a href="https://github.com/tkihira/nmi.jp/blob/master/_posts/2022-05-14-Dynamically-created-WebAssembly.md" target="_blank"><i class="fa fa-github"></i></a>
+            </div>
+
+        </div>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/2022-05-14-Dynamically-created-WebAssembly&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="WebAssembly を動的生成した場合のパフォーマンスについて" data-url="http://nmi.jp/2022-05-14-Dynamically-created-WebAssembly">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/2022-05-14-Dynamically-created-WebAssembly" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="WebAssembly を動的生成した場合のパフォーマンスについて"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="WebAssembly を動的生成した場合のパフォーマンスについて" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+        <article itemscope itemtype="http://schema.org/BlogPosting">
+        <p>本日 TechFeed Conference 2022 で発表した「JavaScript による動的 WebAssembly 生成」についての詳解記事です。</p>
+
+<p>JavaScript を動的に生成することで高速化を図るテクニックについては以前「<a href="http://nmi.jp/2020-12-20-Make_VM_faster">JavaScript における VM の高速化手法</a>」でご紹介しましたが、その記事の最後で少しだけ言及した「WebAssembly の動的生成」についてこの記事で解説します。</p>
+
+<p><a href="https://twitter.com/tkihira/status/1511872190773280768">Java の Virtual Machine よりも Brainfuck の方が知名度が高い</a>というアンケート結果が出ましたので、この記事では Brainfuck（以下 BF と略します）をターゲットとして解説します。</p>
+
+<hr />
+
+<h1 id="bf-とは何か">BF とは何か</h1>
+
+<p>BF とは、8 つの記号のみで構成されるプログラミング言語です。</p>
+
+<ul>
+  <li>『<code class="language-plaintext highlighter-rouge">&gt;</code>』: 現在のポインタを右に 1 つ移動する</li>
+  <li>『<code class="language-plaintext highlighter-rouge">&lt;</code>』: 現在のポインタを左に 1 つ移動する</li>
+  <li>『<code class="language-plaintext highlighter-rouge">+</code>』: 現在のポインタの指すメモリの値を 1 つ増加させる</li>
+  <li>『<code class="language-plaintext highlighter-rouge">-</code>』: 現在のポインタの指すメモリの値を 1 つ減少させる</li>
+  <li>『<code class="language-plaintext highlighter-rouge">.</code>』: 現在のポインタの指すメモリの値をアスキーコードとして文字出力する</li>
+  <li>『<code class="language-plaintext highlighter-rouge">,</code>』: 現在のポインタの指すメモリに標準入力から 1 文字入力する（今回は不使用）</li>
+  <li>『<code class="language-plaintext highlighter-rouge">[</code>』: 現在のポインタの指すメモリの値が 0 ならば対応する括弧まで移動する</li>
+  <li>『<code class="language-plaintext highlighter-rouge">]</code>』: 現在のポインタの指すメモリの値が 0 以外ならば対応する括弧の次まで移動する</li>
+</ul>
+
+<p>例えば、A を表示させるためには、A の ASCII CODE が 65 なので、<code class="language-plaintext highlighter-rouge">+++…（65個）…++++.</code> というコードで出力できます。もう少し簡単にすると、65 は 8 * 8 + 1 なので、<code class="language-plaintext highlighter-rouge">++++++++[&gt;++++++++&lt;-]&gt;+.</code> という風にループを使って短く出来ます。</p>
+
+<p>今回は、このような言語があるのだ、という程度に理解してもらえれば問題ありません。詳しい解説は <a href="https://ja.wikipedia.org/wiki/Brainfuck">Wikipedia</a> を参考にしてみてください。<a href="https://en.wikipedia.org/wiki/Brainfuck#Hello_World!">英語版の Wikipedia</a> には Hello World プログラムの解説もあります。</p>
+
+<h2 id="マンデルブロ集合">マンデルブロ集合</h2>
+
+<p>今回実行するのは、<a href="https://github.com/erikdubbelboer/brainfuck-jit/blob/master/mandelbrot.bf">マンデルブロ集合を描画する BF のプログラム</a>です。マンデルブロ集合と呼ばれるフラクタル図形の描画しますが、良い感じに重いためにベンチマーク用に採用しました。</p>
+
+<p><input id="startbutton" type="button" value="実行" onclick="start()" /> 実行ボタンを押すと、今回一番高速だった実装によるマンデルブロ集合の出力結果が得られます。<br />
+<script src="/js/bfCode.js"></script>
+<script>
+const start = function() {
+    document.getElementById('startbutton').disabled = true;
+    document.getElementById('startbutton').value = '実行中';
+    document.getElementById('bf_output').value = '';
+    window.worker = new Worker('/js/wasm-dcc-multi-functions.js');
+    const startTime = Date.now();
+    worker.postMessage(bfCode);
+    worker.onmessage = function (e) {
+        if (e.data) {
+            document.getElementById('bf_output').value += String.fromCharCode(e.data);
+        } else {
+            document.getElementById('bf_output').value += `time: ${(Date.now() - startTime) / 1000} sec.`;
+            document.getElementById('startbutton').value = '再実行';
+            document.getElementById('startbutton').disabled = false;
+            worker.terminate();
+        }
+    };
+};
+</script></p>
+<textarea id="bf_output" rows="50" cols="160" wrap="off" style="width:100%;word-break:keep-all;white-space:pre;font-family:monospace;font-size:8px;line-height:8px;overflow:scroll"></textarea>
+
+<p>この記事の目的は、この<span style="color:#f00">マンデルブロ集合の描画を行う BF のプログラムを、様々な JavaScript や WebAssembly のコードで実行し、そのベンチマークを取ること</span>です。BF の高速な実行が目的ではないのでご了承ください。</p>
+
+<h1 id="実装の紹介">実装の紹介</h1>
+
+<p>今回の実装を簡単に紹介します。ソースコードは <a href="https://github.com/tkihira/dynamic-wasm">github</a> にあるので参考にしてみてください。</p>
+
+<ul>
+  <li><a href="https://github.com/tkihira/dynamic-wasm/blob/main/js-simple.js">JavaScript simple implementation</a>: JavaScript で素直に実装したプログラム</li>
+  <li><a href="https://github.com/tkihira/dynamic-wasm/blob/main/js-dcc.js">JavaScript dynamic-code-creation implementation: single function</a>: 動的に JavaScript を生成するプログラム（単一関数）</li>
+  <li><a href="https://github.com/tkihira/dynamic-wasm/blob/main/js-dcc.js">JavaScript dynamic-code-creation implementation: multiple functions</a>: 動的に JavaScript を生成するプログラム（複数関数）</li>
+  <li><a href="https://github.com/tkihira/dynamic-wasm/blob/main/wasm-simple.wat">WebAssembly simple implementation</a>: WebAssembly で素直に実装したプログラム</li>
+  <li><a href="https://github.com/tkihira/dynamic-wasm/blob/main/wasm-dcc.js">WebAssembly dynamic-code-creation implementation: single function</a>: 動的に WebAssembly を生成するプログラム（単一関数）</li>
+  <li><a href="https://github.com/tkihira/dynamic-wasm/blob/main/wasm-dcc-multi-functions.js">WebAssembly dynamic-code-creation implementation: multiple functions</a>: 動的に WebAssembly を生成するプログラム（複数関数）</li>
+</ul>
+
+<p>ポイントは、</p>
+
+<ul>
+  <li>JavaScript で実行されているか、WebAssembly で実行されているか</li>
+  <li>単純な実装か、動的にプログラムを生成する実装か</li>
+  <li>動的に生成する場合、単一関数にまとめて出力するか、複数関数に分割して出力するか</li>
+</ul>
+
+<p>の違いがあります。</p>
+
+<h2 id="プロファイル結果">プロファイル結果</h2>
+
+<p>それぞれのコードは、<a href="https://dynamic-wasm.vercel.app/">ここで実際に皆さんのブラウザで試していただくことが出来ます</a>。私の環境で実行した結果はこのようになりました。なお実行はすべて Worker で行われており、また一度実行が終わった後にページリロードして再度実行した時の結果を表示しております。あまり正確な計測ではなく、正しく最適化されていない可能性があることをご容赦ください。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>プログラム</th>
+      <th>Chrome</th>
+      <th>Mobile Chrome</th>
+      <th>Firefox</th>
+      <th>Safari</th>
+      <th>Mobile Safari</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1. js-simple</td>
+      <td>172.057 sec.</td>
+      <td>367.725 sec.</td>
+      <td>147.361 sec.</td>
+      <td>117.136 sec.</td>
+      <td>89.155 sec.</td>
+    </tr>
+    <tr>
+      <td>2. js-dcc</td>
+      <td>40.963 sec.</td>
+      <td>283.213 sec.</td>
+      <td>47.105 sec.</td>
+      <td>4.698 sec.</td>
+      <td>4.441 sec.</td>
+    </tr>
+    <tr>
+      <td>3. js-dcc-multi-functions</td>
+      <td>9.988 sec.</td>
+      <td>17.982 sec.</td>
+      <td>17.002 sec.</td>
+      <td>6.79 sec.</td>
+      <td>7.134 sec.</td>
+    </tr>
+    <tr>
+      <td>4. wasm-simple</td>
+      <td>61.784 sec.</td>
+      <td>300.845 sec.</td>
+      <td>79.478 sec.</td>
+      <td>44.982 sec.</td>
+      <td>50.959 sec.</td>
+    </tr>
+    <tr>
+      <td>5. wasm-dcc</td>
+      <td>4.474 sec.</td>
+      <td>10.04 sec.</td>
+      <td>2.489 sec.</td>
+      <td>75.996 sec.</td>
+      <td>61.432 sec.</td>
+    </tr>
+    <tr>
+      <td>6. wasm-dcc-multi-functions</td>
+      <td>3.286 sec.</td>
+      <td>9.427 sec.</td>
+      <td>3.93 sec.</td>
+      <td>2.725 sec.</td>
+      <td>2.126 sec.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>以下では、それぞれのプログラム実装について詳細を説明していきます。</p>
+
+<h2 id="1-javascript-simple-implementationjs-simple">1. JavaScript simple implementation（js-simple）</h2>
+
+<p><a href="https://github.com/tkihira/dynamic-wasm/blob/main/js-simple.js">ソースコード</a> / <a href="https://dynamic-wasm.vercel.app/js-simple.html">実行結果</a></p>
+
+<p>このプログラムは、JavaScript で BF の文字を 1 文字ずつパースし実行していく、一番シンプルな実装です。対応する括弧のジャンプも、そのたびに愚直に計算して求めています。</p>
+
+<p>一切最適化を施していないため、実行結果はその他のプログラムに比べて一番遅くなっており、<span style="color:blue">各プラットフォームで最も速い結果に比べて 30 倍〜50 倍ほど遅くなっています</span>。</p>
+
+<h2 id="2-javascript-dynamic-code-creation-implementation-single-function-js-dcc">2. JavaScript dynamic-code-creation implementation: single function (js-dcc)</h2>
+
+<p><a href="https://github.com/tkihira/dynamic-wasm/blob/main/js-dcc.js">ソースコード</a> / <a href="https://dynamic-wasm.vercel.app/js-dcc.html">実行結果</a></p>
+
+<p>このプログラムは、BF の各記号に対応する JavaScript を直接文字列として追記し、それを <code class="language-plaintext highlighter-rouge">new Function()</code> で関数化させています。無駄な while 文のコストを減らすのみならず、ブラウザの JavaScript の最適化の恩恵をそのまま受けられるなど数多くのメリットが受けられます。<a href="http://nmi.jp/2020-12-20-Make_VM_faster">以前のブログで紹介した方法</a>もこのやり方です。</p>
+
+<p>ちょっと詳しく解説しましょう。例えば BF で <code class="language-plaintext highlighter-rouge">++++++++[&gt;++++++++&lt;-]&gt;+.</code> というプログラムがあった場合、</p>
+
+<ul>
+  <li>まず <code class="language-plaintext highlighter-rouge">let pointer = 0;const memory = new Int32Array(30000);</code> を関数の先頭に置く</li>
+  <li>BF コード中の <code class="language-plaintext highlighter-rouge">+</code> を <code class="language-plaintext highlighter-rouge">memory[pointer]++;</code> に、<code class="language-plaintext highlighter-rouge">[</code> を <code class="language-plaintext highlighter-rouge">while (memory[pointer]) {</code> に、<code class="language-plaintext highlighter-rouge">&gt;</code> を <code class="language-plaintext highlighter-rouge">pointer++;</code> に、というようにそれぞれ変換していく</li>
+  <li>最後に <code class="language-plaintext highlighter-rouge">output(null);</code> を追加する（コードが終了したことを main thread に通知する）</li>
+</ul>
+
+<p>という処理をすることにより、最終的に（少し整形しましたが）</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">pointer</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">memory</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Int32Array</span><span class="p">(</span><span class="mi">30000</span><span class="p">);</span>
+<span class="nx">memory</span><span class="p">[</span><span class="nx">pointer</span><span class="p">]</span><span class="o">++</span><span class="p">;</span> <span class="nx">memory</span><span class="p">[</span><span class="nx">pointer</span><span class="p">]</span><span class="o">++</span><span class="p">;</span> <span class="nx">memory</span><span class="p">[</span><span class="nx">pointer</span><span class="p">]</span><span class="o">++</span><span class="p">;</span> <span class="nx">memory</span><span class="p">[</span><span class="nx">pointer</span><span class="p">]</span><span class="o">++</span><span class="p">;</span>
+<span class="nx">memory</span><span class="p">[</span><span class="nx">pointer</span><span class="p">]</span><span class="o">++</span><span class="p">;</span> <span class="nx">memory</span><span class="p">[</span><span class="nx">pointer</span><span class="p">]</span><span class="o">++</span><span class="p">;</span> <span class="nx">memory</span><span class="p">[</span><span class="nx">pointer</span><span class="p">]</span><span class="o">++</span><span class="p">;</span> <span class="nx">memory</span><span class="p">[</span><span class="nx">pointer</span><span class="p">]</span><span class="o">++</span><span class="p">;</span>
+<span class="k">while </span><span class="p">(</span><span class="nx">memory</span><span class="p">[</span><span class="nx">pointer</span><span class="p">])</span> <span class="p">{</span>
+    <span class="nx">pointer</span><span class="o">++</span><span class="p">;</span>
+    <span class="nx">memory</span><span class="p">[</span><span class="nx">pointer</span><span class="p">]</span><span class="o">++</span><span class="p">;</span> <span class="nx">memory</span><span class="p">[</span><span class="nx">pointer</span><span class="p">]</span><span class="o">++</span><span class="p">;</span> <span class="nx">memory</span><span class="p">[</span><span class="nx">pointer</span><span class="p">]</span><span class="o">++</span><span class="p">;</span> <span class="nx">memory</span><span class="p">[</span><span class="nx">pointer</span><span class="p">]</span><span class="o">++</span><span class="p">;</span>
+    <span class="nx">memory</span><span class="p">[</span><span class="nx">pointer</span><span class="p">]</span><span class="o">++</span><span class="p">;</span> <span class="nx">memory</span><span class="p">[</span><span class="nx">pointer</span><span class="p">]</span><span class="o">++</span><span class="p">;</span> <span class="nx">memory</span><span class="p">[</span><span class="nx">pointer</span><span class="p">]</span><span class="o">++</span><span class="p">;</span> <span class="nx">memory</span><span class="p">[</span><span class="nx">pointer</span><span class="p">]</span><span class="o">++</span><span class="p">;</span>
+    <span class="nx">pointer</span><span class="o">--</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nx">pointer</span><span class="o">++</span><span class="p">;</span>
+<span class="nx">memory</span><span class="p">[</span><span class="nx">pointer</span><span class="p">]</span><span class="o">++</span><span class="p">;</span>
+<span class="nf">output</span><span class="p">(</span><span class="nx">memory</span><span class="p">[</span><span class="nx">pointer</span><span class="p">]);</span>
+<span class="nf">output</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>という文字列を作り出します。これを <code class="language-plaintext highlighter-rouge">new Function()</code> で関数化して実行することで、BF のコードが実行される仕組みです。</p>
+
+<p>この方法は、シンプルな方法に比べると、数倍程度の大幅な高速化が期待出来ます（Mobile Chrome でも影響が小さいながらもしっかり効果は出ています）。特に Safari の場合は、巨大な関数でも問題なく最適化が適用されたようで、30 倍〜50 倍ほどの高速化が達成出来ました。</p>
+
+<h2 id="3-javascript-dynamic-code-creation-implementation-multiple-functions-js-dcc-multi-functions">3. JavaScript dynamic-code-creation implementation: multiple functions (js-dcc-multi-functions)</h2>
+
+<p><a href="https://github.com/tkihira/dynamic-wasm/blob/main/js-dcc-multi-functions.js">ソースコード</a> / <a href="https://dynamic-wasm.vercel.app/js-dcc-multi-functions.html">実行結果</a></p>
+
+<p>このプログラムは、BF の各記号に対応する JavaScript を直接文字列として追記し、それを <code class="language-plaintext highlighter-rouge">new Function()</code> で関数化させているところまでは js-dcc と同じなのですが、『<code class="language-plaintext highlighter-rouge">[</code>』と『<code class="language-plaintext highlighter-rouge">]</code>』が登場するたびに、その中身を別関数に分離して出力しています。今回のマンデルブロ集合のプログラムには 686 個の 『<code class="language-plaintext highlighter-rouge">[</code>』が存在するため、結果として 686 個 + 2 個（ベース関数）の計 688 個の関数に分割しています。</p>
+
+<p>js-dcc の場合は 129,014 byte もの巨大な単一関数であったのを複数の関数に分割したことで、ブラウザの JavaScript 最適化が効きやすくなっています。Safari の場合は単一関数で十分に最適化が効いていたので遅くなっていますが、Chrome においては js-dcc に比べても 5 倍〜15 倍ほどの顕著な速度差が出ています。</p>
+
+<h2 id="4-webassembly-simple-implementation-wasm-simple">4. WebAssembly simple implementation (wasm-simple)</h2>
+
+<p><a href="https://github.com/tkihira/dynamic-wasm/blob/main/wasm-simple.wat">ソースコード</a> / <a href="https://dynamic-wasm.vercel.app/wasm-simple.html">実行結果</a></p>
+
+<p>このプログラムは、WebAssembly で BF の文字を 1 文字ずつパースし実行する実装で、js-simple とほぼ同じ構造を意識した wasm 移植です。wat と呼ばれる wasm のテキストフォーマットで記述し、<a href="https://github.com/WebAssembly/wabt">wabt の wat2wasm</a> で wasm 化しています。いわばアセンブリ言語を直書きしているようなもので、正直この規模のプログラムでも結構きつかったです。人の手で書くものではないですね。</p>
+
+<p>どのプラットフォームにおいても、<span style="color:blue">JavaScript の同様の実装（js-simple）と比べると 2 〜 3 倍程度速くなっています</span>（Mobiel Chrome を除く）が、一方で<span style="color:blue">工夫された JavaScript の実装（js-dcc）よりは遅い</span>ことが読み取れます。今回の例は WebAssembly に有利なサンプルではありますが、<span style="color:red">JavaScript を単純に wasm に移植するだけでも数倍程度の高速化が期待出来る</span>かもしれません。</p>
+
+<h2 id="5-webassembly-dynamic-code-creation-implementation-single-function-wasm-dcc">5. WebAssembly dynamic-code-creation implementation: single function (wasm-dcc)</h2>
+
+<p><a href="https://github.com/tkihira/dynamic-wasm/blob/main/wasm-dcc.js">ソースコード</a> / <a href="https://dynamic-wasm.vercel.app/wasm-dcc.html">実行結果</a></p>
+
+<p>このプログラムは、BF の各記号に対応する WebAssembly を直接<span style="color:blue">バイナリ</span>として生成し、それを <code class="language-plaintext highlighter-rouge">WebAssembly.instantiate()</code> で関数化させています。生成される関数は、1 つの巨大な wasm 関数になります。js-dcc を純粋に WebAssembly に適用したものになります。まさか 2022 年にもなってハンドアセンブルすることになるとは思わず、新鮮な体験が出来ました。もしあなたが似たようなことをやりたいと思うならば、<a href="https://github.com/AssemblyScript/binaryen.js/">binaryen.js</a> などを使うことを強くオススメします。</p>
+
+<p>このプログラムの結果は、Chrome と Firefox では（Mobile Chrome を含めて）爆速であったのに引き換え、<span style="color:blue">Safari では単純な実装よりもむしろ大幅に遅くなってしまっています</span>。この結果から、Safari では最適化が効いていないであろうことが推測されます。この実装で出力される単一関数の Function Body は 88,566 bytes あり、これが最適化を阻害していることが予想されたため、別の実装を用意して比較してみました。</p>
+
+<h2 id="6-webassembly-dynamic-code-creation-implementation-multiple-functions-wasm-dcc-multi-functions">6. WebAssembly dynamic-code-creation implementation: multiple functions (wasm-dcc-multi-functions)</h2>
+
+<p><a href="https://github.com/tkihira/dynamic-wasm/blob/main/wasm-dcc-multi-functions.js">ソースコード</a> / <a href="https://dynamic-wasm.vercel.app/wasm-dcc-multi-functions.html">実行結果</a></p>
+
+<p>このプログラムは、BF の各記号に対応する WebAssembly を直接<span style="color:blue">バイナリ</span>として生成し、それを <code class="language-plaintext highlighter-rouge">WebAssembly.instantiate()</code> で関数化させている所までは wasm-dcc と同じなのですが、『<code class="language-plaintext highlighter-rouge">[</code>』と『<code class="language-plaintext highlighter-rouge">]</code>』が登場するたびに、その中身を別関数に分離して出力しています。今回のマンデルブロ集合のプログラムには 686 個の 『<code class="language-plaintext highlighter-rouge">[</code>』が存在するため、結果として 686 個 + 2 個（ベース関数）の計 688 個の関数に分割しています。これもハンドアセンブルしましたが、このソースコードには各バイトがどういう意味を持つのかコメントをしっかり書いたので、wasm のバイナリ形式に興味のある方は是非目を通してみてください。</p>
+
+<p>このプログラムは、<span style="color:red">ほぼすべてのプラットフォームにおいて最速の結果を達成しました</span>。wasm-dcc で非常に遅かった Safari でもしっかり最適化が効いて爆速になっていることが確認出来ます。Firefox においては wasm-dcc の段階で最適化が完全に適用されていたために遅くなりましたが、それでも他の実装に比べれば圧倒的なスピードを達成しています。</p>
+
+<h1 id="知見ノウハウ">知見・ノウハウ</h1>
+
+<p>今回の wasm 動的生成で得られた知見やノウハウについて共有します。</p>
+
+<h2 id="webassembly-は純粋な計算能力では-javascript-の数倍速い">WebAssembly は、純粋な計算能力では JavaScript の数倍速い</h2>
+
+<p>WebAssembly を単純に導入するだけでも、それぞれ数倍程度の効果が上がっていることが確認出来ます。JavaScript で重い計算処理に WebAssembly を導入するのは、実行速度だけに注目すれば失敗しない可能性が高い、かもしれません。</p>
+
+<p>ただ、私はこの結論に対して懐疑的です。いかに今回のテストが WebAssembly に有利であったとはいえども、JavaScript と WebAssembly の差は数倍まで大きくつくことがないのではないか、という直感があります。具体的に JavaScript と wasm それぞれにどのような JIT が適用され、どのようなマシンコードが出力された結果速度差が出ているのか、ということについては後日改めて調査したいと思っています。</p>
+
+<h2 id="最適化のかかり方によって結果は大きく異なる">最適化のかかり方によって結果は大きく異なる</h2>
+
+<p>今回のように JavaScript や WebAssembly のコードを自動生成するときには、出力されるコードは一般的なコードの特性と大きく違うことが多く、今回のように最適化がうまく適用されないことが多いです。自動生成の出力コードが普段我々が書くコードに近づくように意識すると良いかもしれません。</p>
+
+<p>なお自動生成された巨大な単一関数を複数の関数に分割するテクニックは、今回に限らず様々なトラブルで効果が期待できるテクニックですので、コードの自動生成で問題に直面した時のために記憶の片隅に置いておくと良いでしょう。</p>
+
+<h2 id="webassembly-の最適化は少し予測しづらい">WebAssembly の最適化は少し予測しづらい</h2>
+
+<p>JavaScript においてどのようなコードに最適化がかかりやすいかについてはある程度の勘所を持っている方も多いと思いますが、WebAssembly における最適化の勘所は中々難しそうだという認識を持っています（ここでいう最適化は WebAssembly のバイトコード自体にかかる最適化の話であり、その前のコンパイラのフロントエンド・バックエンドで入る最適化とは別の話であることにご注意ください）。Chrome や Safari といったプラットフォームによって最適化の傾向は大きく異なるので、そこも難しい点です。</p>
+
+<h2 id="webassembly-の実行はchrome-において-devtools-を開くだけで遅くなる">WebAssembly の実行は、Chrome において DevTools を開くだけで遅くなる</h2>
+
+<p>Chrome において、DevTools をただ開くと wasm の実行が極めて遅くなる現象が確認されております。これは<a href="https://v8.dev/docs/wasm-compilation-pipeline#debugging">バグではなくて仕様</a>なのですが、結構複雑な仕様で、</p>
+
+<ul>
+  <li>DevTools を開くと TurboFan の最適化がキャンセルされて遅くなる</li>
+  <li>しかし Profile タブで Profile を取るときには再度 TurboFan の最適化が適用される</li>
+</ul>
+
+<p>という挙動になっております。<span style="color:red">Chrome では、ただ DevTools を開いているだけで wasm の実行がかなり遅くなります。大変気づきにくいトリガーなので、wasm 系の開発をされる時にはお気をつけください</span>。</p>
+
+<h2 id="safari-において-worker-の-gc-判定にバグがありたまに突然止まる">Safari において Worker の GC 判定にバグがあり、たまに突然止まる</h2>
+
+<p>これは WebAssembly の話ではないのですが、今回の実装中に再現方法を見つけたバグであることと、今まで WebAssembly を利用しているときに頻繁に遭遇したバグであるということもあり、ここでも共有します。</p>
+
+<p>現行の Safari では、Worker それ自体が起動し handler が設定されていたとしても、Worker の参照が root から辿れない場合には GC されてしまうバグがあります。実際に<a href="https://dynamic-wasm-6128yfdg3-tkihira.vercel.app/worker-stall.html">こちらのページから試していただけます</a>が、PC もしくは iOS の Safari（15 以前）でアクセスすると一部の Worker が高確率で止まることが確認できるかと思います。タイミングバグでもあるので、発生しないこともあるかもしれません。</p>
+
+<p>Worker がいきなり止まってしまうバグに遭遇された方は、とりあえずは window.worker みたいなプロパティに代入することで回避出来るかと思います。既に <a href="https://bugs.webkit.org/show_bug.cgi?id=240062">WebKit の Bugzilla に報告しております</a>ので近々修正されると思いますが、現状で困っている方はこの workaround をご利用ください。</p>
+
+<h1 id="まとめ">まとめ</h1>
+
+<p>今回のような JavaScript / WebAssembly の動的生成技術は、言語のランタイムを JavaScript で実装する方にとっては有用な情報になり得ます。今回は触れませんでしたが、動的に生成する際にさらなる最適化が可能であることも多く（今回の場合は、例えば複数の記号をまとめるとか、<code class="language-plaintext highlighter-rouge">[-]</code> のような典型的な処理を専用出力に置換するとか（実はこれらは既に最適化が十分効いているために効果が薄いのですが））、動的なコード生成は可能性の広い技術です。私も以前 Flash Player Runtime を JavaScript 上で実装した時に、この動的生成を利用することによって大幅な高速化を実現しました。今でも例えばゲーム等のスクリプトの高速処理などには、かなりの応用が出来るのではないかと思います。</p>
+
+<p>なお wasm を生成することによる BF の高速実装については、<a href="https://github.com/Quantaly/bf2wasm">こちらのプロジェクト</a>が参考になるかと思います。<a href="https://twitter.com/ko_noike">@ko_noike</a>さんに教えてもらいました。ありがとうございます！Rust で実装して wasm 化というのは筋が良さそうですね。</p>
+
+<p>WebAssembly は、ブラウザの API の中でも WebGL と並ぶ低レイヤーな技術であり、その適用範囲はまだまだ開拓しつくされていないでしょう。皆さんも、是非とも色々なアイデアを wasm のバイナリに落とし込んで楽しんでみてください。</p>
+
+        </article>
+        <hr>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/2022-05-14-Dynamically-created-WebAssembly&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="WebAssembly を動的生成した場合のパフォーマンスについて" data-url="http://nmi.jp/2022-05-14-Dynamically-created-WebAssembly">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/2022-05-14-Dynamically-created-WebAssembly" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="WebAssembly を動的生成した場合のパフォーマンスについて"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="WebAssembly を動的生成した場合のパフォーマンスについて" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+
+        
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+        
+
+        <div class="post-recent">
+    <div class="pre">
+
+    
+        <p><strong>前の投稿</strong> <a href="/2022-02-18-Understanding-ReDoS">正規表現の脆弱性 (ReDoS) を JavaScript で学ぶ</a></p>
+    
+    </div>
+    <div class="nex">
+
+        
+        <p><strong>次の投稿</strong> <a href="/2022-08-01-Becoming-YouTuber">YouTube チャンネル「ニコニコプログラミング」を開設しました</a></p>
+        
+    </div>
+</div>
+
+
+    </div>
+    <button class="anchor"><i class="fa fa-anchor"></i></button>
+
+
+    <div class="right">
+        <div class="wrap">
+            <div class="side">
+                <div>
+                    <i class="fa fa-tags"></i>
+                    Top Popular Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2016-07-23-stock-strategy-for-early-startup-employee">スタートアップに転職する時に最低限知っておくべき株の話</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/582">生WebGL入門:初音ミクの美麗3Dモデルを表示する(前編)</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2017-10-06-Making_a-business_plan">事業計画書の作り方、新規ビジネスの考え方</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/902">Convertible Note / Convertible Equity とは？</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/488">JavaScript イディオム集</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/465">ExGameの製作で感じたこと</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                </ul>
+            </div>
+
+            <div class="side">
+                <div>
+                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                    Recent Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        <li><a href="/2024-08-28-Review-Binary-Hacks-Rebooted">書評 "Binary Hacks Rebooted"</a></li>
+                    
+                        <li><a href="/2024-06-10-Deep-Dive-into-ARM-JavaScript-Special-Instruction-FJCVTZS">ARM に存在する JavaScript 専用命令「FJCVTZS」を追う（ついでに V8 をビルドする）</a></li>
+                    
+                        <li><a href="/2024-06-03-Exploring-V8-JIT-Outputs">JavaScript 実行エンジン V8 の JIT 出力コードを読んでみよう</a></li>
+                    
+                </ul>
+            </div>
+
+            <!-- <div class="side">
+                <div>
+                    <i class="fa fa-external-link"></i>
+                    Links
+                </div>
+                <ul  class="content-ul">
+
+                </ul>
+            </div> -->
+        </div>
+    </div>
+
+
+
+</div>
+<script>
+/**
+ * target _blank
+ */
+(function() {
+    var aTags = document.querySelectorAll('article a:not([id])')
+    for (var i = 0; i < aTags.length; i++) {
+        aTags[i].setAttribute('target', '_blank')
+    }
+}());
+</script>
+<script src="/js/pageContent.js " charset="utf-8"></script>
+
+
+    <footer class="site-footer">
+
+
+    <div class="wrapper">
+
+        <p class="description">
+             Takuo Kihira 
+        </p>
+        <p class="contact">
+            Contact me at: 
+            <a href="https://github.com/tkihira" title="GitHub"><i class="fa fa-github" aria-hidden="true"></i></a>     
+            <a href="https://twitter.com/tkihira" title="Twitter"><i class="fa fa-twitter" aria-hidden="true"></i></a>  
+            <a href="https://www.facebook.com/takuo.kihira" title="Facebook"><i class="fa fa-facebook-official" aria-hidden="true"></i></a>    
+        </p>
+        <p class="power">
+            <span>
+                Site powered by <a href="https://jekyllrb.com/">Jekyll</a>.
+            </span>
+            <span>
+                Theme designed by <a href="https://github.com/Gaohaoyang">HyG</a>.
+            </span>
+        </p>
+    </div>
+</footer>
+
+    <div class="back-to-top">
+    <a href="#top" class="scroll">
+        <i class="fa fa-arrow-up" aria-hidden="true"></i>
+    </a>
+</div>
+
+    <script src=" /js/main.js " charset="utf-8"></script>
+    <script src=" /js/scroll.min.js " charset="utf-8"></script>
+  </body>
+
+</html>

@@ -1,0 +1,1641 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>知られざる globalCompositeOperation テクニック</title>
+    <meta name="description" content="この記事は、JavaScript で Flash Player の実現を頑張った（もしくは現在進行系で頑張っている）人たちの集う Flash Advent Calendar 2020 に参加しております。HTML5 の Canvas はかなりの機能を有しております。Flash Player の実装にあたってこれら...">
+
+    <link rel="stylesheet" href=" /css/fontawesome/css/font-awesome.min.css ">
+    <link rel="stylesheet" href=" /css/main.css ">
+    <link rel="canonical" href="http://nmi.jp/2020-12-17-globalCompositeOperation">
+    <link rel="alternate" type="application/rss+xml" title="nmi.jp" href="http://nmi.jp/feed.xml">
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=3.0'></script>
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=1.1'></script>
+    <script>
+        if(location.href.match(/\.html$/)) {
+            location.href = location.href.match(/(.+)\.html/)[1];
+        }
+    </script>
+
+
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-229769-8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-229769-8');
+</script>
+</head>
+
+
+  <body>
+
+    <header id="top">
+    <div class="wrapper">
+        <a href="/" class="brand">nmi.jp</a>
+        <small>Twitter → <a href="https://twitter.com/tkihira" target="_blank">@tkihira</a></small>
+        <button id="headerMenu" class="menu"><i class="fa fa-bars"></i></button>
+        <nav id="headerNav">
+            <ul>
+                <li>
+                    
+                    <a href="/">
+                    
+                        <i class="fa fa-home"></i>Home
+                    </a>
+                </li>
+
+                
+                    
+                    <li>
+                        
+                        <a href="/archive/">
+                        
+                            <i class="fa fa-archive"></i>Archives
+                        </a>
+                    </li>
+                    
+                
+                    
+                    <li>
+                        
+                        <a href="/category/">
+                        
+                            <i class="fa fa-th-list"></i>Categories
+                        </a>
+                    </li>
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            </ul>
+        </nav>
+    </div>
+</header>
+
+
+        <div class="page clearfix" post>
+    <div class="left">
+        <div class="post-recent">
+    <table style="width:100%;border:0;padding:0;"><tbody><tr style="padding:0">
+        <td class="toppre" style="padding:0">
+        
+        <a href="/2020-03-30-Pomodoro">リモートワーク・テクニック「紀平式ポモドーロ」の紹介</a>
+        
+        </td><td class="topnex" style="text-align:right;padding:0">
+        
+        <a href="/2020-12-20-Make_VM_faster">JavaScript における VM の高速化手法</a>
+        
+        </td>
+    </tr></tbody></table>
+</div>
+
+        <hr style="margin:0"/>
+        <h1 style="margin-top:10px">知られざる globalCompositeOperation テクニック</h1>
+<hr />
+        <div class="label">
+
+            <div class="label-card">
+                <i class="fa fa-calendar"></i>2020-12-17
+            </div>
+
+            <div class="label-card">
+                <i class="fa fa-user"></i>Takuo Kihira
+                
+            </div>
+
+            <div class="label-card">
+                
+            </div>
+
+            <div class="label-card">
+            
+
+
+<!-- <span class="point">•</span> -->
+<span class="categories">
+  <i class="fa fa-th-list"></i>
+  
+    
+        <a href="/category/#HTML5" title="Category: HTML5" rel="category">HTML5</a>&nbsp;
+    
+        <a href="/category/#Canvas" title="Category: Canvas" rel="category">Canvas</a>&nbsp;
+    
+        <a href="/category/#JavaScript" title="Category: JavaScript" rel="category">JavaScript</a>
+    
+  
+
+  <!-- <span class="point">•</span> -->
+</span>
+
+
+            </div>
+
+            <div class="label-card">
+                <a href="https://github.com/tkihira/nmi.jp/blob/master/_posts/2020-12-17-globalCompositeOperation.md" target="_blank"><i class="fa fa-github"></i></a>
+            </div>
+
+        </div>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/2020-12-17-globalCompositeOperation&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="知られざる globalCompositeOperation テクニック" data-url="http://nmi.jp/2020-12-17-globalCompositeOperation">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/2020-12-17-globalCompositeOperation" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="知られざる globalCompositeOperation テクニック"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="知られざる globalCompositeOperation テクニック" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+        <article itemscope itemtype="http://schema.org/BlogPosting">
+        <p>この記事は、JavaScript で Flash Player の実現を頑張った（もしくは現在進行系で頑張っている）人たちの集う <a href="https://qiita.com/advent-calendar/2020/flash">Flash Advent Calendar 2020</a> に参加しております。</p>
+
+<p>HTML5 の Canvas はかなりの機能を有しております。Flash Player の実装にあたってこれらの豊富な Canvas の機能は大変有用なのですが、そんな中でも <code class="language-plaintext highlighter-rouge">globalCompositeOperation</code> というマイナー機能の活用方法は、今の時代でも十分に応用が効く知識です。Flash 終了への手向けとして、ここにその機能の素晴らしさと有効利用の方法を改めて紹介致します。</p>
+
+<h1 id="html5-canvas-の-globalcompositeoperation-とは">HTML5 (canvas) の globalCompositeOperation とは</h1>
+
+<p>一言で言うと、<code class="language-plaintext highlighter-rouge">globalCompositeOperation</code> は <code class="language-plaintext highlighter-rouge">Composite</code> すなわち合成方法の指定になります。</p>
+
+<p>Canvas に何かを描画する時、デフォルトでは普通に上書きされるのですが、<code class="language-plaintext highlighter-rouge">globalCompositeOperation</code> を指定している時はその効果が適用されます。 <code class="language-plaintext highlighter-rouge">globalCompositeOperation</code> は <code class="language-plaintext highlighter-rouge">globalAlpha</code> と同じように、Canvas におけるすべての描画命令に対して強制的に適用される効果を持ちます。たとえば</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">ctx</span><span class="p">.</span><span class="nx">globalAlpha</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>と書くと全ての描画において alpha 値 0.3 が強制的に適用されるのですが、同じ様に例えば</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">ctx</span><span class="p">.</span><span class="nx">globalCompositeOperation</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">source-atop</span><span class="dl">'</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>と指定すると、「既に描画されている場所にのみ上書きされる」という効果を得ることが出来ます。</p>
+
+<p><img src="/img/globalCompositeOperation.png" alt="globalCompositeOperation の例" /></p>
+
+<p>MDN の <a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation">CanvasRenderingContext2D.globalCompositeOperation</a> を見ると、具体的な利用方法が描画結果つきで確認出来ます。もしご存知なければ、軽く目を通してみてください。</p>
+
+<p>これだけを見ると、これがいかに強力な機能なのかがおわかりにはならないと思います。強いてあげれば「Flash でクリッピングマスクを行う時に、<code class="language-plaintext highlighter-rouge">source-atop</code> などを使うと便利そうだね」程度でしょうか（実際の Flash の clipping は非常に複雑で、<code class="language-plaintext highlighter-rouge">source-atop</code> でカバーするにはあまりに大変ですし、そもそも Canvas には <a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/clip">clip</a> というそのものズバリの機能があるのでこれを使いますが）。</p>
+
+<h1 id="flash-player-の-addcolor">Flash Player の addColor</h1>
+
+<p>さて、Flash Player には Canvas 泣かせの機能が山程あるのですが、その中で最も使用頻度が高い機能のひとつが <code class="language-plaintext highlighter-rouge">addColor</code> もしくは <code class="language-plaintext highlighter-rouge">subColor</code> です。何かシェイプ（もしくはムービークリップ）を描画する時に、RGB の足し算をして描画する、という機能です。例えば <code class="language-plaintext highlighter-rouge">addColor</code> が (60,30,0) が指定されている場合、そのシェイプの元々の色が (90, 150, 80) であった場合、期待される出力は (150, 180, 80) になるわけです。（本質ではないので、この記事では 255 を超えた場合は 255 みたいな境界条件はとりあえず無視します）</p>
+
+<p>さてこれを Canvas で実装しようとすると、恐ろしく難しいことがわかります。シェイプの色が全体で一律に決まっていればいいのですが、実際はグラデーションあり、画像あり、半透明あり、と一律な色を想定することは全く出来ません。なので、素直に実現しようとすると、<code class="language-plaintext highlighter-rouge">addColor</code> が指定されている場合はピクセルデータを <a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/getImageData">getImageData</a> で取得し、ピクセルごとに足し算引き算を行い、その結果を <a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/putImageData">putImageData</a> で描画することになるでしょう。</p>
+
+<p>しかしご存知の通り、<code class="language-plaintext highlighter-rouge">getImageData</code> ならびに <code class="language-plaintext highlighter-rouge">putImageData</code> は物凄く重いのです。そして不幸なことに、<code class="language-plaintext highlighter-rouge">addColor</code> は使用頻度が高く、ここの処理が重いと全体のパフォーマンスに大きな影響を与えてしまいます。私が HTML5 の Flash Player エンジン「ExGame」の最初のバージョンを作成したのはちょうど 10 年前、2010 年の 11 月でした。当時は iPhone 3GS が最先端であり、Canvas の描画速度も物凄く遅かったのです。当時、ここは何としても高速化が必要でした。</p>
+
+<p>ちなみに当時、当然ながら WebGL は使えませんでした。</p>
+
+<h1 id="globalcompositeoperation-の仕様">globalCompositeOperation の仕様</h1>
+
+<p>結論から言うと、<code class="language-plaintext highlighter-rouge">lighter</code> と <code class="language-plaintext highlighter-rouge">difference</code>（当時は <code class="language-plaintext highlighter-rouge">darker</code> という名前でした）を使うことによって<span style="color:red">この処理を超高速に実現することが可能になり、それにより数多くの Flash が爆速で動くようになりました</span>。具体的にどのように色の足し算・引き算を実現したか、ここで解説します。</p>
+
+<p>W3C の <a href="https://www.w3.org/TR/compositing-1/">Compositeing and Blending Level 1</a> という仕様書がキーになります（余談ですが開発当時はこんな便利な資料がなかったので、ブラウザのソースコードを読んで実装を学んでいました。<a href="http://blog.fchiba.net/archives/172477.html">当時の同僚の資料</a>が全部リンク切れなのが切ない）。知識がないと読むのが大変だと思いますので、簡単にキーポイントをご説明します。</p>
+
+<p>まず <a href="https://www.w3.org/TR/compositing-1/#porterduffcompositingoperators">9.1章</a> で説明されているように、<code class="language-plaintext highlighter-rouge">globalCompositeOperation</code> の各オペレーションの内容は数式にて定義することが可能です。</p>
+
+<ul>
+  <li>最終的なアウトプットの色を <code class="language-plaintext highlighter-rouge">co</code> (Color Output)</li>
+  <li>最終的なアウトプットのα値を <code class="language-plaintext highlighter-rouge">αo</code> (Alpha Output)</li>
+  <li>今から描画する色を <code class="language-plaintext highlighter-rouge">Cs</code> (Color Source)</li>
+  <li>今から描画するα値を <code class="language-plaintext highlighter-rouge">αs</code> (Alpha Source)</li>
+  <li>既に描画されている色を <code class="language-plaintext highlighter-rouge">Cb</code> (Color Background)</li>
+  <li>既に描画されているα値を <code class="language-plaintext highlighter-rouge">αb</code> (Alpha Background)</li>
+  <li>描画の割合を示す定数 <code class="language-plaintext highlighter-rouge">Fa</code> と <code class="language-plaintext highlighter-rouge">Fb</code></li>
+</ul>
+
+<p>これらのうち、<code class="language-plaintext highlighter-rouge">Cs</code>, <code class="language-plaintext highlighter-rouge">αs</code>, <code class="language-plaintext highlighter-rouge">Cb</code>, <code class="language-plaintext highlighter-rouge">αb</code> は描画時の Canvas に描かれているデータが入力となり、<code class="language-plaintext highlighter-rouge">Fa</code> <code class="language-plaintext highlighter-rouge">Fb</code> はオペレーションによって定義されます。アウトプットの <code class="language-plaintext highlighter-rouge">co</code> <code class="language-plaintext highlighter-rouge">αo</code> については、</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>co = αs * Fa * Cs + αb * Fb * Cb
+αo = αs * Fa + αb * Fb
+</code></pre></div></div>
+
+<p>で決まります。要するに、 <code class="language-plaintext highlighter-rouge">Fa</code> <code class="language-plaintext highlighter-rouge">Fb</code> が各オペレーションの実際の処理を内包します。</p>
+
+<p>デフォルトの <a href="https://www.w3.org/TR/compositing-1/#porterduffcompositingoperators_srcover">Source Over</a> を見てみましょう。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Fa = 1; Fb = 1 – αs
+</code></pre></div></div>
+
+<p>これを上記の式に代入して、</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>co = αs * Cs + αb * Cb * (1 – αs)
+αo = αs + αb * (1 – αs)
+</code></pre></div></div>
+
+<p>が得られます。これが、実際に <code class="language-plaintext highlighter-rouge">globalCompositeOperation</code> で実現されている効果として表れてくるのです。</p>
+
+<h1 id="globalcompositeoperation-を使った色の足し算">globalCompositeOperation を使った色の足し算</h1>
+
+<p>やっと本題に入りますが、（とりあえず α を無視して）<code class="language-plaintext highlighter-rouge">globalCompositeOperation</code> で色の足し算をしたい場合、</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>co = Cs + Cb
+</code></pre></div></div>
+
+<p>にて得ることが出来ます。なんと標準の仕様では、これが <a href="https://www.w3.org/TR/compositing-1/#porterduffcompositingoperators_plus">Lighter</a> として定義されています。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Fa = 1; Fb = 1
+co = αs * Cs + αb * Cb;
+αo = αs + αb
+</code></pre></div></div>
+
+<p>これで αs と αb が共に 1 であれば、<code class="language-plaintext highlighter-rouge">globalCompositeOperation</code> を使って色の足し算が出来るのです！</p>
+
+<p>例えばとあるシェイプ（もしくはムービークリップ）をある canvas に書いているとして、その canvas に <code class="language-plaintext highlighter-rouge">addColor(10,50,100)</code> という描画をしたい場合、</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">canvas</span> <span class="o">=</span> <span class="nf">getShapeOrMovieClipCanvas</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">ctx</span> <span class="o">=</span> <span class="nx">canvas</span><span class="p">.</span><span class="nf">getContext</span><span class="p">(</span><span class="dl">'</span><span class="s1">2d</span><span class="dl">'</span><span class="p">);</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">globalCompositeOperation</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">lighter</span><span class="dl">'</span><span class="p">;</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">fillStyle</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">rgb(10,50,100)</span><span class="dl">'</span><span class="p">;</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nf">fillRect</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">canvas</span><span class="p">.</span><span class="nx">width</span><span class="p">,</span> <span class="nx">canvas</span><span class="p">.</span><span class="nx">height</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>という形で実現することが出来るのです。</p>
+
+<p>色の引き算は <code class="language-plaintext highlighter-rouge">difference</code> を利用して実現するのですが、少し複雑になるのでここでは説明を省略します。ExGame の後継である <a href="https://github.com/PexJS/PexJS/blob/master/src/renderer/util_render.js#L313-L370">Pex.js の実際のソースコードを</a> github にて見ることが出来るので、興味のある方はご参照ください。</p>
+
+<h1 id="現代の応用方法">現代の応用方法</h1>
+
+<p>近年は WebGL が使えるようになったので、このような処理は自分でシェーダーを書いて簡単に実現出来るようになりました。素晴らしい…。しかしそれでもなお、これらの技術は利用価値があります。</p>
+
+<p>私が今年作った <a href="https://bp.game5.app/">Block Pong</a> というゲームがあるのですが、このゲーム内部でも <code class="language-plaintext highlighter-rouge">globalCompositeOperation</code> を使ったテクニックを活用しています。実際にゲームを遊んで頂ければおわかりになると思いますが、このゲームの画面全体には blur 効果（いわゆるフィードバックブラー）をかけており、それが球の軌跡を綺麗に見せてくれております。</p>
+
+<p><img src="/img/block_pong.png" alt="Block Pong のスクショ" /></p>
+
+<p>これを実現するのは簡単で、レンダリングの先頭で</p>
+
+<ul>
+  <li>現在の Canvas の内容を保存する</li>
+  <li>現在の Canvas をクリアする</li>
+  <li>先程保存した内容を Canvas に <code class="language-plaintext highlighter-rouge">globalAlpha = 0.9</code> くらいで描画する</li>
+  <li>残りのレンダリング処理をする</li>
+</ul>
+
+<p>という処理を入れるだけです。</p>
+
+<p>しかしこれをやると、</p>
+
+<ul>
+  <li>Canvas を毎回メモリに退避する必要があるが、最近は devicePixelRatio &gt;= 3 の端末も増えてきて、結構メモリを圧迫するので出来ればやりたくない</li>
+  <li>その巨大な Canvas を毎フレーム <code class="language-plaintext highlighter-rouge">drawImage</code> してやらないといけないが、端末によってはその処理が結構重い</li>
+</ul>
+
+<p>という問題がありました。</p>
+
+<p>そこで、<code class="language-plaintext highlighter-rouge">globalCompositeOperation</code> の登場です。上記の処理は、結局の所「ピクセル全体の色を 0.9 で掛けたい」というだけの話なのです。既存の Canvas の API を使うと、どうしても α 値だけを書き換えることは出来ないのですが、<code class="language-plaintext highlighter-rouge">globalCompositeOperation</code> を使えば可能です。この場合は <code class="language-plaintext highlighter-rouge">destination-in</code> を利用します。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">ctx</span><span class="p">.</span><span class="nx">globalCompositeOperation</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">destination-in</span><span class="dl">'</span><span class="p">;</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nx">fillStyle</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">rgba(255, 255, 255, 0.9)</span><span class="dl">'</span><span class="p">;</span>
+<span class="nx">ctx</span><span class="p">.</span><span class="nf">fillRect</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">canvas</span><span class="p">.</span><span class="nx">width</span><span class="p">,</span> <span class="nx">canvas</span><span class="p">.</span><span class="nx">height</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p><a href="https://www.w3.org/TR/compositing-1/#porterduffcompositingoperators_dstin">Destination In の仕様</a> を確認すると、</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Fa = 0; Fb = αs
+co = αb * Cb * αs 
+αo = αb * αs
+</code></pre></div></div>
+
+<p>となっております。全体を <code class="language-plaintext highlighter-rouge">rgb(255, 255, 255, 0.9)</code> で描画することにより、全体を一律薄くすることが可能になります。これにより、かなり重い <code class="language-plaintext highlighter-rouge">drawImage</code> に頼ること無く blur 効果を得ることが出来るようになっています。これを WebGL で実現しようとすると WebGL 専用の Canvas が必要になってしまうため、HTML5 ではこのやり方にまさる方法はないでしょう。</p>
+
+<p>Canvas の API では α 値だけを書き換えることが（<code class="language-plaintext highlighter-rouge">getImageData</code> 等を使わない限り）出来ないのですが、<code class="language-plaintext highlighter-rouge">globalCompositeOperation</code> を使うことでその制限を取り払い、α 値の一括処理が可能になります。使い所は限られますが、Canvas を多用する方にとってはとても有用なテクニックだと思います。</p>
+
+<h1 id="おわりに">おわりに</h1>
+
+<p>ExGame のリリースは 2011 年でした。Canvas や HTML5 の機能が大幅に制限されている中で「（当時の）iPhone でまともに動作する Flash Player を HTML5 で作る」というのは極めて負荷の高いプロジェクトであり、その実現のために様々な高速化を実現すべく頭をフル回転していたことを、Flash のサポートが切れる 2020 年末である今、とても懐かしく思い起こしております。</p>
+
+<p>今回ご紹介した <code class="language-plaintext highlighter-rouge">globalCompositeOperation</code> の話は、現代の開発でも有用になることがあろうと思います（実際私は今年使いました）。Canvas を使われる方は、何か少し特殊な処理が必要な時に、そういえばあんなテクニックがあったなぁ…、と思い出せるように頭の片隅に置いておくと良いかも知れません。</p>
+
+        </article>
+        <hr>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/2020-12-17-globalCompositeOperation&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="知られざる globalCompositeOperation テクニック" data-url="http://nmi.jp/2020-12-17-globalCompositeOperation">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/2020-12-17-globalCompositeOperation" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="知られざる globalCompositeOperation テクニック"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="知られざる globalCompositeOperation テクニック" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+
+        
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+        
+
+        <div class="post-recent">
+    <div class="pre">
+
+    
+        <p><strong>前の投稿</strong> <a href="/2020-03-30-Pomodoro">リモートワーク・テクニック「紀平式ポモドーロ」の紹介</a></p>
+    
+    </div>
+    <div class="nex">
+
+        
+        <p><strong>次の投稿</strong> <a href="/2020-12-20-Make_VM_faster">JavaScript における VM の高速化手法</a></p>
+        
+    </div>
+</div>
+
+
+    </div>
+    <button class="anchor"><i class="fa fa-anchor"></i></button>
+
+
+    <div class="right">
+        <div class="wrap">
+            <div class="side">
+                <div>
+                    <i class="fa fa-tags"></i>
+                    Top Popular Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2016-07-23-stock-strategy-for-early-startup-employee">スタートアップに転職する時に最低限知っておくべき株の話</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/582">生WebGL入門:初音ミクの美麗3Dモデルを表示する(前編)</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2017-10-06-Making_a-business_plan">事業計画書の作り方、新規ビジネスの考え方</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/902">Convertible Note / Convertible Equity とは？</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/488">JavaScript イディオム集</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/465">ExGameの製作で感じたこと</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                </ul>
+            </div>
+
+            <div class="side">
+                <div>
+                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                    Recent Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        <li><a href="/2024-08-28-Review-Binary-Hacks-Rebooted">書評 "Binary Hacks Rebooted"</a></li>
+                    
+                        <li><a href="/2024-06-10-Deep-Dive-into-ARM-JavaScript-Special-Instruction-FJCVTZS">ARM に存在する JavaScript 専用命令「FJCVTZS」を追う（ついでに V8 をビルドする）</a></li>
+                    
+                        <li><a href="/2024-06-03-Exploring-V8-JIT-Outputs">JavaScript 実行エンジン V8 の JIT 出力コードを読んでみよう</a></li>
+                    
+                </ul>
+            </div>
+
+            <!-- <div class="side">
+                <div>
+                    <i class="fa fa-external-link"></i>
+                    Links
+                </div>
+                <ul  class="content-ul">
+
+                </ul>
+            </div> -->
+        </div>
+    </div>
+
+
+
+</div>
+<script>
+/**
+ * target _blank
+ */
+(function() {
+    var aTags = document.querySelectorAll('article a:not([id])')
+    for (var i = 0; i < aTags.length; i++) {
+        aTags[i].setAttribute('target', '_blank')
+    }
+}());
+</script>
+<script src="/js/pageContent.js " charset="utf-8"></script>
+
+
+    <footer class="site-footer">
+
+
+    <div class="wrapper">
+
+        <p class="description">
+             Takuo Kihira 
+        </p>
+        <p class="contact">
+            Contact me at: 
+            <a href="https://github.com/tkihira" title="GitHub"><i class="fa fa-github" aria-hidden="true"></i></a>     
+            <a href="https://twitter.com/tkihira" title="Twitter"><i class="fa fa-twitter" aria-hidden="true"></i></a>  
+            <a href="https://www.facebook.com/takuo.kihira" title="Facebook"><i class="fa fa-facebook-official" aria-hidden="true"></i></a>    
+        </p>
+        <p class="power">
+            <span>
+                Site powered by <a href="https://jekyllrb.com/">Jekyll</a>.
+            </span>
+            <span>
+                Theme designed by <a href="https://github.com/Gaohaoyang">HyG</a>.
+            </span>
+        </p>
+    </div>
+</footer>
+
+    <div class="back-to-top">
+    <a href="#top" class="scroll">
+        <i class="fa fa-arrow-up" aria-hidden="true"></i>
+    </a>
+</div>
+
+    <script src=" /js/main.js " charset="utf-8"></script>
+    <script src=" /js/scroll.min.js " charset="utf-8"></script>
+  </body>
+
+</html>

@@ -1,0 +1,60 @@
+<html><head><title>bezier test</title><script>
+var size = 500;
+var point = function(ctx, x, y, color, r) {
+	ctx.fillStyle = color; ctx.beginPath();
+	ctx.arc(x, y, r || 2, 0, Math.PI * 2, true);
+	ctx.fill();
+};
+var line = function(ctx, x1, y1, x2, y2, color) {
+	ctx.beginPath(); ctx.strokeStyle = color;
+	ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+	ctx.stroke();
+};
+var drawCurve = function(ctx, x1, y1, cx1, cy1, cx2, cy2, x2, y2, ratio, calcOnly) {
+	var p1x = x1 + (cx1 - x1) * ratio; var p1y = y1 + (cy1 - y1) * ratio;
+	var p2x = cx1 + (cx2 - cx1) * ratio; var p2y = cy1 + (cy2 - cy1) * ratio;
+	var p3x = cx2 + (x2 - cx2) * ratio; var p3y = cy2 + (y2 - cy2) * ratio;
+	var q1x = p1x + (p2x - p1x) * ratio; var q1y = p1y + (p2y - p1y) * ratio;
+	var q2x = p2x + (p3x - p2x) * ratio; var q2y = p2y + (p3y - p2y) * ratio;
+	var px = q1x + (q2x - q1x) * ratio; var py = q1y + (q2y - q1y) * ratio;
+	if(!calcOnly) {
+		line(ctx, x1, y1, cx1, cy1, "#ccc"); line(ctx, cx1, cy1, cx2, cy2, "#ccc");
+		line(ctx, cx2, cy2, x2, y2, "#ccc"); line(ctx, p1x, p1y, p2x, p2y, "#080");
+		line(ctx, p2x, p2y, p3x, p3y, "#080"); line(ctx, q1x, q1y, q2x, q2y, "#00b");
+		point(ctx, p1x, p1y, "#080"); point(ctx, p2x, p2y, "#080");
+		point(ctx, p3x, p3y, "#080"); point(ctx, q1x, q1y, "#00e");
+		point(ctx, q2x, q2y, "#00e"); point(ctx, px, py, "#000", 3);
+		ctx.beginPath();ctx.moveTo(x1, y1);
+		for(var r = 0; r < ratio; r += 0.01) {
+			var ret = drawCurve(ctx, x1, y1, cx1, cy1, cx2, cy2, x2, y2, r, true);
+			ctx.lineTo(ret[0], ret[1]);
+		}
+		ctx.strokeStyle = "#f00"; ctx.stroke();
+	} else {
+		return [px, py];
+	}
+};
+
+window.onload = function() {
+	var ctx = document.getElementById("canvas").getContext("2d");
+	var x1 = Math.random() * size; var y1 = Math.random() * size;
+	var x2 = Math.random() * size; var y2 = Math.random() * size;
+	var cx1 = Math.random() * size; var cy1 = Math.random() * size;
+	var cx2 = Math.random() * size; var cy2 = Math.random() * size;
+	var r = 0;
+	(function draw() {
+		if(r > 1.01) {
+			return;
+		}
+		ctx.clearRect(0, 0, size, size);
+		ctx.beginPath(); ctx.moveTo(x1, y1);
+		ctx.bezierCurveTo(cx1, cy1, cx2, cy2, x2, y2);
+		ctx.strokeStyle = "#faa"; ctx.stroke();
+		point(ctx, x1, y1, "#333"); point(ctx, x2, y2, "#333");
+		point(ctx, cx1, cy1, "#333"); point(ctx, cx2, cy2, "#333");
+		drawCurve(ctx, x1, y1, cx1, cy1, cx2, cy2, x2, y2, r);
+		r += 1 / 200;
+		setTimeout(draw, 50);
+	})();
+};
+</script></head><body><canvas id="canvas" width="500" height="500"></canvas></body>

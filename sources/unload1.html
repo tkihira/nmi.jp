@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html><head><title>onunload test</title>
+<script>
+window.onunload = function() {};
+window.onload = function() {
+	var count = 0;
+	var loop = function() {
+		document.getElementById("num").innerHTML = (count++);
+		setTimeout(loop, 50);
+	};
+	loop();
+};
+</script>
+</head><body><div id="num"></div><a href='http://broadtail.jp'>link</a></body></html>

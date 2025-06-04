@@ -1,0 +1,1796 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>JavaScript の undefined と null を完全に理解する</title>
+    <meta name="description" content="JavaScript で頻出する undefined と null について語ります。">
+
+    <link rel="stylesheet" href=" /css/fontawesome/css/font-awesome.min.css ">
+    <link rel="stylesheet" href=" /css/main.css ">
+    <link rel="canonical" href="http://nmi.jp/2022-10-17-Understanding-Undefined-And-Null">
+    <link rel="alternate" type="application/rss+xml" title="nmi.jp" href="http://nmi.jp/feed.xml">
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=3.0'></script>
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=1.1'></script>
+    <script>
+        if(location.href.match(/\.html$/)) {
+            location.href = location.href.match(/(.+)\.html/)[1];
+        }
+    </script>
+
+
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-229769-8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-229769-8');
+</script>
+</head>
+
+
+  <body>
+
+    <header id="top">
+    <div class="wrapper">
+        <a href="/" class="brand">nmi.jp</a>
+        <small>Twitter → <a href="https://twitter.com/tkihira" target="_blank">@tkihira</a></small>
+        <button id="headerMenu" class="menu"><i class="fa fa-bars"></i></button>
+        <nav id="headerNav">
+            <ul>
+                <li>
+                    
+                    <a href="/">
+                    
+                        <i class="fa fa-home"></i>Home
+                    </a>
+                </li>
+
+                
+                    
+                    <li>
+                        
+                        <a href="/archive/">
+                        
+                            <i class="fa fa-archive"></i>Archives
+                        </a>
+                    </li>
+                    
+                
+                    
+                    <li>
+                        
+                        <a href="/category/">
+                        
+                            <i class="fa fa-th-list"></i>Categories
+                        </a>
+                    </li>
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            </ul>
+        </nav>
+    </div>
+</header>
+
+
+        <div class="page clearfix" post>
+    <div class="left">
+        <div class="post-recent">
+    <table style="width:100%;border:0;padding:0;"><tbody><tr style="padding:0">
+        <td class="toppre" style="padding:0">
+        
+        <a href="/2022-10-03-How-To-Make-Wordle-Solver">Wordle のソルバー（Hard Mode 対応）を作りました</a>
+        
+        </td><td class="topnex" style="text-align:right;padding:0">
+        
+        <a href="/2022-11-14-Be-careful-about-console-log-in-chrome">Chrome の console.log でハマらないために</a>
+        
+        </td>
+    </tr></tbody></table>
+</div>
+
+        <hr style="margin:0"/>
+        <h1 style="margin-top:10px">JavaScript の undefined と null を完全に理解する</h1>
+<hr />
+        <div class="label">
+
+            <div class="label-card">
+                <i class="fa fa-calendar"></i>2022-10-17
+            </div>
+
+            <div class="label-card">
+                <i class="fa fa-user"></i>Takuo Kihira
+                
+            </div>
+
+            <div class="label-card">
+                
+            </div>
+
+            <div class="label-card">
+            
+
+
+<!-- <span class="point">•</span> -->
+<span class="categories">
+  <i class="fa fa-th-list"></i>
+  
+    
+        <a href="/category/#JavaScript" title="Category: JavaScript" rel="category">JavaScript</a>
+    
+  
+
+  <!-- <span class="point">•</span> -->
+</span>
+
+
+            </div>
+
+            <div class="label-card">
+                <a href="https://github.com/tkihira/nmi.jp/blob/master/_posts/2022-10-17-Understanding-Undefined-And-Null.md" target="_blank"><i class="fa fa-github"></i></a>
+            </div>
+
+        </div>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/2022-10-17-Understanding-Undefined-And-Null&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="JavaScript の undefined と null を完全に理解する" data-url="http://nmi.jp/2022-10-17-Understanding-Undefined-And-Null">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/2022-10-17-Understanding-Undefined-And-Null" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="JavaScript の undefined と null を完全に理解する"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="JavaScript の undefined と null を完全に理解する" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+        <article itemscope itemtype="http://schema.org/BlogPosting">
+        <p>JavaScript で頻出する <code class="language-plaintext highlighter-rouge">undefined</code> と <code class="language-plaintext highlighter-rouge">null</code> について語ります。</p>
+
+<h1 id="言語仕様上の違い">言語仕様上の違い</h1>
+
+<p>JavaScript (ECMAScript) において、仕様上 <code class="language-plaintext highlighter-rouge">undefined</code> と <code class="language-plaintext highlighter-rouge">null</code> は当然ながら明確に区別されています。いくつか言語仕様上の扱いについて挙げてみます。</p>
+
+<h2 id="比較">比較</h2>
+
+<p>厳密な比較演算子 === において <code class="language-plaintext highlighter-rouge">undefined</code> と <code class="language-plaintext highlighter-rouge">null</code> は区別されます。ゆるい比較演算子 == においては両者は区別されません（<a href="https://tc39.es/ecma262/#sec-islooselyequal">仕様 7.2.14</a>）。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="kc">undefined</span> <span class="o">===</span> <span class="kc">null</span><span class="p">);</span> <span class="c1">// false</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="kc">undefined</span> <span class="o">==</span> <span class="kc">null</span><span class="p">);</span> <span class="c1">// true</span>
+</code></pre></div></div>
+
+<p>他の falsy な値（false とみなされる値）との比較は、ゆるい比較演算子であっても区別されます（<a href="https://tc39.es/ecma262/#sec-islooselyequal">仕様 同上</a>）。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="kc">undefined</span> <span class="o">==</span> <span class="kc">false</span><span class="p">);</span> <span class="c1">// false</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="kc">null</span> <span class="o">==</span> <span class="dl">""</span><span class="p">);</span> <span class="c1">// false</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="kc">undefined</span> <span class="o">==</span> <span class="mi">0</span><span class="p">);</span> <span class="c1">// false</span>
+</code></pre></div></div>
+
+<p>この「ゆるい比較演算子による <code class="language-plaintext highlighter-rouge">null</code> と <code class="language-plaintext highlighter-rouge">undefined</code> の比較」は、広く使われています。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nf">checkValue</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if </span><span class="p">(</span><span class="o">!</span><span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">value is falsy.</span><span class="dl">"</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">if </span><span class="p">(</span><span class="nx">value</span> <span class="o">==</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">value is null or undefined.</span><span class="dl">"</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nf">checkValue</span><span class="p">();</span> <span class="c1">// value is falsy &amp; value is null or undefined</span>
+<span class="nf">checkValue</span><span class="p">(</span><span class="dl">""</span><span class="p">);</span> <span class="c1">// value is falsy</span>
+<span class="nf">checkValue</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span> <span class="c1">// value is falsy</span>
+</code></pre></div></div>
+
+<p>0 や 空文字列のような falsy な値は受け付けつつ、<code class="language-plaintext highlighter-rouge">null</code> と <code class="language-plaintext highlighter-rouge">undefined</code> を弾きたい、という場面において、「<code class="language-plaintext highlighter-rouge">null</code> とのゆるい比較演算子による比較」は歴史的にもよく使われています。覚えておくと良いでしょう。</p>
+
+<p>余談ですが、少し特殊な例として、ブラウザにおいてゆるい比較演算子は <code class="language-plaintext highlighter-rouge">document.all</code> と <code class="language-plaintext highlighter-rouge">undefined</code> ならびに <code class="language-plaintext highlighter-rouge">null</code> を区別しません（<a href="https://tc39.es/ecma262/#sec-IsHTMLDDA-internal-slot-aec">仕様 B.3.6.2</a>）。詳細については<a href="http://nmi.jp/2022-08-01-Document-Dot-All">以前のブログ記事</a>にまとめましたので、興味のある方は読んでみてください。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">all</span><span class="p">);</span> <span class="c1">// [HTMLAllCollection]</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">all</span> <span class="o">==</span> <span class="kc">undefined</span><span class="p">);</span> <span class="c1">// true</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">all</span> <span class="o">===</span> <span class="kc">undefined</span><span class="p">);</span> <span class="c1">// false</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">all</span> <span class="o">==</span> <span class="kc">null</span><span class="p">);</span> <span class="c1">// true</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">all</span> <span class="o">===</span> <span class="kc">null</span><span class="p">);</span> <span class="c1">// false</span>
+<span class="kd">const</span> <span class="nx">dda</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">all</span><span class="p">;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">dda</span> <span class="o">==</span> <span class="kc">undefined</span><span class="p">);</span> <span class="c1">// true</span>
+</code></pre></div></div>
+
+<h2 id="json">JSON</h2>
+
+<p>JSON に変換する際にも <code class="language-plaintext highlighter-rouge">undefined</code> と <code class="language-plaintext highlighter-rouge">null</code> で差があります。(<a href="https://twitter.com/tamtam180">@tamtam180</a> さん、指摘ありがとうございます)。</p>
+
+<p><code class="language-plaintext highlighter-rouge">null</code> は JSON 化する時に特に問題なく扱えます（<a href="https://tc39.es/ecma262/#sec-serializejsonproperty">仕様 25.5.2.2 の 5</a>）。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">obj</span> <span class="o">=</span> <span class="p">{</span><span class="na">key</span><span class="p">:</span> <span class="kc">null</span><span class="p">,</span> <span class="na">array</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="kc">null</span><span class="p">]};</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nf">stringify</span><span class="p">(</span><span class="nx">obj</span><span class="p">));</span>
+<span class="c1">// {"key":null,"array":[1,null,3,null]}</span>
+</code></pre></div></div>
+
+<p>一方、<code class="language-plaintext highlighter-rouge">undefined</code> は<span style="color:red">オブジェクトの value に指定されていた場合はその要素が無視され</span>（<a href="https://tc39.es/ecma262/#sec-serializejsonobject">仕様 25.5.2.5 の 8-b</a>）、<span style="color:red">配列の要素であった場合には <code class="language-plaintext highlighter-rouge">null</code> に変換されます</span>（<a href="https://tc39.es/ecma262/#sec-serializejsonarray">仕様 25.5.2.6 の 8-b</a>）。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">obj</span> <span class="o">=</span> <span class="p">{</span><span class="na">key</span><span class="p">:</span> <span class="kc">undefined</span><span class="p">,</span> <span class="na">array</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="kc">undefined</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="kc">undefined</span><span class="p">]};</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nf">stringify</span><span class="p">(</span><span class="nx">obj</span><span class="p">));</span>
+<span class="c1">// {"array":[1,null,3,null]}</span>
+</code></pre></div></div>
+
+<p>そもそもの JSON の仕様に <code class="language-plaintext highlighter-rouge">undefined</code> がないため、一貫性のない挙動になっています。気をつけましょう。</p>
+
+<hr />
+
+<p>そして<span style="color:red">私の個人的な意見ですが、<code class="language-plaintext highlighter-rouge">null</code> と <code class="language-plaintext highlighter-rouge">undefined</code> の言語仕様上の違いにおいて、実務上しっかりと覚えておく必要があるのはここまで</span>だと思います。ここから下は「意味上の違い」の章まで読み飛ばしても大丈夫だと思います。</p>
+
+<h2 id="型">型</h2>
+
+<p>ECMAScript において、<code class="language-plaintext highlighter-rouge">undefined</code> は Undefined 型、<code class="language-plaintext highlighter-rouge">null</code> は Null 型になります（<a href="https://tc39.es/ecma262/#sec-ecmascript-data-types-and-values">仕様 6.1.1 ならびに 6.1.2</a>）。なお、この型は内部的なもので、実際のコードには登場しません。</p>
+
+<p><code class="language-plaintext highlighter-rouge">typeof</code> 演算子の返す結果も違います。<code class="language-plaintext highlighter-rouge">typeof undefined</code> は <code class="language-plaintext highlighter-rouge">undefined</code> を返し、<code class="language-plaintext highlighter-rouge">typeof null</code> は <code class="language-plaintext highlighter-rouge">object</code> を返します（<a href="https://tc39.es/ecma262/#sec-typeof-operator">仕様 13.5.3</a>）。<code class="language-plaintext highlighter-rouge">typeof null</code> の結果に納得がいかない方もいらっしゃるかと思いますが、仕様に書いてあるので仕方ありません。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="k">typeof</span> <span class="kc">undefined</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">undefined</span><span class="dl">'</span><span class="p">);</span> <span class="c1">// true</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="k">typeof</span> <span class="kc">null</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">object</span><span class="dl">'</span><span class="p">);</span> <span class="c1">// true</span>
+</code></pre></div></div>
+
+<p>余談ですが、<code class="language-plaintext highlighter-rouge">typeof</code> 演算子は右辺の値が宣言されていなくても例外を飛ばさず <code class="language-plaintext highlighter-rouge">undefined</code> を返す（<a href="https://tc39.es/ecma262/#sec-typeof-operator">仕様 13.5.3.1</a> の 2 項目）ため、グローバルオブジェクトの存在を確認する時に使われることもあります。ECMAScript 3 から 5 への移行期では、<code class="language-plaintext highlighter-rouge">JSON</code> オブジェクトの存在確認によく使われていました。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if </span><span class="p">(</span><span class="k">typeof</span> <span class="nx">LOVE</span> <span class="o">===</span> <span class="dl">"</span><span class="s2">undefined</span><span class="dl">"</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">typeof LOVE doesn't throw any exceptions</span><span class="dl">"</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="k">if </span><span class="p">(</span><span class="nx">LOVE</span> <span class="o">===</span> <span class="kc">undefined</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// ReferenceError: LOVE is not defined</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="変換">変換</h2>
+
+<p>Boolean 型に変換すると、両者とも <code class="language-plaintext highlighter-rouge">false</code> に変換されます（<a href="https://tc39.es/ecma262/#sec-toboolean">仕様 7.1.2</a>）。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nc">Boolean</span><span class="p">(</span><span class="kc">undefined</span><span class="p">));</span> <span class="c1">// false</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nc">Boolean</span><span class="p">(</span><span class="kc">null</span><span class="p">));</span> <span class="c1">// false</span>
+</code></pre></div></div>
+
+<p>Number 型に変換すると、<code class="language-plaintext highlighter-rouge">undefined</code> は <code class="language-plaintext highlighter-rouge">NaN</code> に、<code class="language-plaintext highlighter-rouge">null</code> は <code class="language-plaintext highlighter-rouge">0</code> に変換されます（<a href="https://tc39.es/ecma262/#sec-tonumber">仕様 7.1.4</a>）。この仕様に納得のいかない方もいらっしゃるかと思いますが、仕様に書いてあるので仕方ありません。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nc">Number</span><span class="p">(</span><span class="kc">undefined</span><span class="p">));</span> <span class="c1">// NaN</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nc">Number</span><span class="p">(</span><span class="kc">null</span><span class="p">));</span> <span class="c1">// 0</span>
+</code></pre></div></div>
+
+<p>String 型に変換すると、<code class="language-plaintext highlighter-rouge">undefined</code> は <code class="language-plaintext highlighter-rouge">"undefined"</code> という文字列に、<code class="language-plaintext highlighter-rouge">null</code> は <code class="language-plaintext highlighter-rouge">"null"</code> という文字列に変換されます（<a href="https://tc39.es/ecma262/#sec-tostring">仕様 7.1.17</a>）。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nc">String</span><span class="p">(</span><span class="kc">undefined</span><span class="p">));</span> <span class="c1">// "undefined"</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nc">String</span><span class="p">(</span><span class="kc">null</span><span class="p">));</span> <span class="c1">// "null"</span>
+</code></pre></div></div>
+
+<h2 id="リテラル">リテラル</h2>
+
+<p><code class="language-plaintext highlighter-rouge">null</code> は予約語であり、<code class="language-plaintext highlighter-rouge">null</code> と書くと <code class="language-plaintext highlighter-rouge">null</code> が返ります。<code class="language-plaintext highlighter-rouge">null</code> リテラルは<a href="https://tc39.es/ecma262/#prod-NullLiteral">仕様 12.9.1</a> に、その実行時の挙動は<a href="https://tc39.es/ecma262/#sec-literals-runtime-semantics-evaluation">仕様 13.2.3.1</a> に書かれています。</p>
+
+<p><code class="language-plaintext highlighter-rouge">undefined</code> は予約語<span style="color:red;font-weight:bold">ではなく</span>、グローバルオブジェクトのプロパティとして定義されています（<a href="https://tc39.es/ecma262/#sec-undefined">仕様 19.1.4</a>）。ECMAScript 5 より上書きが出来ない設定に変更されておりますが、上書きが出来ないだけで代入は可能ですし、スコープを用意すればそのスコープ内では <code class="language-plaintext highlighter-rouge">undefined</code> に別の値を代入することも出来ます。もちろんそんなコードを書くメリットは皆無です。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kc">undefined</span> <span class="o">=</span> <span class="mi">7</span><span class="p">;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="kc">undefined</span><span class="p">);</span> <span class="c1">// undefined</span>
+<span class="p">{</span>
+    <span class="kd">const</span> <span class="kc">undefined</span> <span class="o">=</span> <span class="mi">7</span><span class="p">;</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="kc">undefined</span><span class="p">);</span> <span class="c1">// 7</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>なぜこのような仕様になっているのか納得のいかない方もいらっしゃるかと思いますが、仕様に書いてあるので仕方ありません。</p>
+
+<p>なお 100% 確実に <code class="language-plaintext highlighter-rouge">undefined</code> 値を取得したい場合は <code class="language-plaintext highlighter-rouge">void</code> 演算子を使います（<a href="https://tc39.es/ecma262/#sec-void-operator">仕様 13.5.2</a>）。これは単項演算子であり、右側に引数を取りますが、しかしその引数は一切使われません。これも完全に意味不明な挙動だと思う方もいらっしゃるかと思いますが、仕様に書いてあるので仕方ありません。<code class="language-plaintext highlighter-rouge">void</code> 演算子の引数は使用されませんが、引数の評価はされます。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="k">void</span> <span class="mi">0</span><span class="p">);</span> <span class="c1">// undefined</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="k">void</span> <span class="dl">"</span><span class="s2">Hello, world!</span><span class="dl">"</span><span class="p">);</span> <span class="c1">// undefined</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="k">void </span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">abc</span><span class="dl">"</span><span class="p">))());</span> <span class="c1">// abc, undefined</span>
+</code></pre></div></div>
+
+<p>なお <code class="language-plaintext highlighter-rouge">void</code> 演算子は、歴史的には DOM のイベントハンドラをインラインの JavaScript で実装する時に多用されており、最近でも Non-leaking Arrow Function の文脈で散見されます。しかし存在すら知らない方も多い無名な演算子であるのは間違いないので、プロジェクトやコミュニティのコンセンサスのない場所では使わない方が良いと思います。</p>
+
+<p>余談になりますが、ECMAScript 3 時代（IE 6 の時代）はグローバルオブジェクトの <code class="language-plaintext highlighter-rouge">undefined</code> プロパティを書き換えることが可能でしたので、一部のコードでは以下のようなコードを書いて <code class="language-plaintext highlighter-rouge">undefined</code> 上書き対策を行うテクニックもありました。jQuery などで使われていた記憶があります。今はもうグローバルオブジェクトの <code class="language-plaintext highlighter-rouge">undefined</code> プロパティが上書きされる心配はないので、このようなテクニックは必要ありません。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nf">function </span><span class="p">(</span><span class="kc">undefined</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// この関数は引数なしで呼ばれるので、引数 undefined には undefined が代入される</span>
+    <span class="c1">// よって、この関数内においては必ず undefined を参照すると undefined が入っていることが保障される</span>
+<span class="p">})();</span>
+</code></pre></div></div>
+
+<p>そして、このように <code class="language-plaintext highlighter-rouge">undefined</code> という引数名や変数名に <code class="language-plaintext highlighter-rouge">undefined</code> を代入するテクニックがあるせいで、もし今さら仕様で <code class="language-plaintext highlighter-rouge">undefined</code> を予約語に変更してしまうと、jQuery を含む過去のコードで動かないものが多数出てしまいます。それは <code class="language-plaintext highlighter-rouge">Don't break the web.</code> の原則に反します。そのため、今やもう <code class="language-plaintext highlighter-rouge">undefined</code> を予約語にしたくともすることが出来なくなっているのです。悲しい歴史です。</p>
+
+<h1 id="意味上の違い">意味上の違い</h1>
+
+<p><span style="font-weight: bold">ここまでは事実ベースで書いてきましたが、ここからは私見も入ります</span>。ご注意ください。</p>
+
+<h2 id="undefined"><code class="language-plaintext highlighter-rouge">undefined</code></h2>
+
+<p><code class="language-plaintext highlighter-rouge">undefined</code> は、文字通り「定義されていない」ことを意味する場面で使われます。定義されない変数や、指定されなかった引数、値を指定しなかった関数の返り値などでよく登場します。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">value</span><span class="p">;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">value</span><span class="p">);</span> <span class="c1">// undefined</span>
+<span class="p">((</span><span class="nx">arg</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">arg</span><span class="p">);</span> <span class="c1">// undefined</span>
+<span class="p">})();</span>
+<span class="kd">const</span> <span class="nx">f</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{};</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nf">f</span><span class="p">());</span> <span class="c1">// undefined</span>
+</code></pre></div></div>
+
+<p>また、配列の range 外アクセスをしたり、オブジェクトの存在しないプロパティを参照した場合にも登場します。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">arr</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">];</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">arr</span><span class="p">[</span><span class="mi">3</span><span class="p">]);</span> <span class="c1">// undefined</span>
+<span class="kd">const</span> <span class="nx">obj</span> <span class="o">=</span> <span class="p">{};</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">obj</span><span class="p">.</span><span class="nx">foo</span><span class="p">);</span> <span class="c1">// undefined</span>
+</code></pre></div></div>
+
+<p>これらの <code class="language-plaintext highlighter-rouge">undefined</code> は、<code class="language-plaintext highlighter-rouge">undefined</code> を代入した配列、もしくは <code class="language-plaintext highlighter-rouge">undefined</code> を代入したオブジェクトのプロパティとは意味的に異なるものです。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">arr</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">];</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">arr</span><span class="p">[</span><span class="mi">3</span><span class="p">]);</span> <span class="c1">// undefined</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">arr</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span> <span class="c1">// 3</span>
+<span class="nx">arr</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="kc">undefined</span><span class="p">;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">arr</span><span class="p">[</span><span class="mi">3</span><span class="p">]);</span> <span class="c1">// undefined</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">arr</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span> <span class="c1">// 4</span>
+<span class="nx">arr</span><span class="p">.</span><span class="nf">splice</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">arr</span><span class="p">[</span><span class="mi">3</span><span class="p">]);</span> <span class="c1">// undefined</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">arr</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span> <span class="c1">// 3</span>
+
+<span class="kd">const</span> <span class="nx">obj</span> <span class="o">=</span> <span class="p">{};</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">obj</span><span class="p">.</span><span class="nx">foo</span><span class="p">);</span> <span class="c1">// undefined</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">obj</span><span class="p">.</span><span class="nf">hasOwnProperty</span><span class="p">(</span><span class="dl">"</span><span class="s2">foo</span><span class="dl">"</span><span class="p">));</span> <span class="c1">// false</span>
+<span class="nx">obj</span><span class="p">.</span><span class="nx">foo</span> <span class="o">=</span> <span class="kc">undefined</span><span class="p">;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">obj</span><span class="p">.</span><span class="nx">foo</span><span class="p">);</span> <span class="c1">// undefined</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">obj</span><span class="p">.</span><span class="nf">hasOwnProperty</span><span class="p">(</span><span class="dl">"</span><span class="s2">foo</span><span class="dl">"</span><span class="p">));</span> <span class="c1">// true</span>
+<span class="k">delete</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">foo</span><span class="p">;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">obj</span><span class="p">.</span><span class="nx">foo</span><span class="p">);</span> <span class="c1">// undefined</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">obj</span><span class="p">.</span><span class="nf">hasOwnProperty</span><span class="p">(</span><span class="dl">"</span><span class="s2">foo</span><span class="dl">"</span><span class="p">));</span> <span class="c1">// false</span>
+</code></pre></div></div>
+
+<h2 id="null"><code class="language-plaintext highlighter-rouge">null</code></h2>
+
+<p><code class="language-plaintext highlighter-rouge">null</code> は「存在しない」ことを表したい場面で使われる値です。関数の返り値などで、返り値が存在しなかったことを示すために使われます。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nf">getElementById</span><span class="p">(</span><span class="dl">""</span><span class="p">));</span> <span class="c1">// null</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">null</code> は <code class="language-plaintext highlighter-rouge">undefined</code> と違って、明示的に指定しない限り、滅多に登場しません。<span style="color:red">ECMAScript の範囲で <code class="language-plaintext highlighter-rouge">null</code> リテラルを参照せずに <code class="language-plaintext highlighter-rouge">null</code> を作り出すのは至難の業です</span>。これは良い JavaScript クイズになると思います。<a href="https://gist.github.com/tkihira/808ca736e6ff289844c65bbfd3ce5fe5">私の思いついた・教えてもらった作り出し方（ネタバレ注意）</a>以外にもし別解がある方は是非 <a href="https://twitter.com/tkihira">@tkihira</a> まで教えて下さい。</p>
+
+<p>一方で、DOM や Node.js の API では値が存在しないことを示す返り値に <code class="language-plaintext highlighter-rouge">null</code> を返すものがほとんどで、明示的に <code class="language-plaintext highlighter-rouge">undefined</code> を返すものはあまりありません。</p>
+
+<p>ECMAScript では <code class="language-plaintext highlighter-rouge">typeof null === "object"</code> の仕様から想像するに、<code class="language-plaintext highlighter-rouge">null</code> を「インスタンスのないオブジェクト」という意味で捉えているのかな、と個人的に考えております。なので、数値型を返す関数で 0 が false を意味したり、文字列型を返す関数で空文字列 “” が false を意味するのと同じように、オブジェクト型を返す関数において false の意味を返したい時に <code class="language-plaintext highlighter-rouge">null</code> を利用するのが良いのではないだろうか、と考えております。</p>
+
+<h1 id="個人的な-undefined-と-null-の使い分けの考え方">個人的な <code class="language-plaintext highlighter-rouge">undefined</code> と <code class="language-plaintext highlighter-rouge">null</code> の使い分けの考え方</h1>
+
+<p><span style="color:red">ここからは完全に個人の見解となります</span>のでご注意ください。</p>
+
+<h2 id="変数への代入">変数への代入</h2>
+
+<p>個人的には「変数、配列の要素、オブジェクトのプロパティに、<code class="language-plaintext highlighter-rouge">undefined</code> が代入されうるコードは良くない」と考えています。</p>
+
+<p>前述したように <code class="language-plaintext highlighter-rouge">undefined</code> は突然登場するタイミングが多くある一方で <code class="language-plaintext highlighter-rouge">null</code> は予期せぬタイミングで登場することはほとんどありません。一切 <code class="language-plaintext highlighter-rouge">undefined</code> を変数などに代入しないコーディングスタイルを利用していると、もし実行時に何らかの変数やプロパティに <code class="language-plaintext highlighter-rouge">undefined</code> が入っていた場合、それは即座にバグであることが確定します。そしてそれは大抵の場合、配列外アクセスや存在しないプロパティへのアクセスによって生み出されているはずなので、デバッグも比較的容易になります。</p>
+
+<p>JavaScript は動的言語であり、いかに TypeScript を使ってガチガチに型を定義していようとも、実行時に <code class="language-plaintext highlighter-rouge">undefined</code> が入ることを 100% 防ぐことは出来ません。なので、もしコードで <code class="language-plaintext highlighter-rouge">undefined</code> を明示的に代入していたり、もしくは変数やプロパティの中に <code class="language-plaintext highlighter-rouge">undefined</code> が入りうるパスを許している場合、その <code class="language-plaintext highlighter-rouge">undefined</code> が実行時エラーによって発生したのか、意図的に代入しているのかを即座に判断することが出来なくなります。</p>
+
+<p>全ての変数やプロパティに <code class="language-plaintext highlighter-rouge">undefined</code> を入れないか、許容するにしても引数のみにし、それも絶対に他の変数等に伝搬させない形を徹底することで、実行時に <code class="language-plaintext highlighter-rouge">undefined</code> が発生するバグが出た場合の調査を楽にすることが出来ます。<span style="color:red">一般的に <code class="language-plaintext highlighter-rouge">undefined</code> と <code class="language-plaintext highlighter-rouge">NaN</code> は根本原因の場所とは全然関係のない場所で顕在化することが多く</span>、問題が発生した際に少しでもトラッキングを楽にするという意味で効果的だと思います。</p>
+
+<p>また意味的にも、<code class="language-plaintext highlighter-rouge">undefined</code> は定義されていないもののみに紐づくべきであり、変数やプロパティなどの明確に「定義」されている要素に紐づくべきではないという考え方もあります。返り値でも、明示的に <code class="language-plaintext highlighter-rouge">return undefined;</code> とするのは間違っていると考えております。値を返すべき関数であれば <code class="language-plaintext highlighter-rouge">null</code> を返すべきでしょうし、そうでない場合は <code class="language-plaintext highlighter-rouge">return;</code> とのみ書いて明示的に <code class="language-plaintext highlighter-rouge">undefined</code> を返すべきではないです。</p>
+
+<h2 id="undefined-との比較"><code class="language-plaintext highlighter-rouge">undefined</code> との比較</h2>
+
+<p>一方で、個人的に <code class="language-plaintext highlighter-rouge">undefined</code> を比較等に使用するのには寛容です。オブジェクトのプロパティの存在確認などで <code class="language-plaintext highlighter-rouge">undefined</code> と比較するのは、本来は <code class="language-plaintext highlighter-rouge">hasOwnProperty</code> 等を使うべきであり、意味的にはあまり良くないかもしれません。ただ実務上そこの違いがバグにつながることはまずないため、良いのではないかと思います。</p>
+
+<p>前述の通り ECMAScript 3 においては <code class="language-plaintext highlighter-rouge">undefined</code> に別の数値を代入可能であったために <code class="language-plaintext highlighter-rouge">undefined</code> という名前への参照の利用を厭う方も多いですが、今の御時世 ECMAScript 3 を考慮しなければいけない環境は絶滅危惧種ですし、現実的に考える必要はないと思います。逆にお行儀よく <code class="language-plaintext highlighter-rouge">void 0</code> のような形で <code class="language-plaintext highlighter-rouge">undefined</code> を取り出しても、むしろそれが可読性を落としてしまうデメリットの方が大きい可能性まであります。</p>
+
+<p>自分の場合、プロパティや引数などを <code class="language-plaintext highlighter-rouge">undefined</code> であるかどうか確認する必要がある時は、ゆるい比較演算子を用いて <code class="language-plaintext highlighter-rouge">value == null</code> と比較することがほとんどです。ただ稀に本当に <code class="language-plaintext highlighter-rouge">undefined</code> のみと比較しなければいけないことがある場合は、躊躇なく厳密な比較演算子 === を用いて <code class="language-plaintext highlighter-rouge">value === undefined</code> と比較しています。</p>
+
+<p>まとめると、個人的に <code class="language-plaintext highlighter-rouge">undefined</code> を代入等で変数やプロパティに入れることには反対だが、<code class="language-plaintext highlighter-rouge">undefined</code> と比較するのは寛容である、ということです。</p>
+
+<h1 id="typescript-の-null-と-undefined-の考え方">TypeScript の <code class="language-plaintext highlighter-rouge">null</code> と <code class="language-plaintext highlighter-rouge">undefined</code> の考え方</h1>
+
+<p>ここまで読んでいただいた方に対してちゃぶ台をひっくり返すのは大変に心苦しいのですが、この<span style="color:red">私の考え方はおそらく TypeScript の思想と真っ向から対立しています</span>。</p>
+
+<h2 id="typescript-の-optional-argumentsproperties">TypeScript の optional arguments/properties</h2>
+
+<p>まず実用の観点での話ですが、TypeScript の optional arguments/properties <code class="language-plaintext highlighter-rouge">name?</code> が実用上 <code class="language-plaintext highlighter-rouge">| undefined</code> と同じ内容を示すように出来ており（セマンティクスは異なるのですが）、型定義を短くするためには <code class="language-plaintext highlighter-rouge">null</code> ではなく <code class="language-plaintext highlighter-rouge">undefined</code> を利用する方が便利です。引数の optional 定義はそもそもの JavaScript の挙動とも一致するので、引数において <code class="language-plaintext highlighter-rouge">undefined</code> を多用するのは自然なことでしょう。</p>
+
+<p>そして、<code class="language-plaintext highlighter-rouge">| undefined</code> で定義された型に対して、さらに <code class="language-plaintext highlighter-rouge">| null</code> を追加するのはどう考えてもナンセンスです。なのでそういった値に対して <code class="language-plaintext highlighter-rouge">null</code> を代入したくなったり、引数を別の変数にコピーしたくなった場合は、<code class="language-plaintext highlighter-rouge">null</code> ではなくて <code class="language-plaintext highlighter-rouge">undefined</code> を利用する方が自然になるでしょう。</p>
+
+<p>このように、TypeScript の環境下においては <code class="language-plaintext highlighter-rouge">undefined</code> を代入用途でも利用するのは理解が出来る話であり、TypeScript を使っていると自然と <code class="language-plaintext highlighter-rouge">undefined</code> を扱うことが増えるのではないかと思います。そもそも、TypeScript を使っているとランタイムエラーが発生する可能性がかなり小さくなるわけですし、TypeScript において <code class="language-plaintext highlighter-rouge">undefined</code> を使うのはむしろ自然な話なのかもしれません。</p>
+
+<p>（ここら辺の情報は <a href="https://twitter.com/shibu_jp">@shibu_jp</a> さん提供です、ありがとうございます！）</p>
+
+<h2 id="typescript-deep-dive-の考え方">TypeScript Deep Dive の考え方</h2>
+
+<p>（以下の情報は <a href="https://twitter.com/bad_at_math">@bad_at_math</a> さん提供です、ありがとうございます！）</p>
+
+<p><a href="https://basarat.gitbook.io/typescript/">TypeScript Deep Dive</a> という本には、<a href="https://basarat.gitbook.io/typescript/recap/null-undefined">“Null vs. Undefined”</a> という章において</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>JavaScript (and by extension TypeScript) has two bottom types : null and undefined. They are intended to mean different things:
+- Something hasn't been initialized : undefined.
+- Something is currently unavailable: null.
+</code></pre></div></div>
+
+<p>という記載があります。私のような <code class="language-plaintext highlighter-rouge">undefined</code> 撲滅過激派の思考からすると少し生ぬるい感じがしますが、この考え方に従うのも良いと思います。</p>
+
+<h2 id="typescript-contributor-の-coding-guideline">TypeScript Contributor の Coding Guideline</h2>
+
+<p>TypeScript の Contributor のための Coding Guidline の <a href="https://github.com/microsoft/TypeScript/wiki/Coding-guidelines#null-and-undefined">“null and undefined”</a> の節には、シンプルに</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Use undefined. Do not use null.
+</code></pre></div></div>
+
+<p>とわかりやすく書いてあります。<code class="language-plaintext highlighter-rouge">null</code> 撲滅過激派ですね！</p>
+
+<p>事実、どのように使い分けるのかを悩むくらいなら、一切使わないという考え方は合理的だと思います。どちらを撲滅しやすいかを考えると、残念ながら <code class="language-plaintext highlighter-rouge">null</code> 撲滅の方が多くのメンバーの間で意思統一しやすいと思います。とはいえ DOM や Node.js の API 等で <code class="language-plaintext highlighter-rouge">null</code> を返すものは大量に存在するわけで、結局のところどちらも完全な撲滅は出来ないのですが。</p>
+
+<p>なお、このページの一番上に<span style="color:red;font-weight:bold">「今すぐ読むのをやめろ！これは TypeScript コミュニティのための規範的なガイドラインじゃないぞ！！！！」</span>ってデカデカと書いてあります。これがあくまで TypeScript の Contributor のための Coding Guideline という点には留意してください。でも TypeScript 本体の開発者たちが基本的にこういう考え方をしているというのは参考になるところです。</p>
+
+<p>もっとも、<a href="https://twitter.com/__gfx__">@__gfx__</a> さんはこのような過激な意見を言っていました。</p>
+
+<blockquote>
+  <p>TypeScript compilerはTypeScriptの最古のコードなので、そのコーディングスタイルはあまり参考にすべきでない、というのがコミュニティのコンセンサスだと思いますよ…。</p>
+</blockquote>
+
+<h3 id="余談">余談</h3>
+
+<p>さて、なぜ TypeScript の Contributor は <code class="language-plaintext highlighter-rouge">null</code> を使わないのでしょうか。</p>
+
+<p>「JavaScript: The Good Parts」という（もう時代遅れの本であり、むしろ読むべきではない本だと思うので、敢えてリンクは貼らないでおきます）、2008年に出版されて JavaScript 業界にに大きな影響を与えた本があります。その著者の Douglas Crockford は、JSLint 等の開発者としても有名ですが、<a href="https://www.youtube.com/watch?v=PSGEjv3Tqo0&amp;t=561s">2014 年の講演</a>において「私は <code class="language-plaintext highlighter-rouge">null</code> を使わない」と表明しています。要約すると、「<code class="language-plaintext highlighter-rouge">undefined</code> と <code class="language-plaintext highlighter-rouge">null</code> は同じ様な型であり、別々に存在する意味はない。そして言語で <code class="language-plaintext highlighter-rouge">undefined</code> が頻出するなら、<code class="language-plaintext highlighter-rouge">null</code> は必要ない」という考え方のようです。</p>
+
+<p>私は上記の本は当時の JavaScript においてはとても良い本だと思って他人にも積極的に勧めていた一方で、その本における <code class="language-plaintext highlighter-rouge">undefined</code> と <code class="language-plaintext highlighter-rouge">null</code> の扱い方が非常に悪いものだったという意見を持っておりました。手元にないのですが、Appendix において「決して == を使うな、常に === を使え」という指摘があった記憶があります。当時、それを真に受けた人たちの <code class="language-plaintext highlighter-rouge">value !== null &amp;&amp; value !== undefined</code> という（個人的には見るに堪えない）コードが量産されました。</p>
+
+<p>私はこれらの Douglas Crockford の考え方それ自体は面白いなと思っており、おそらく TypeScript の <code class="language-plaintext highlighter-rouge">null</code> を絶対に使わないという考え方も、このような考え方が根底にあるのかな、と想像しております。皆さんの「なぜ TypeScript は <code class="language-plaintext highlighter-rouge">null</code> を使わないのか」を想像する足がかりになれば、と思います。</p>
+
+<p>なお Node.js コミュニティ会長の <a href="https://twitter.com/yosuke_furukawa">@yosuke_furukawa</a> さんは以下のようなコメントでした。</p>
+
+<blockquote>
+  <p>null よりも undefined を好んで使ってるの、 Douglas Crockford か TS Contributor しか居ない気もしている</p>
+</blockquote>
+
+<h1 id="まとめ">まとめ</h1>
+
+<p>JavaScript において <code class="language-plaintext highlighter-rouge">undefined</code> 値は頻出しますので、その取り扱いについては慣れておく必要があります。しかし残念ながら、仕様上 <code class="language-plaintext highlighter-rouge">undefined</code> や <code class="language-plaintext highlighter-rouge">null</code> は一貫しない振る舞いをしているように感じることも多く、直感的に扱いづらい値です。その挙動を仕様から追いたくなった場合には、本記事はきっと役に立つことでしょう。また <code class="language-plaintext highlighter-rouge">null</code> と <code class="language-plaintext highlighter-rouge">undefined</code> の違いによる問題に直面する機会はそこまでないと思いますが、もしどちらの値を使うのが望ましいか悩むことなどがあった際には、この記事にかかれているいくつかの事例が手助けになるかと思います。</p>
+
+<p>そして <code class="language-plaintext highlighter-rouge">undefined</code> と <code class="language-plaintext highlighter-rouge">null</code> をどのように使うか、という点に関しては、世の中千差万別の考え方があって面白いですね。それぞれのコーディングスタイルにはそれぞれ筋の通った考え方があり、それを理解することは言語自体に対する考え方をも深めるものだと思います。この記事が皆さんの JavaScript に対する興味や理解を深めるものになれば光栄です。</p>
+
+<p>最後に。<span style="color:blue">正直に申し上げると、<code class="language-plaintext highlighter-rouge">undefined</code> と <code class="language-plaintext highlighter-rouge">null</code> の使い分けの重要度は低いです。これは自転車置き場の議論に近いものがあります。あまり本気にならない方が良い</span>と思います。それぞれの言語仕様上の違いさえ理解していれば、使い分けは大きな問題ではないと思います。</p>
+
+<h1 id="余談-なぜ-undefined-と-null-が別々に登場したのか">余談: なぜ <code class="language-plaintext highlighter-rouge">undefined</code> と <code class="language-plaintext highlighter-rouge">null</code> が別々に登場したのか</h1>
+
+<p>JavaScript の開発者である Brendan 氏がツイッターで以下のような発言をされています（<a href="https://twitter.com/bad_at_math">@bad_at_math</a> さん、ありがとうございます）。</p>
+
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr"><a href="https://twitter.com/ronkorving?ref_src=twsrc%5Etfw">@ronkorving</a> 1/ Java &lt;=&gt; JS bridge (LiveConnect) part of plan from start because MILLJ. Java had null and primitives, e.g. int string double.</p>&mdash; BrendanEich (@BrendanEich) <a href="https://twitter.com/BrendanEich/status/652440848299372544?ref_src=twsrc%5Etfw">October 9, 2015</a></blockquote>
+<script async="" src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<p>ここからのスレッドを読むと、歴史的には Java と JavaScript の通信に対するサポートが言語設計の基底にあったようです。なるほどなぁ…。</p>
+
+        </article>
+        <hr>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/2022-10-17-Understanding-Undefined-And-Null&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="JavaScript の undefined と null を完全に理解する" data-url="http://nmi.jp/2022-10-17-Understanding-Undefined-And-Null">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/2022-10-17-Understanding-Undefined-And-Null" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="JavaScript の undefined と null を完全に理解する"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="JavaScript の undefined と null を完全に理解する" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+
+        
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+        
+
+        <div class="post-recent">
+    <div class="pre">
+
+    
+        <p><strong>前の投稿</strong> <a href="/2022-10-03-How-To-Make-Wordle-Solver">Wordle のソルバー（Hard Mode 対応）を作りました</a></p>
+    
+    </div>
+    <div class="nex">
+
+        
+        <p><strong>次の投稿</strong> <a href="/2022-11-14-Be-careful-about-console-log-in-chrome">Chrome の console.log でハマらないために</a></p>
+        
+    </div>
+</div>
+
+
+    </div>
+    <button class="anchor"><i class="fa fa-anchor"></i></button>
+
+
+    <div class="right">
+        <div class="wrap">
+            <div class="side">
+                <div>
+                    <i class="fa fa-tags"></i>
+                    Top Popular Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2016-07-23-stock-strategy-for-early-startup-employee">スタートアップに転職する時に最低限知っておくべき株の話</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/582">生WebGL入門:初音ミクの美麗3Dモデルを表示する(前編)</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2017-10-06-Making_a-business_plan">事業計画書の作り方、新規ビジネスの考え方</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/902">Convertible Note / Convertible Equity とは？</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/488">JavaScript イディオム集</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/465">ExGameの製作で感じたこと</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                </ul>
+            </div>
+
+            <div class="side">
+                <div>
+                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                    Recent Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        <li><a href="/2024-08-28-Review-Binary-Hacks-Rebooted">書評 "Binary Hacks Rebooted"</a></li>
+                    
+                        <li><a href="/2024-06-10-Deep-Dive-into-ARM-JavaScript-Special-Instruction-FJCVTZS">ARM に存在する JavaScript 専用命令「FJCVTZS」を追う（ついでに V8 をビルドする）</a></li>
+                    
+                        <li><a href="/2024-06-03-Exploring-V8-JIT-Outputs">JavaScript 実行エンジン V8 の JIT 出力コードを読んでみよう</a></li>
+                    
+                </ul>
+            </div>
+
+            <!-- <div class="side">
+                <div>
+                    <i class="fa fa-external-link"></i>
+                    Links
+                </div>
+                <ul  class="content-ul">
+
+                </ul>
+            </div> -->
+        </div>
+    </div>
+
+
+
+</div>
+<script>
+/**
+ * target _blank
+ */
+(function() {
+    var aTags = document.querySelectorAll('article a:not([id])')
+    for (var i = 0; i < aTags.length; i++) {
+        aTags[i].setAttribute('target', '_blank')
+    }
+}());
+</script>
+<script src="/js/pageContent.js " charset="utf-8"></script>
+
+
+    <footer class="site-footer">
+
+
+    <div class="wrapper">
+
+        <p class="description">
+             Takuo Kihira 
+        </p>
+        <p class="contact">
+            Contact me at: 
+            <a href="https://github.com/tkihira" title="GitHub"><i class="fa fa-github" aria-hidden="true"></i></a>     
+            <a href="https://twitter.com/tkihira" title="Twitter"><i class="fa fa-twitter" aria-hidden="true"></i></a>  
+            <a href="https://www.facebook.com/takuo.kihira" title="Facebook"><i class="fa fa-facebook-official" aria-hidden="true"></i></a>    
+        </p>
+        <p class="power">
+            <span>
+                Site powered by <a href="https://jekyllrb.com/">Jekyll</a>.
+            </span>
+            <span>
+                Theme designed by <a href="https://github.com/Gaohaoyang">HyG</a>.
+            </span>
+        </p>
+    </div>
+</footer>
+
+    <div class="back-to-top">
+    <a href="#top" class="scroll">
+        <i class="fa fa-arrow-up" aria-hidden="true"></i>
+    </a>
+</div>
+
+    <script src=" /js/main.js " charset="utf-8"></script>
+    <script src=" /js/scroll.min.js " charset="utf-8"></script>
+  </body>
+
+</html>

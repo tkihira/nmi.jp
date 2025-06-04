@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html><head><title>右回りと左回り</title>
+<script>
+(function() {
+	window.onload = function() {
+		var canvas = document.getElementById("canvas1");
+		var ctx = canvas.getContext("2d");
+		ctx.fillStyle = "rgb(128,255,255)";
+		ctx.fillRect(0, 0, 400, 300);
+		ctx.beginPath();
+		ctx.arc(150, 150, 150, 0, Math.PI * 2, false);
+		ctx.arc(250, 150, 150, 0, Math.PI * 2, false);
+		ctx.fillStyle = "rgb(0,0,0)";
+		ctx.fill();
+		
+		canvas = document.getElementById("canvas2");
+		ctx = canvas.getContext("2d");
+		ctx.fillStyle = "rgb(128,255,255)";
+		ctx.fillRect(0, 0, 400, 300);
+		ctx.beginPath();
+		ctx.arc(150, 150, 150, 0, Math.PI * 2, false);
+		ctx.arc(250, 150, 150, 0, Math.PI * 2, true);
+		ctx.fillStyle = "rgb(0,0,0)";
+		ctx.fill();
+	};
+})();
+</script></head>
+<body><canvas id="canvas1" width="400" height="300"></canvas><br><canvas id="canvas2" width="400" height="300"></canvas></body></html>

@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Chrome の隠し機能 chrome://tracing (about:tracing) の使い方</title>
+    <meta name="description" content="こんにちは。仕事上で chrome://tracing (about:tracing) を使う必要が出たので、私の知っている限りの情報をここでまとめることにしました。chrome://tracing の情報は世の中にあまりありません。もし記事中に間違いを見つけられたり、より良い利用方法をご存知の方は、ぜひ @tk...">
+
+    <link rel="stylesheet" href=" /css/fontawesome/css/font-awesome.min.css ">
+    <link rel="stylesheet" href=" /css/main.css ">
+    <link rel="canonical" href="http://nmi.jp/2018-02-17-How-to-use-chrome_tracing">
+    <link rel="alternate" type="application/rss+xml" title="nmi.jp" href="http://nmi.jp/feed.xml">
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=3.0'></script>
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=1.1'></script>
+    <script>
+        if(location.href.match(/\.html$/)) {
+            location.href = location.href.match(/(.+)\.html/)[1];
+        }
+    </script>
+
+
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-229769-8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-229769-8');
+</script>
+</head>
+
+
+  <body>
+
+    <header id="top">
+    <div class="wrapper">
+        <a href="/" class="brand">nmi.jp</a>
+        <small>Twitter → <a href="https://twitter.com/tkihira" target="_blank">@tkihira</a></small>
+        <button id="headerMenu" class="menu"><i class="fa fa-bars"></i></button>
+        <nav id="headerNav">
+            <ul>
+                <li>
+                    
+                    <a href="/">
+                    
+                        <i class="fa fa-home"></i>Home
+                    </a>
+                </li>
+
+                
+                    
+                    <li>
+                        
+                        <a href="/archive/">
+                        
+                            <i class="fa fa-archive"></i>Archives
+                        </a>
+                    </li>
+                    
+                
+                    
+                    <li>
+                        
+                        <a href="/category/">
+                        
+                            <i class="fa fa-th-list"></i>Categories
+                        </a>
+                    </li>
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            </ul>
+        </nav>
+    </div>
+</header>
+
+
+        <div class="page clearfix" post>
+    <div class="left">
+        <div class="post-recent">
+    <table style="width:100%;border:0;padding:0;"><tbody><tr style="padding:0">
+        <td class="toppre" style="padding:0">
+        
+        <a href="/2017-12-03-Profiling-of-huge-wasm">巨大 WebAssembly ファイルのコンパイル時間</a>
+        
+        </td><td class="topnex" style="text-align:right;padding:0">
+        
+        <a href="/2018-03-19-WebAssembly-with-Rust">Rust で WebAssembly を出力する</a>
+        
+        </td>
+    </tr></tbody></table>
+</div>
+
+        <hr style="margin:0"/>
+        <h1 style="margin-top:10px">Chrome の隠し機能 chrome://tracing (about:tracing) の使い方</h1>
+<hr />
+        <div class="label">
+
+            <div class="label-card">
+                <i class="fa fa-calendar"></i>2018-02-17
+            </div>
+
+            <div class="label-card">
+                <i class="fa fa-user"></i>Takuo Kihira
+                
+            </div>
+
+            <div class="label-card">
+                
+            </div>
+
+            <div class="label-card">
+            
+
+
+<!-- <span class="point">•</span> -->
+<span class="categories">
+  <i class="fa fa-th-list"></i>
+  
+    
+        <a href="/category/#JavaScript" title="Category: JavaScript" rel="category">JavaScript</a>
+    
+  
+
+  <!-- <span class="point">•</span> -->
+</span>
+
+
+            </div>
+
+            <div class="label-card">
+                <a href="https://github.com/tkihira/nmi.jp/blob/master/_posts/2018-02-17-How-to-use-chrome_tracing.md" target="_blank"><i class="fa fa-github"></i></a>
+            </div>
+
+        </div>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/2018-02-17-How-to-use-chrome_tracing&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="Chrome の隠し機能 chrome://tracing (about:tracing) の使い方" data-url="http://nmi.jp/2018-02-17-How-to-use-chrome_tracing">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/2018-02-17-How-to-use-chrome_tracing" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="Chrome の隠し機能 chrome://tracing (about:tracing) の使い方"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="Chrome の隠し機能 chrome://tracing (about:tracing) の使い方" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+        <article itemscope itemtype="http://schema.org/BlogPosting">
+        <p>こんにちは。仕事上で <span style="font-weight:bold">chrome://tracing (about:tracing)</span> を使う必要が出たので、私の知っている限りの情報をここでまとめることにしました。</p>
+
+<p>chrome://tracing の情報は世の中にあまりありません。もし記事中に間違いを見つけられたり、より良い利用方法をご存知の方は、ぜひ <a href="https://twitter.com/tkihira">@tkihira</a> まで教えてください。よろしくお願いします！</p>
+
+<p>なお実際は隠し機能ではなく、ただあまり知られていないだけです。公式の情報は <a href="https://www.chromium.org/developers/how-tos/trace-event-profiling-tool">https://www.chromium.org/developers/how-tos/trace-event-profiling-tool</a> ここから辿れると思います。</p>
+
+<h1 id="注意">注意</h1>
+
+<p>この機能は、Chrome のインスタンス全体のプロファイルを取るものです。不用意に実行すると、<span style="color:red;font-weight:bold">すべての Chrome のタブを巻き込んで落ちます</span>。記事中では Chrome Canary を別に立ち上げて、そこで計測しています。皆様も気をつけてください。</p>
+
+<h1 id="どんな時に使うのか">どんな時に使うのか</h1>
+
+<p>Chrome には、皆さんご存知 DevTools があります。大変高機能で、Web の開発において頻繁に利用します。私が一番使うのはコンソールですが、他にもネットワークのログを見たり、メモリのスナップショットを取ったり、DOMにアクセスして要素を変更したり、Web 開発に便利な様々な機能が利用できます。</p>
+
+<p>DevTools の中には Performance というタブがあり、ここでプロファイルを取ることが出来ます。瞬間瞬間のCPUの使用率、その時点で呼び出されている関数と消費時間、メモリ使用率、スクリーンショットなどなど、時系列でアプリケーションのいろいろな情報を記録することが出来て、それらの情報は問題の原因を探る上で貴重な手がかりになります。</p>
+
+<p>普通はこれらの情報で十分足りるのですが、巨大な asm.js や WebAssembly などとガッツリ取り組んでいる場合、時たまプロファイルが出力する情報では満足出来なくなることがあります。</p>
+
+<p>例として、<a href="http://webassembly.org/demo/">WebAssembly の公式デモ</a>のプロファイルを取ってみましょう。Unity から出力されたサンプルゲームのプロファイルです。</p>
+
+<p><img src="/img/wasm-profile.png" alt="WebAssembly Profiling Result" /></p>
+
+<p>私の環境ではダウンロード完了から起動までに10秒ほどかかっているのですが、そこに記録されているのは<span style="color:blue">Run Microtasks</span>という謎の処理です。また、それ以外の何も記録されていない白い部分でも相当の時間がかかっており、一体内部でどのような処理を行っているのか（もしくは本当に何もしていないのか）をこのプロファイル結果から伺い知ることは出来ません。</p>
+
+<p><span style="color:#ccc">（こんなことは普通に開発している限り、滅多にないんですけどね…）</span></p>
+
+<p>このような場合に、C++ のソースコードレベルで何をしているのかチェックしたい場合に使うのが <span style="font-weight:bold;color:red">chrome://tracing (about:tracing)</span> です。たぶん。今回は、この謎の空白部分でブラウザが何をしているのかを調べてみましょう。</p>
+
+<h1 id="使い方">使い方</h1>
+
+<p>chrome://tracing は、Chrome で動いているすべてのタスクのプロファイルを取ります。関係ないページを沢山開いていると、それらすべてのプロファイルも取ることになります。それは無駄ですし不用意に実行するとブラウザの反応がなくなるほど重くなるので、個人的に chrome://tracing を使う時にはそれ専用の Chrome インスタンスを別に立ち上げています。今回は Chrome Canary を使うことにしました。</p>
+
+<p>まずはアドレスバーに about:tracing （もしくは chrome://tracing ）と打ち込みます。そうすると次の画面が出てきます。</p>
+
+<p><img src="/img/tracing-usage-0.png" alt="usage" /></p>
+
+<p>この画面を見るときは大体切羽詰まっているので、謎の顔文字にイラッとします。ここで左上の Record ボタンを押します。</p>
+
+<p><img src="/img/tracing-usage-1.png" alt="usage" /></p>
+
+<p>とりあえず今回は WebDeveloper を選んでおきましょう。ここで Edit categories を選んで細かく出力情報を選べるので、ぜひ見てみてください。さて、ここで Record を押すとプロファイリングが始まるのですが、その前に別タブを立ち上げてプロファイル対象の準備をしましょう。</p>
+
+<p><img src="/img/tracing-usage-2.jpg" alt="usage" /></p>
+
+<p>私はプライベートモードで立ち上げました。プライベートモードのタブであっても問題なくプロファイルをとれます。</p>
+
+<p>そして、chrome://tracing のタブに戻り、Record ボタンを押して、プロファイルの対象タブに移動し、今回の場合は Play WebAssembly ボタンを押します。そしてプロファイルしたいところまでの動作が完了したら、Stop ボタンを押してプロファイルを止めます。</p>
+
+<p><img src="/img/tracing-usage-3.png" alt="usage" /></p>
+
+<p>色々と内部で処理が終わったら、プロファイルの結果が表示されます。このプロファイル結果画面は、DevTools みたいに優しくありません。マウスツールを駆使しながら時間軸の拡大縮小を行い、目的の部分を見つけ出す必要があります。大変面倒です。</p>
+
+<p>とりあえずスクロールし、<span style="color:red">Unity WebGL Player | Tanks!</span> と書かれた Renderer を見つけ、そこの CrRendererMain に注目しましょう。</p>
+
+<p><img src="/img/tracing-usage-4.png" alt="usage" /></p>
+
+<p>マウスツールの「拡大縮小」を選び、紫のバーの先頭の方を拡大してみます。拡大縮小ツールは上にドラッグすると拡大、下にドラッグすると縮小出来ます。上手く拡大して対象をダブルクリックして、次のように具体的になにをやっているのか確認してみましょう。</p>
+
+<p><img src="/img/tracing-usage-5.png" alt="usage" /></p>
+
+<p>例えばここでは <span style="font-weight:bold">V8.ScriptCompiler</span> が呼ばれていることが確認出来ました。では問題の、プロファイル上では空白に見えた地点で何をやっているのか確認してみましょう。紫のバーに見えた所を拡大してみると、細かいタスクの寄せ集めであることがわかります。そのうちの一つを確認してみましょう。</p>
+
+<p><img src="/img/tracing-usage-6.png" alt="usage" /></p>
+
+<p>何らかの超小さいタスクが実行されていることがわかります。ソースコードは <code class="language-plaintext highlighter-rouge">v8_foreground_task_runner.cc</code>、関数名は <code class="language-plaintext highlighter-rouge">PostTask</code> であることが読み取れます。今回のプロファイリングからは、どうやら WebAssembly のコンパイル後に、何らかの超細かい大量のタスクが実行されていること、また個々のタスクが小さすぎてオーバーヘッドが大きく無駄な時間が消費されていること、が読み取れます。これ以上調べるためには、直接ソースコードを読んで、実際にデバッグログを入れた Chromium をビルドしたりすることになりそうです。</p>
+
+<h1 id="まとめ">まとめ</h1>
+
+<p>Chrome は DevTools のプロファイラが大変しっかりしているので、この機能が必要になる状況においてこの機能を使っても、大抵の場合、特に解決しません。それでも、どうしようも無い時にブラウザの奥底で何が起こっているのかを可能な限り理解するための手軽な方法としては結構役立ちます。以前この機能を使うことで、Chrome のバグで無駄な JavaScript の再コンパイルが発生していることを確認出来たので、報告して修正してもらったことがありました。</p>
+
+<p>あまり使うことはないとは思いますが、知っていて損をする情報でもないですし、日本語資料は一切無かったと思うので、書いておきました。自分も詳しいわけではないので、（冒頭でも書きましたが）間違いやもっとよい使い方などご存知であれば、ぜひ <a href="https://twitter.com/tkihira">@tkihira</a> まで教えてください。よろしくお願いします！</p>
+
+<h1 id="追記2018-02-18">追記(2018-02-18)</h1>
+
+<p>Twitterにて <a href="https://twitter.com/azu_re">azu</a> さんに “<a href="https://qiita.com/keishi/items/5f1af0851901e9021488">パフォーマンス計測に困らない！tracing活用術100</a>” という Web を教えてもらいました。上で「日本語資料は一切なかった」とか書いておきながら、こんなに詳しいサイトがあったんですね、お恥ずかしい。ありがとうございました！</p>
+
+
+        </article>
+        <hr>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/2018-02-17-How-to-use-chrome_tracing&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="Chrome の隠し機能 chrome://tracing (about:tracing) の使い方" data-url="http://nmi.jp/2018-02-17-How-to-use-chrome_tracing">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/2018-02-17-How-to-use-chrome_tracing" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="Chrome の隠し機能 chrome://tracing (about:tracing) の使い方"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="Chrome の隠し機能 chrome://tracing (about:tracing) の使い方" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+
+        
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+        
+
+        <div class="post-recent">
+    <div class="pre">
+
+    
+        <p><strong>前の投稿</strong> <a href="/2017-12-03-Profiling-of-huge-wasm">巨大 WebAssembly ファイルのコンパイル時間</a></p>
+    
+    </div>
+    <div class="nex">
+
+        
+        <p><strong>次の投稿</strong> <a href="/2018-03-19-WebAssembly-with-Rust">Rust で WebAssembly を出力する</a></p>
+        
+    </div>
+</div>
+
+
+    </div>
+    <button class="anchor"><i class="fa fa-anchor"></i></button>
+
+
+    <div class="right">
+        <div class="wrap">
+            <div class="side">
+                <div>
+                    <i class="fa fa-tags"></i>
+                    Top Popular Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2016-07-23-stock-strategy-for-early-startup-employee">スタートアップに転職する時に最低限知っておくべき株の話</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/582">生WebGL入門:初音ミクの美麗3Dモデルを表示する(前編)</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2017-10-06-Making_a-business_plan">事業計画書の作り方、新規ビジネスの考え方</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/902">Convertible Note / Convertible Equity とは？</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/488">JavaScript イディオム集</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/465">ExGameの製作で感じたこと</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                </ul>
+            </div>
+
+            <div class="side">
+                <div>
+                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                    Recent Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        <li><a href="/2024-08-28-Review-Binary-Hacks-Rebooted">書評 "Binary Hacks Rebooted"</a></li>
+                    
+                        <li><a href="/2024-06-10-Deep-Dive-into-ARM-JavaScript-Special-Instruction-FJCVTZS">ARM に存在する JavaScript 専用命令「FJCVTZS」を追う（ついでに V8 をビルドする）</a></li>
+                    
+                        <li><a href="/2024-06-03-Exploring-V8-JIT-Outputs">JavaScript 実行エンジン V8 の JIT 出力コードを読んでみよう</a></li>
+                    
+                </ul>
+            </div>
+
+            <!-- <div class="side">
+                <div>
+                    <i class="fa fa-external-link"></i>
+                    Links
+                </div>
+                <ul  class="content-ul">
+
+                </ul>
+            </div> -->
+        </div>
+    </div>
+
+
+
+</div>
+<script>
+/**
+ * target _blank
+ */
+(function() {
+    var aTags = document.querySelectorAll('article a:not([id])')
+    for (var i = 0; i < aTags.length; i++) {
+        aTags[i].setAttribute('target', '_blank')
+    }
+}());
+</script>
+<script src="/js/pageContent.js " charset="utf-8"></script>
+
+
+    <footer class="site-footer">
+
+
+    <div class="wrapper">
+
+        <p class="description">
+             Takuo Kihira 
+        </p>
+        <p class="contact">
+            Contact me at: 
+            <a href="https://github.com/tkihira" title="GitHub"><i class="fa fa-github" aria-hidden="true"></i></a>     
+            <a href="https://twitter.com/tkihira" title="Twitter"><i class="fa fa-twitter" aria-hidden="true"></i></a>  
+            <a href="https://www.facebook.com/takuo.kihira" title="Facebook"><i class="fa fa-facebook-official" aria-hidden="true"></i></a>    
+        </p>
+        <p class="power">
+            <span>
+                Site powered by <a href="https://jekyllrb.com/">Jekyll</a>.
+            </span>
+            <span>
+                Theme designed by <a href="https://github.com/Gaohaoyang">HyG</a>.
+            </span>
+        </p>
+    </div>
+</footer>
+
+    <div class="back-to-top">
+    <a href="#top" class="scroll">
+        <i class="fa fa-arrow-up" aria-hidden="true"></i>
+    </a>
+</div>
+
+    <script src=" /js/main.js " charset="utf-8"></script>
+    <script src=" /js/scroll.min.js " charset="utf-8"></script>
+  </body>
+
+</html>

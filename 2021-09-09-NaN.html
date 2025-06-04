@@ -1,0 +1,1723 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>JavaScript クイズ解説: NaN === NaN の結果はどうなる？</title>
+    <meta name="description" content="先日、このようなツイートを書きました。久しぶりの JavaScript クイズ。JavaScript において NaN === NaN の結果は次のうちどれになるでしょうか？&mdash; Takuo Kihira (@tkihira) September 7, 2021答えは 4 の「状況によって上記以外もあり...">
+
+    <link rel="stylesheet" href=" /css/fontawesome/css/font-awesome.min.css ">
+    <link rel="stylesheet" href=" /css/main.css ">
+    <link rel="canonical" href="http://nmi.jp/2021-09-09-NaN">
+    <link rel="alternate" type="application/rss+xml" title="nmi.jp" href="http://nmi.jp/feed.xml">
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=3.0'></script>
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=1.1'></script>
+    <script>
+        if(location.href.match(/\.html$/)) {
+            location.href = location.href.match(/(.+)\.html/)[1];
+        }
+    </script>
+
+
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-229769-8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-229769-8');
+</script>
+</head>
+
+
+  <body>
+
+    <header id="top">
+    <div class="wrapper">
+        <a href="/" class="brand">nmi.jp</a>
+        <small>Twitter → <a href="https://twitter.com/tkihira" target="_blank">@tkihira</a></small>
+        <button id="headerMenu" class="menu"><i class="fa fa-bars"></i></button>
+        <nav id="headerNav">
+            <ul>
+                <li>
+                    
+                    <a href="/">
+                    
+                        <i class="fa fa-home"></i>Home
+                    </a>
+                </li>
+
+                
+                    
+                    <li>
+                        
+                        <a href="/archive/">
+                        
+                            <i class="fa fa-archive"></i>Archives
+                        </a>
+                    </li>
+                    
+                
+                    
+                    <li>
+                        
+                        <a href="/category/">
+                        
+                            <i class="fa fa-th-list"></i>Categories
+                        </a>
+                    </li>
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            </ul>
+        </nav>
+    </div>
+</header>
+
+
+        <div class="page clearfix" post>
+    <div class="left">
+        <div class="post-recent">
+    <table style="width:100%;border:0;padding:0;"><tbody><tr style="padding:0">
+        <td class="toppre" style="padding:0">
+        
+        <a href="/2020-12-24-About-Acquiring">10 年前に JavaScript で Flash Player を開発し買収された話</a>
+        
+        </td><td class="topnex" style="text-align:right;padding:0">
+        
+        <a href="/2022-01-24-Bitwise-operation-with-JavaScript">JavaScript で学ぶビット演算の基礎</a>
+        
+        </td>
+    </tr></tbody></table>
+</div>
+
+        <hr style="margin:0"/>
+        <h1 style="margin-top:10px">JavaScript クイズ解説: NaN === NaN の結果はどうなる？</h1>
+<hr />
+        <div class="label">
+
+            <div class="label-card">
+                <i class="fa fa-calendar"></i>2021-09-09
+            </div>
+
+            <div class="label-card">
+                <i class="fa fa-user"></i>Takuo Kihira
+                
+            </div>
+
+            <div class="label-card">
+                
+            </div>
+
+            <div class="label-card">
+            
+
+
+<!-- <span class="point">•</span> -->
+<span class="categories">
+  <i class="fa fa-th-list"></i>
+  
+    
+        <a href="/category/#JavaScript" title="Category: JavaScript" rel="category">JavaScript</a>
+    
+  
+
+  <!-- <span class="point">•</span> -->
+</span>
+
+
+            </div>
+
+            <div class="label-card">
+                <a href="https://github.com/tkihira/nmi.jp/blob/master/_posts/2021-09-09-NaN.md" target="_blank"><i class="fa fa-github"></i></a>
+            </div>
+
+        </div>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/2021-09-09-NaN&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="JavaScript クイズ解説: NaN === NaN の結果はどうなる？" data-url="http://nmi.jp/2021-09-09-NaN">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/2021-09-09-NaN" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="JavaScript クイズ解説: NaN === NaN の結果はどうなる？"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="JavaScript クイズ解説: NaN === NaN の結果はどうなる？" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+        <article itemscope itemtype="http://schema.org/BlogPosting">
+        <p>先日、このようなツイートを書きました。</p>
+
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">久しぶりの JavaScript クイズ。<br />JavaScript において NaN === NaN の結果は次のうちどれになるでしょうか？</p>&mdash; Takuo Kihira (@tkihira) <a href="https://twitter.com/tkihira/status/1435379645310902276?ref_src=twsrc%5Etfw">September 7, 2021</a></blockquote>
+<script async="" src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<p><strong>答えは <span style="color:red">4 の「状況によって上記以外もありうる」</span>です</strong>。でも、2 や 3 を選んだ方も、もはや正解だといって差し支えないと思います。</p>
+
+<p>解説が長くなったので、ブログ記事にまとめました。</p>
+
+<h1 id="そもそも-nan-とは">そもそも NaN とは</h1>
+
+<p><code class="language-plaintext highlighter-rouge">NaN</code> は “Not a Number” を意味する数値です。数値なのに「Not a Number」というのは違和感があるかもしれませんが、数値表現することが出来ない状態を保持するために便宜的に用意された数値、というようなものです。</p>
+
+<p><code class="language-plaintext highlighter-rouge">NaN</code> は、浮動小数点演算において数値では表現出来ない計算をしようとすると登場します。例えば JavaScript において <code class="language-plaintext highlighter-rouge">0 / 0</code> の計算結果は <code class="language-plaintext highlighter-rouge">NaN</code> になります。<code class="language-plaintext highlighter-rouge">Infinity * 0</code> も <code class="language-plaintext highlighter-rouge">NaN</code> です。実際の JavaScript のプログラムでは、<code class="language-plaintext highlighter-rouge">"string" - 0</code> のように、他の型を数値に変換した時に発生することが多いでしょう。</p>
+
+<p>JavaScript における <code class="language-plaintext highlighter-rouge">NaN</code> に対する数値演算は、常に <code class="language-plaintext highlighter-rouge">NaN</code> になります。一度 <code class="language-plaintext highlighter-rouge">NaN</code> が登場すると、それが伝搬してしまい、思わぬところで <code class="language-plaintext highlighter-rouge">NaN</code> が登場してしまうことがあります。</p>
+
+<p><code class="language-plaintext highlighter-rouge">NaN</code> は falsy であり、boolean に変換すると <code class="language-plaintext highlighter-rouge">false</code> になります。しかし、他の falsy な値と違い、false と比較しても false を返します。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="kc">NaN</span> <span class="o">==</span> <span class="kc">false</span><span class="p">);</span> <span class="c1">// → false</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">""</span> <span class="o">==</span> <span class="kc">false</span><span class="p">);</span> <span class="c1">// → true</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="mi">0</span> <span class="o">==</span> <span class="kc">false</span><span class="p">);</span> <span class="c1">// → true</span>
+</code></pre></div></div>
+
+<p>これは<a href="https://tc39.es/ecma262/#sec-islooselyequal">数値型と boolean の比較の場合は boolean が数値に変換されて比較される仕様</a>の影響であり、この場合は <code class="language-plaintext highlighter-rouge">NaN === 0</code> という比較になり、結果 <code class="language-plaintext highlighter-rouge">false</code> が返っています。少し特殊な状況ですね。</p>
+
+<h1 id="nan-の比較">NaN の比較</h1>
+
+<p>さて、今回のツイートの問題である <code class="language-plaintext highlighter-rouge">NaN</code> 同士の比較についてですが、これはなんと <code class="language-plaintext highlighter-rouge">false</code> になります。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="kc">NaN</span> <span class="o">===</span> <span class="kc">NaN</span><span class="p">);</span> <span class="c1">// → false</span>
+</code></pre></div></div>
+
+<p>JavaScript(ECMAScript) では NaN の扱い方は明確に仕様で決められています。</p>
+
+<p><a href="https://tc39.es/ecma262/#sec-numeric-types-number-equal">https://tc39.es/ecma262/#sec-numeric-types-number-equal</a></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Number::equal ( x, y )
+
+The abstract operation Number::equal takes arguments x (a Number) and y (a Number). It performs the following steps when called:
+
+1. If x is NaN, return false.
+2. If y is NaN, return false.
+3. If x is the same Number value as y, return true.
+4. If x is +0𝔽 and y is -0𝔽, return true.
+5. If x is -0𝔽 and y is +0𝔽, return true.
+6. Return false.
+</code></pre></div></div>
+
+<p>このように、どちらかが <code class="language-plaintext highlighter-rouge">NaN</code> であれば、常に <code class="language-plaintext highlighter-rouge">false</code> が返るようになっています。</p>
+
+<p>JavaScript における <code class="language-plaintext highlighter-rouge">NaN</code> に対する比較は not equal 以外はすべて false が返ります。not equal は true が返ります。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="kc">NaN</span> <span class="o">===</span> <span class="kc">NaN</span><span class="p">);</span> <span class="c1">// → false</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="kc">NaN</span> <span class="o">&gt;</span> <span class="kc">NaN</span><span class="p">);</span> <span class="c1">// → false</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="kc">NaN</span> <span class="o">&gt;=</span> <span class="kc">NaN</span><span class="p">);</span> <span class="c1">// → false</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="kc">NaN</span> <span class="o">&lt;</span> <span class="kc">NaN</span><span class="p">);</span> <span class="c1">// → false</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="kc">NaN</span> <span class="o">&lt;=</span> <span class="kc">NaN</span><span class="p">);</span> <span class="c1">// → false</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="kc">NaN</span> <span class="o">!==</span> <span class="kc">NaN</span><span class="p">);</span> <span class="c1">// → true</span>
+</code></pre></div></div>
+
+<p>このような仕様に決まったのは、浮動小数点演算の標準規格である <a href="https://ja.wikipedia.org/wiki/IEEE_754">IEEE 754</a> の影響です。IEEE 754 内で、NaN に対する比較が上記のように定義されています。</p>
+
+<p>JavaScript 以外の言語でも、大抵は IEEE 754 に準拠しており、同じ比較結果になることが期待されます。JavaScript に限らず、<code class="language-plaintext highlighter-rouge">NaN</code> と <code class="language-plaintext highlighter-rouge">NaN</code> の比較は <code class="language-plaintext highlighter-rouge">false</code> になることが多い、という風に理解しておくと良いと思います。</p>
+
+<h2 id="余談1-nan-のビット表現">余談1: NaN のビット表現</h2>
+
+<p><code class="language-plaintext highlighter-rouge">NaN</code> は IEEE 754 において、複数通りのビット表現を持つことが許されています。<code class="language-plaintext highlighter-rouge">NaN</code> 以外のすべての浮動小数点の数値は <code class="language-plaintext highlighter-rouge">+Infinity</code> <code class="language-plaintext highlighter-rouge">-Infinity</code> <code class="language-plaintext highlighter-rouge">+0</code> <code class="language-plaintext highlighter-rouge">-0</code> を含め、すべて一意のビット表現を持ちます。しかし <code class="language-plaintext highlighter-rouge">NaN</code> だけは、指数部のビットがすべて 1 であれば、仮数部に 0 以外の何を持っても <code class="language-plaintext highlighter-rouge">NaN</code> になると定義されています（仮数部が 0 になると <code class="language-plaintext highlighter-rouge">Infinity</code> になります）。</p>
+
+<p>これを、TypedArray を用いて実際に確かめてみることが出来ます（このコードはリトルエンディアン前提です）。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">floatView</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Float64Array</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">charView</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Uint8Array</span><span class="p">(</span><span class="nx">floatView</span><span class="p">.</span><span class="nx">buffer</span><span class="p">);</span>
+<span class="nx">floatView</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="kc">NaN</span><span class="p">;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">charView</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">,</span><span class="dl">'</span><span class="p">));</span> <span class="c1">// → 0,0,0,0,0,0,248,127</span>
+<span class="c1">// 127 -&gt; 0111 1111</span>
+<span class="c1">// 248 -&gt; 1111 1000</span>
+<span class="nx">charView</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="mh">0xf0</span><span class="p">;</span> <span class="c1">// 1111 0000</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">floatView</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span> <span class="c1">// → Infinity: 仮数部が全部 0 のため</span>
+<span class="nx">charView</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="mh">0xf4</span> <span class="c1">// 1111 0100</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">floatView</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span> <span class="c1">// → NaN: 仮数部にビットが立っているため</span>
+</code></pre></div></div>
+
+<p>この例でいうと、最初の <code class="language-plaintext highlighter-rouge">0111 1111 1111 1000 [0000 0000]×6</code> と <code class="language-plaintext highlighter-rouge">0111 1111 1111 0100 [0000 0000]×6</code> ではビット表現が違いますが、両者とも同じように <code class="language-plaintext highlighter-rouge">NaN</code> を表現していることがわかります。</p>
+
+<h1 id="ここまでのまとめ">ここまでのまとめ</h1>
+
+<p><strong>JavaScript では NaN 同士の比較は false になります</strong></p>
+
+<p>なので例えば、</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if </span><span class="p">(</span><span class="nx">value</span> <span class="o">===</span> <span class="kc">NaN</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// value が NaN だった時の処理</span>
+  <span class="p">...</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>みたいなコードは、意図通りに動かないので気をつけましょう。こういう場合は次のように書きます</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if </span><span class="p">(</span><span class="nb">Number</span><span class="p">.</span><span class="nf">isNaN</span><span class="p">(</span><span class="nx">value</span><span class="p">))</span> <span class="p">{</span>
+  <span class="c1">// value が NaN だった時の処理</span>
+  <span class="p">...</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="余談2-javascript-の-isnan-と-numberisnan">余談2: JavaScript の isNaN と Number.isNaN</h2>
+
+<p>グローバルオブジェクトにある <code class="language-plaintext highlighter-rouge">isNaN</code> 関数と、ビルトインオブジェクト <code class="language-plaintext highlighter-rouge">Number</code> のプロパティにある <code class="language-plaintext highlighter-rouge">isNaN</code> 関数は挙動が違うので気をつけましょう。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>入力</th>
+      <th>isNaN</th>
+      <th>Number.isNaN</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>NaN</td>
+      <td>true</td>
+      <td>true</td>
+    </tr>
+    <tr>
+      <td>0</td>
+      <td>false</td>
+      <td>false</td>
+    </tr>
+    <tr>
+      <td>“string”</td>
+      <td><span style="color:red">true</span></td>
+      <td>false</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><code class="language-plaintext highlighter-rouge">isNaN</code> は、入力を数値に変換すると <code class="language-plaintext highlighter-rouge">NaN</code> になる場合に <code class="language-plaintext highlighter-rouge">true</code> を返します。一方で <code class="language-plaintext highlighter-rouge">Number.isNaN</code> は入力が <code class="language-plaintext highlighter-rouge">NaN</code> そのものであった場合のみ <code class="language-plaintext highlighter-rouge">true</code> を返します。</p>
+
+<h2 id="余談3-javascript-ビルトイン関数の-nan-比較問題">余談3: JavaScript ビルトイン関数の NaN 比較問題</h2>
+
+<p>配列の中にある <code class="language-plaintext highlighter-rouge">NaN</code> を探す時に、この <code class="language-plaintext highlighter-rouge">NaN</code> の仕様のせいで少しおかしなことになりますので注意しましょう。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="kc">NaN</span><span class="p">,</span> <span class="mi">2</span><span class="p">];</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">a</span><span class="p">.</span><span class="nf">indexOf</span><span class="p">(</span><span class="kc">NaN</span><span class="p">));</span> <span class="c1">// → -1  !!!!!</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">a</span><span class="p">.</span><span class="nf">includes</span><span class="p">(</span><span class="kc">NaN</span><span class="p">));</span> <span class="c1">// → true</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">a</span><span class="p">.</span><span class="nf">findIndex</span><span class="p">(</span><span class="nx">v</span> <span class="o">=&gt;</span> <span class="nb">Number</span><span class="p">.</span><span class="nf">isNaN</span><span class="p">(</span><span class="nx">v</span><span class="p">)));</span> <span class="c1">// → 5</span>
+</code></pre></div></div>
+
+<p>このように、<span style="color:red"><code class="language-plaintext highlighter-rouge">indexOf</code> で NaN を探そうとしても見つけることが出来ません</span>。内部で <code class="language-plaintext highlighter-rouge">NaN === NaN</code> を呼んで、それが <code class="language-plaintext highlighter-rouge">false</code> を返してしまっているからです。</p>
+
+<h1 id="nan--nan-は常に-false-なのか">NaN === NaN は常に false なのか</h1>
+
+<p>以上より、<code class="language-plaintext highlighter-rouge">NaN === NaN</code> が <code class="language-plaintext highlighter-rouge">false</code> になる、ということをご理解いただけたかと思います。では冒頭の問題は 2 番が正解なのでしょうか？</p>
+
+<p>しかし、<span style="color:red"><strong>状況によっては <code class="language-plaintext highlighter-rouge">NaN === NaN</code> が <code class="language-plaintext highlighter-rouge">true</code> になることがあります</strong></span>。ここではそれをご説明しましょう。</p>
+
+<p><code class="language-plaintext highlighter-rouge">NaN</code> は JavaScript(ECMAScript) において次のように定義されています。</p>
+
+<p><a href="https://tc39.es/ecma262/#sec-value-properties-of-the-global-object-nan">https://tc39.es/ecma262/#sec-value-properties-of-the-global-object-nan</a></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>19.1 Value Properties of the Global Object
+
+（略）
+
+19.1.3 NaN
+The value of NaN is NaN (see 6.1.6.1). This property has the attributes { [[Writable]]: false, [[Enumerable]]: false, [[Configurable]]: false }.
+
+19.1.4 undefined
+The value of undefined is undefined (see 6.1.1). This property has the attributes { [[Writable]]: false, [[Enumerable]]: false, [[Configurable]]: false }.
+</code></pre></div></div>
+
+<p>実は <code class="language-plaintext highlighter-rouge">undefined</code> や <code class="language-plaintext highlighter-rouge">NaN</code> は、<code class="language-plaintext highlighter-rouge">null</code> などのキーワードとは違い、<strong>グローバルオブジェクトのプロパティとして定義されている</strong>のです。幸い <code class="language-plaintext highlighter-rouge">[[Writable]]: false</code> なので上書きすることは出来ませんが、上書きしようとすること自体は可能です。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kc">undefined</span> <span class="o">=</span> <span class="mi">7</span><span class="p">;</span>
+<span class="kc">NaN</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">hello world</span><span class="dl">"</span><span class="p">;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="kc">undefined</span><span class="p">);</span> <span class="c1">// → undefined</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="kc">NaN</span><span class="p">);</span> <span class="c1">// → NaN</span>
+<span class="c1">// null = 0; // Syntax Error!</span>
+</code></pre></div></div>
+
+<p>グローバルスコープだと上書きは出来ないのですが、ローカルにスコープを作成すれば、その中で値を自由に書き換えることは可能です。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span>
+  <span class="kd">const</span> <span class="kc">undefined</span> <span class="o">=</span> <span class="mi">7</span><span class="p">;</span>
+  <span class="kd">let</span> <span class="kc">NaN</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">hello world</span><span class="dl">"</span><span class="p">;</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="kc">undefined</span><span class="p">);</span> <span class="c1">// → 7</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="kc">NaN</span><span class="p">);</span> <span class="c1">// → hello world</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><strong>もちろんこんなコードは絶対に書かないで下さい</strong>。しかし理論上 <code class="language-plaintext highlighter-rouge">NaN</code> の値を書き換えることが可能なため、 <code class="language-plaintext highlighter-rouge">NaN === NaN</code> が <code class="language-plaintext highlighter-rouge">true</code> になる状況もあり得るということになります。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span>
+  <span class="kd">const</span> <span class="kc">NaN</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="kc">NaN</span> <span class="o">===</span> <span class="kc">NaN</span><span class="p">);</span> <span class="c1">// → true</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="nan--nan-は常に-boolean-なのか">NaN === NaN は常に boolean なのか</h1>
+
+<p>以上より、<code class="language-plaintext highlighter-rouge">NaN === NaN</code> が <code class="language-plaintext highlighter-rouge">true</code> にもなりえる、ということをご理解いただけたかと思います。では冒頭の問題は 3 番が正解なのでしょうか？</p>
+
+<p>限りなく 3 番で正解だと言ってよいのですが、しかしわずかに例外を作成することが出来ます。JavaScript(ECMAScript) の <code class="language-plaintext highlighter-rouge">===</code> の挙動の仕様を見てみましょう。</p>
+
+<p><a href="https://tc39.es/ecma262/#sec-equality-operators-runtime-semantics-evaluation">https://tc39.es/ecma262/#sec-equality-operators-runtime-semantics-evaluation</a></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>EqualityExpression : EqualityExpression === RelationalExpression
+1. Let lref be the result of evaluating EqualityExpression.
+2. Let lval be ? GetValue(lref).
+3. Let rref be the result of evaluating RelationalExpression.
+4. Let rval be ? GetValue(rref).
+5. Return IsStrictlyEqual(rval, lval).
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">IsStrictlyEqual</code> は必ず boolean が返ってくるので、この処理は常に boolean が返ってきそうに思えますが、罠が一つあります。<code class="language-plaintext highlighter-rouge">GetValue</code> は例外を出すことが出来るのです。なので、<code class="language-plaintext highlighter-rouge">NaN</code> を評価するときに例外を投げることが出来れば、true/false 以外の結果となります。</p>
+
+<p>しかし上記の例だと、<code class="language-plaintext highlighter-rouge">NaN</code> は変数へのアクセスになります。変数へのアクセスで例外を出すことは出来ません。<code class="language-plaintext highlighter-rouge">globalThis.NaN</code> の読み込み時に getter を設定することが出来ればよいのですが、<code class="language-plaintext highlighter-rouge">NaN</code> は <code class="language-plaintext highlighter-rouge">[[Writable]]: false</code> でもあるため、次のコードは失敗します。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">Object</span><span class="p">.</span><span class="nf">defineProperty</span><span class="p">(</span><span class="nx">globalThis</span><span class="p">,</span> <span class="dl">'</span><span class="s1">NaN</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span><span class="na">get</span><span class="p">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span> <span class="k">throw</span> <span class="dl">"</span><span class="s2">Yay!</span><span class="dl">"</span><span class="p">;</span> <span class="p">}});</span>
+<span class="c1">// TypeError: Cannot redefine property: NaN</span>
+</code></pre></div></div>
+
+<p>ではどうするか…。</p>
+
+<p><span style="color:red">ここで、禁断の <code class="language-plaintext highlighter-rouge">with</code> 構文を使うのです。</span></p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">o</span> <span class="o">=</span> <span class="p">{};</span>
+<span class="nb">Object</span><span class="p">.</span><span class="nf">defineProperty</span><span class="p">(</span><span class="nx">o</span><span class="p">,</span> <span class="dl">'</span><span class="s1">NaN</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span><span class="na">get</span><span class="p">:</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span> <span class="k">throw</span> <span class="dl">"</span><span class="s2">Yay!</span><span class="dl">"</span><span class="p">;</span> <span class="p">}});</span>
+<span class="nf">with </span><span class="p">(</span><span class="nx">o</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="kc">NaN</span> <span class="o">===</span> <span class="kc">NaN</span><span class="p">);</span> <span class="c1">// Uncaught: "Yay!"</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">with</code> 構文は、その複雑怪奇な仕様、かつ直感に反する挙動により、数多のバグを世の中に送り出した忌むべき構文となっており、使ってはいけない構文の筆頭です。<code class="language-plaintext highlighter-rouge">strict mode</code> では、そもそも利用することすら出来ません。みなさんも存在すら忘れていたのではないでしょうか。<strong>そのまま忘れていて良いと思います</strong>。</p>
+
+<p>なんにせよ、<code class="language-plaintext highlighter-rouge">NaN === NaN</code> で見事例外を投げることが出来ました！よって、冒頭の問題の答えは <strong>4 の「状況によっては上記以外もありうる」</strong>が正解になります。</p>
+
+<h1 id="まとめ">まとめ</h1>
+
+<p>長々と書いてきましたが、 <strong>NaN === NaN は false である</strong>、ということだけ知っておけば問題ありません。それ以降の話は、細かい仕様の隅をついた、JavaScript ならではの汚いテクニックの話でした。冒頭の問題で 2 3 4 を選んだ方は十分です。1 を選んだ方にとって、この記事が <code class="language-plaintext highlighter-rouge">NaN</code> の特性を学ぶきっかけになれば幸いです。</p>
+
+<p><code class="language-plaintext highlighter-rouge">undefined</code> と同じく、<code class="language-plaintext highlighter-rouge">NaN</code> もコード中に出てきたらバグの発生源になりかねない危険な数値です。どのような場合に <code class="language-plaintext highlighter-rouge">NaN</code> が発生するのかを理解し、<code class="language-plaintext highlighter-rouge">NaN</code> の伝搬しないコードを書くように心がけましょう。</p>
+
+        </article>
+        <hr>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/2021-09-09-NaN&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="JavaScript クイズ解説: NaN === NaN の結果はどうなる？" data-url="http://nmi.jp/2021-09-09-NaN">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/2021-09-09-NaN" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="JavaScript クイズ解説: NaN === NaN の結果はどうなる？"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="JavaScript クイズ解説: NaN === NaN の結果はどうなる？" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+
+        
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+        
+
+        <div class="post-recent">
+    <div class="pre">
+
+    
+        <p><strong>前の投稿</strong> <a href="/2020-12-24-About-Acquiring">10 年前に JavaScript で Flash Player を開発し買収された話</a></p>
+    
+    </div>
+    <div class="nex">
+
+        
+        <p><strong>次の投稿</strong> <a href="/2022-01-24-Bitwise-operation-with-JavaScript">JavaScript で学ぶビット演算の基礎</a></p>
+        
+    </div>
+</div>
+
+
+    </div>
+    <button class="anchor"><i class="fa fa-anchor"></i></button>
+
+
+    <div class="right">
+        <div class="wrap">
+            <div class="side">
+                <div>
+                    <i class="fa fa-tags"></i>
+                    Top Popular Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2016-07-23-stock-strategy-for-early-startup-employee">スタートアップに転職する時に最低限知っておくべき株の話</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/582">生WebGL入門:初音ミクの美麗3Dモデルを表示する(前編)</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2017-10-06-Making_a-business_plan">事業計画書の作り方、新規ビジネスの考え方</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/902">Convertible Note / Convertible Equity とは？</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/488">JavaScript イディオム集</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/465">ExGameの製作で感じたこと</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                </ul>
+            </div>
+
+            <div class="side">
+                <div>
+                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                    Recent Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        <li><a href="/2024-08-28-Review-Binary-Hacks-Rebooted">書評 "Binary Hacks Rebooted"</a></li>
+                    
+                        <li><a href="/2024-06-10-Deep-Dive-into-ARM-JavaScript-Special-Instruction-FJCVTZS">ARM に存在する JavaScript 専用命令「FJCVTZS」を追う（ついでに V8 をビルドする）</a></li>
+                    
+                        <li><a href="/2024-06-03-Exploring-V8-JIT-Outputs">JavaScript 実行エンジン V8 の JIT 出力コードを読んでみよう</a></li>
+                    
+                </ul>
+            </div>
+
+            <!-- <div class="side">
+                <div>
+                    <i class="fa fa-external-link"></i>
+                    Links
+                </div>
+                <ul  class="content-ul">
+
+                </ul>
+            </div> -->
+        </div>
+    </div>
+
+
+
+</div>
+<script>
+/**
+ * target _blank
+ */
+(function() {
+    var aTags = document.querySelectorAll('article a:not([id])')
+    for (var i = 0; i < aTags.length; i++) {
+        aTags[i].setAttribute('target', '_blank')
+    }
+}());
+</script>
+<script src="/js/pageContent.js " charset="utf-8"></script>
+
+
+    <footer class="site-footer">
+
+
+    <div class="wrapper">
+
+        <p class="description">
+             Takuo Kihira 
+        </p>
+        <p class="contact">
+            Contact me at: 
+            <a href="https://github.com/tkihira" title="GitHub"><i class="fa fa-github" aria-hidden="true"></i></a>     
+            <a href="https://twitter.com/tkihira" title="Twitter"><i class="fa fa-twitter" aria-hidden="true"></i></a>  
+            <a href="https://www.facebook.com/takuo.kihira" title="Facebook"><i class="fa fa-facebook-official" aria-hidden="true"></i></a>    
+        </p>
+        <p class="power">
+            <span>
+                Site powered by <a href="https://jekyllrb.com/">Jekyll</a>.
+            </span>
+            <span>
+                Theme designed by <a href="https://github.com/Gaohaoyang">HyG</a>.
+            </span>
+        </p>
+    </div>
+</footer>
+
+    <div class="back-to-top">
+    <a href="#top" class="scroll">
+        <i class="fa fa-arrow-up" aria-hidden="true"></i>
+    </a>
+</div>
+
+    <script src=" /js/main.js " charset="utf-8"></script>
+    <script src=" /js/scroll.min.js " charset="utf-8"></script>
+  </body>
+
+</html>

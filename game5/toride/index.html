@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html><head><title>砦の攻防 for SmartPhone</title>
+<meta name="viewport" content="width=480,user-scalable=no">
+<script>
+(function() {
+	var config = {
+		width: 480,
+		height: 268,
+		groundHeight: 50,
+		summitNum: 6,
+		basePosition: 40,
+		airColor: "rgb(0, 128, 255)",
+		playerColors: ["#f00", "#00f"],
+		ballRadius: 10,
+		flickRadius: 50,
+		explosionRadius: 30,
+		playerName: ["<span style='color:#f00'>RED</span>", "<span style='color:#00f'>BLUE</span>"]
+	};
+	var status = {};
+
+	var setBallPosition = function(player, x, y) {
+		var ctx = status.ballList[player];
+		if(status.visible) {
+			if(x > config.width - config.ballRadius) {
+				ctx.canvas.style.display = "none";
+			} else {
+				ctx.canvas.style.display = "block";
+			}
+			ctx.canvas.style.left = (x - config.ballRadius) + "px";
+			ctx.canvas.style.top = (y - config.ballRadius) + "px";
+		} else {
+			ctx.canvas.style.display = "none";
+		}
+	};
+	
+	var setMessage = function(msg) {
+		if(!msg) {
+			msg = "Player " + config.playerName[status.turn] + " to play.<br>flick!";
+		}
+		status.message.innerHTML = msg;
+	};
+	
+	var touchListener = {
+		start: function(e) {
+			var pos = e;
+			if(e.touches && e.touches.length > 0) {
+				pos = e.touches[0];
+			}
+			if(status.state == "normal") {
+				var dx = Math.abs(status.basePosition[status.turn][0] - pos.pageX);
+				var dy = Math.abs(status.basePosition[status.turn][1] - pos.pageY);
+				status.state = "dragging";
+				status.dragPosition = null;
+			} else if(status.state == "gameover") {
+				reset();
+			} else if(status.state == "opening") {
+				reset();
+			}
+			e.preventDefault();
+		},
+		move: function(e) {
+			if(status.state == "dragging") {
+				var pos = e;
+				if(e.touches && e.touches.length > 0) {
+					pos = e.touches[0];
+				}
+				if(!status.dragPosition) {
+					status.dragPosition = [pos.pageX, pos.pageY];
+				}
+				var dx = pos.pageX - status.dragPosition[0];
+				var dy = pos.pageY - status.dragPosition[1];
+				if(dx * dx + dy * dy < config.flickRadius * config.flickRadius) {
+					status.movePosition = [pos.pageX, pos.pageY];
+					status.moveTime = Date.now();
+					setBallPosition(status.turn, status.basePosition[status.turn][0] + dx, status.basePosition[status.turn][1] + dy);
+				} else {
+					// flickの角度と初速を測る
+					dx = pos.pageX - status.movePosition[0];
+					dy = pos.pageY - status.movePosition[1];
+					var angle = Math.atan2(dy, dx);
+					var velocity = Math.sqrt(dx * dx + dy * dy) * 100 / (Date.now() - status.moveTime);
+					// 飛ばす
+					status.state = "flying";
+					message.innerHTML = "";
+					status.x = status.basePosition[status.turn][0] + pos.pageX - status.dragPosition[0];
+					status.y = status.basePosition[status.turn][1] + pos.pageY - status.dragPosition[1];
+					status.vx = velocity * Math.cos(angle);
+					status.vy = velocity * Math.sin(angle);
+				}
+			}
+		},
+		end: function(e) {
+			if(status.state == "dragging") {
+				status.state = "normal";
+				setBallPosition(status.turn, status.basePosition[status.turn][0], status.basePosition[status.turn][1]);
+			}
+		}
+	};
+
+	var reset = function() {
+		// 初期値の設定
+		status.state = "normal";
+		status.visible = true;
+		setMessage();
+		// 空を描画
+		var ctx = status.ctx;
+		ctx.fillStyle = config.airColor;
+		ctx.fillRect(0, 0, config.width, config.height);
+		// 地面を作成
+		var lastY = Math.random() * (config.height - config.groundHeight) + config.groundHeight;
+		var lastControl = lastY + (Math.random() * config.groundHeight * 2 - config.groundHeight);
+		var lastX = 0;
+		var interval = config.width / config.summitNum;
+		ctx.beginPath();
+		ctx.moveTo(0, config.height + 10);
+		ctx.lineTo(0, lastY);
+		for(var x = interval; x <= config.width + 1; x += interval) {
+			var y = Math.random() * (config.height - config.groundHeight * 2) + config.groundHeight;
+			var control = y + (Math.random() * config.groundHeight * 2 - config.groundHeight);
+			ctx.lineWidth = 3;
+			ctx.bezierCurveTo(lastX + interval / 3, lastY - (lastControl - lastY) * 1, lastX + interval / 3 * 2, control, x, y);
+			
+			lastControl = control;
+			lastX = x;
+			lastY = y;
+		}
+		ctx.lineTo(lastX, config.height + 10);
+		ctx.closePath();
+		
+		// グラデーション作成
+		var grad = ctx.createLinearGradient(0, 0, 0, config.height);
+		grad.addColorStop(0, "#0f0");
+		grad.addColorStop(0.6, "#0f0");
+		grad.addColorStop(1, "#080");
+		ctx.fillStyle = grad;
+		ctx.fill();
+		
+		// それぞれの基地を設定
+		status.basePosition = [];
+		for(var player = 0; player <= 1; player++) {
+			for(var y = 0; y < config.height; y++) {
+				var x = (player == 0)? config.basePosition: config.width - config.basePosition;
+				var data = ctx.getImageData(x, y, 1, 1).data;
+				if(data[2] != 255) {
+					break;
+				}
+			}
+			status.basePosition[player] = [x, y];
+			setBallPosition(player, x, y);
+		}
+	};
+	
+	var mainLoop = function() {
+		if(status.state == "flying") {
+			var turnChange = false;
+			status.x += status.vx / 15;
+			status.y += status.vy / 15;
+			status.vy += 10;
+			if(status.y > config.height || status.x < 0 || status.x > config.width) {
+				// 場外
+				turnChange = true;
+				status.state = "normal";
+				status.x = status.basePosition[status.turn][0];
+				status.y = status.basePosition[status.turn][1];
+			} else if(status.y > 0) {
+				// 接地チェック
+				var data = status.ctx.getImageData(status.x, status.y, 1, 1).data;
+				if(data[2] != 255) {
+					// 爆発
+					status.state = "explosion";
+					status.explosion = 0;
+					status.visible = false;
+				}
+			}
+			setBallPosition(status.turn, status.x, status.y);
+			if(turnChange) {
+				status.turn = 1 - status.turn;
+				setMessage();
+			}
+		} else if(status.state == "explosion") {
+			status.explosion += 2;
+			var ctx = status.ctx;
+			ctx.beginPath();
+			ctx.arc(status.x, status.y, status.explosion, 0, 2 * Math.PI, true);
+			if(status.explosion > config.explosionRadius) {
+				ctx.fillStyle = config.airColor;
+				ctx.fill();
+				status.visible = true;
+				setBallPosition(status.turn, status.basePosition[status.turn][0], status.basePosition[status.turn][1]);
+				// gameover check
+				var gameover = false;
+				for(var player = 0; player <= 1; player++) {
+					var data = ctx.getImageData(status.basePosition[player][0], status.basePosition[player][1], 1, 1).data;
+					if(data[2] == 255) {
+						gameover = true;
+						status.turn = player;
+						status.visible = false;
+						setBallPosition(status.turn, 0, 0);
+						status.state = "gameover";
+						setMessage("<span style='font-size:30px'>Player " + config.playerName[1 - status.turn] + " win!</span><br>touch to replay");
+						break;
+					}
+				}
+				if(!gameover) {
+					status.turn = 1 - status.turn;
+					status.state = "normal";
+					setMessage();
+				}
+			} else {
+				ctx.fillStyle = "rgba(255,0,0,0.2)";
+				ctx.fill();
+			}
+		}
+		setTimeout(mainLoop, 30);
+	};
+	
+	window.onload = function() {
+		var container = document.getElementById("container");
+		container.style.width = config.width + "px";
+		container.style.height = config.height + "px";
+		var canvas = document.getElementById("main");
+		canvas.width = config.width;
+		canvas.height = config.height;
+		
+		// context
+		var ctx = canvas.getContext("2d");
+		status.ctx = ctx;
+		status.message = document.getElementById("message");
+		
+		status.ballList = [];
+		for(var player = 0; player <= 1; player++) {
+			// 砲弾のcanvasを作成
+			var ball = document.createElement("canvas");
+			ball.width = ball.height = config.ballRadius * 2;
+			
+			var bctx = ball.getContext("2d");
+			bctx.beginPath();
+			bctx.fillStyle = config.playerColors[player];
+			bctx.arc(config.ballRadius, config.ballRadius, config.ballRadius, 0, Math.PI * 2, true);
+			bctx.fill();
+			status.ballList[player] = bctx;
+			ball.style.position = "absolute";
+			container.appendChild(ball);
+		}
+		// リスナーを設定
+		document.onmousedown = document.body.ontouchstart = touchListener.start;
+		document.onmousemove = document.body.ontouchmove = touchListener.move;
+		document.onmouseup = document.body.ontouchend = touchListener.end;
+		window.onresize = window.onorientationchange = function() {
+			setTimeout(function() {window.scrollTo(0, 1);}, 100);
+		};
+		window.onresize();
+		// 初期化
+		status.turn = 0;
+		reset();
+		status.state = "opening";
+		mainLoop();
+		setMessage("<span style='font-size:45px'>砦の攻防</span><br>touch to start");
+	};
+})();
+</script></head></head>
+<body style="margin:0;font-family:Futura;">
+<canvas id="main" style="position:absolute;left:0;top:0"></canvas>
+<div id="container" style="position:relative;left:0;top:0;display:table">
+	<div id="message" style="display:table-cell;vertical-align:middle;text-align:center;color:#303;font-size:20px"></div>
+</div>
+
+</body></html>

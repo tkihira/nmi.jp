@@ -1,0 +1,1665 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>JavaScript で parseInt / parseFloat を使わない方が良い理由</title>
+    <meta name="description" content="先日、Twitter のタイムライン上で JavaScript における parseInt 関数の不可解な挙動に関するネタがバズっていました。console.log(parseInt(0.000005)); // → 0console.log(parseInt(0.0000005)); // → 5 !!!!!こ...">
+
+    <link rel="stylesheet" href=" /css/fontawesome/css/font-awesome.min.css ">
+    <link rel="stylesheet" href=" /css/main.css ">
+    <link rel="canonical" href="http://nmi.jp/2022-02-03-dont-use-parseInt">
+    <link rel="alternate" type="application/rss+xml" title="nmi.jp" href="http://nmi.jp/feed.xml">
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=3.0'></script>
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=1.1'></script>
+    <script>
+        if(location.href.match(/\.html$/)) {
+            location.href = location.href.match(/(.+)\.html/)[1];
+        }
+    </script>
+
+
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-229769-8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-229769-8');
+</script>
+</head>
+
+
+  <body>
+
+    <header id="top">
+    <div class="wrapper">
+        <a href="/" class="brand">nmi.jp</a>
+        <small>Twitter → <a href="https://twitter.com/tkihira" target="_blank">@tkihira</a></small>
+        <button id="headerMenu" class="menu"><i class="fa fa-bars"></i></button>
+        <nav id="headerNav">
+            <ul>
+                <li>
+                    
+                    <a href="/">
+                    
+                        <i class="fa fa-home"></i>Home
+                    </a>
+                </li>
+
+                
+                    
+                    <li>
+                        
+                        <a href="/archive/">
+                        
+                            <i class="fa fa-archive"></i>Archives
+                        </a>
+                    </li>
+                    
+                
+                    
+                    <li>
+                        
+                        <a href="/category/">
+                        
+                            <i class="fa fa-th-list"></i>Categories
+                        </a>
+                    </li>
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            </ul>
+        </nav>
+    </div>
+</header>
+
+
+        <div class="page clearfix" post>
+    <div class="left">
+        <div class="post-recent">
+    <table style="width:100%;border:0;padding:0;"><tbody><tr style="padding:0">
+        <td class="toppre" style="padding:0">
+        
+        <a href="/2022-01-24-Bitwise-operation-with-JavaScript">JavaScript で学ぶビット演算の基礎</a>
+        
+        </td><td class="topnex" style="text-align:right;padding:0">
+        
+        <a href="/2022-02-08-Porting-LibRaw-with-Emscripten">都会の星の撮り方本を出版しました。WebAssembly を使っています</a>
+        
+        </td>
+    </tr></tbody></table>
+</div>
+
+        <hr style="margin:0"/>
+        <h1 style="margin-top:10px">JavaScript で parseInt / parseFloat を使わない方が良い理由</h1>
+<hr />
+        <div class="label">
+
+            <div class="label-card">
+                <i class="fa fa-calendar"></i>2022-02-03
+            </div>
+
+            <div class="label-card">
+                <i class="fa fa-user"></i>Takuo Kihira
+                
+            </div>
+
+            <div class="label-card">
+                
+            </div>
+
+            <div class="label-card">
+            
+
+
+<!-- <span class="point">•</span> -->
+<span class="categories">
+  <i class="fa fa-th-list"></i>
+  
+    
+        <a href="/category/#JavaScript" title="Category: JavaScript" rel="category">JavaScript</a>
+    
+  
+
+  <!-- <span class="point">•</span> -->
+</span>
+
+
+            </div>
+
+            <div class="label-card">
+                <a href="https://github.com/tkihira/nmi.jp/blob/master/_posts/2022-02-03-dont-use-parseInt.md" target="_blank"><i class="fa fa-github"></i></a>
+            </div>
+
+        </div>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/2022-02-03-dont-use-parseInt&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="JavaScript で parseInt / parseFloat を使わない方が良い理由" data-url="http://nmi.jp/2022-02-03-dont-use-parseInt">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/2022-02-03-dont-use-parseInt" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="JavaScript で parseInt / parseFloat を使わない方が良い理由"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="JavaScript で parseInt / parseFloat を使わない方が良い理由" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+        <article itemscope itemtype="http://schema.org/BlogPosting">
+        <p>先日、Twitter のタイムライン上で JavaScript における <code class="language-plaintext highlighter-rouge">parseInt</code> 関数の不可解な挙動に関するネタがバズっていました。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nf">parseInt</span><span class="p">(</span><span class="mf">0.000005</span><span class="p">));</span> <span class="c1">// → 0</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nf">parseInt</span><span class="p">(</span><span class="mf">0.0000005</span><span class="p">));</span> <span class="c1">// → 5 !!!!!</span>
+</code></pre></div></div>
+
+<p>この記事では、JavaScript における文字列から数値への変換について簡単に説明します。</p>
+
+<h1 id="parseint00000005--5-になる理由"><code class="language-plaintext highlighter-rouge">parseInt(0.0000005) === 5</code> になる理由</h1>
+
+<p>結論から書くと、</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nc">String</span><span class="p">(</span><span class="mf">0.000005</span><span class="p">));</span> <span class="c1">// → "0.000005"</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nc">String</span><span class="p">(</span><span class="mf">0.0000005</span><span class="p">));</span> <span class="c1">// → "5e-7"</span>
+</code></pre></div></div>
+
+<p>となるのが原因です。<code class="language-plaintext highlighter-rouge">parseInt</code> というのは、文字列を解析して整数値（int）を返すグローバル関数であり、<span style="color:blue">引数をまず文字列に変換する</span>仕様となっております。その段階で <code class="language-plaintext highlighter-rouge">0.0000005</code> が <code class="language-plaintext highlighter-rouge">"5e-7"</code> という文字列に変換されてしまい、その文字列の先頭の <code class="language-plaintext highlighter-rouge">5</code> だけが数字として解析されてしまったため、結果として <code class="language-plaintext highlighter-rouge">parseInt(0.0000005) === 5</code> となりました。</p>
+
+<p>なぜ <code class="language-plaintext highlighter-rouge">String(0.000005) === "0.000005"</code> に、<code class="language-plaintext highlighter-rouge">String(0.0000005) === "5e-7"</code> になるのかについては、この記事の最後で余談として説明します。</p>
+
+<h1 id="整数化には-mathtrunc-を使おう">整数化には Math.trunc を使おう</h1>
+
+<p>このように、<code class="language-plaintext highlighter-rouge">parseInt</code> は<span style="color:blue">文字列を引数にすることを前提にしている</span>ため、速度の面でも可読性の面でも「小数値を整数値に変換したい」という場合に使うのは望ましくありません。最も望ましいのは、<code class="language-plaintext highlighter-rouge">Math.trunc</code> を使う方法でしょう。意図もはっきりして大変に良いです。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">positive</span> <span class="o">=</span> <span class="mf">3.141592</span><span class="p">;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nf">trunc</span><span class="p">(</span><span class="nx">positive</span><span class="p">));</span> <span class="c1">// → 3</span>
+<span class="kd">const</span> <span class="nx">negative</span> <span class="o">=</span> <span class="o">-</span><span class="mf">2.718281</span><span class="p">;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nf">trunc</span><span class="p">(</span><span class="nx">negative</span><span class="p">));</span> <span class="c1">// → -2</span>
+<span class="kd">const</span> <span class="nx">large</span> <span class="o">=</span> <span class="mf">12345678901.234</span><span class="p">;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nf">trunc</span><span class="p">(</span><span class="nx">large</span><span class="p">));</span> <span class="c1">// → 12345678901</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">Math.floor</code> も使えそうに見えますが、<span style="color:red">floor は整数化ではなく、その数値を超えない一番大きな整数を返す関数</span>です。マイナスの値における挙動が違うので、整数化したい場合には仮にプラスの値のみであることが保障されていても <code class="language-plaintext highlighter-rouge">Math.trunc</code> を使う方が望ましいです。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">positive</span> <span class="o">=</span> <span class="mf">3.141592</span><span class="p">;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nf">floor</span><span class="p">(</span><span class="nx">positive</span><span class="p">));</span> <span class="c1">// → 3</span>
+<span class="kd">const</span> <span class="nx">negative</span> <span class="o">=</span> <span class="o">-</span><span class="mf">2.718281</span><span class="p">;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nf">floor</span><span class="p">(</span><span class="nx">negative</span><span class="p">));</span> <span class="c1">// → -3 !!!!!</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">Math.trunc</code> が使えなかった時代は、同じ挙動のためにビット演算(<code class="language-plaintext highlighter-rouge">v &gt;&gt; 0</code> や <code class="language-plaintext highlighter-rouge">v | 0</code> や <code class="language-plaintext highlighter-rouge">~~v</code> など）を利用して整数化するのが一般的でした。しかし、これらの方法は可読性が悪い上に 32bit の範囲を超える整数値に関しては予期しない挙動となるので、速度が相当にクリティカルでない限り使わないようにしましょう。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">positive</span> <span class="o">=</span> <span class="mf">3.141592</span><span class="p">;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">positive</span> <span class="o">|</span> <span class="mi">0</span><span class="p">);</span> <span class="c1">// → 3</span>
+<span class="kd">const</span> <span class="nx">negative</span> <span class="o">=</span> <span class="o">-</span><span class="mf">2.718281</span><span class="p">;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">negative</span> <span class="o">|</span> <span class="mi">0</span><span class="p">);</span> <span class="c1">// → -2</span>
+<span class="kd">const</span> <span class="nx">large</span> <span class="o">=</span> <span class="mf">12345678901.234</span><span class="p">;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">large</span> <span class="o">|</span> <span class="mi">0</span><span class="p">);</span> <span class="c1">// → -539222987 !!!!!</span>
+</code></pre></div></div>
+
+<h1 id="parseint-も-parsefloat-も使うべきではない">parseInt も parseFloat も使うべきではない</h1>
+
+<p>「とはいっても、文字列から数値にする場合には <code class="language-plaintext highlighter-rouge">parseInt</code> / <code class="language-plaintext highlighter-rouge">parseFloat</code> を使っても良いでしょ？」</p>
+
+<p>と思われるかもしれませんが、<span style="color:red">使うべきではありません</span>。</p>
+
+<h2 id="parseint-の場合">parseInt の場合</h2>
+
+<p>まず<a href="https://262.ecma-international.org/12.0/#sec-parseint-string-radix">parseIntの仕様</a>は、完全に対象を数値文字の羅列と仮定した処理が定義されています。本来数値として何ら問題のない <code class="language-plaintext highlighter-rouge">1e3 === 1000</code> のような表現であっても、</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nf">parseInt</span><span class="p">(</span><span class="dl">"</span><span class="s2">1e3</span><span class="dl">"</span><span class="p">));</span> <span class="c1">// → 1 !!!!!</span>
+</code></pre></div></div>
+
+<p>と意図した表現になりません。次のように <code class="language-plaintext highlighter-rouge">Number</code> を使って数値に変換して書くようにしましょう。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nf">trunc</span><span class="p">(</span><span class="nc">Number</span><span class="p">(</span><span class="dl">"</span><span class="s2">1e3</span><span class="dl">"</span><span class="p">)));</span> <span class="c1">// → 1000</span>
+</code></pre></div></div>
+
+<p>なお、<span style="color:blue">例外として 16 進数文字列（もしくは 2 進数文字列など）を数値に変換する場合は積極的に使って良い</span>です。<code class="language-plaintext highlighter-rouge">0x</code> のプリフィクスを付けると自動的に 16 進数でパースしてくれます。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nf">parseInt</span><span class="p">(</span><span class="dl">"</span><span class="s2">0x1234</span><span class="dl">"</span><span class="p">));</span> <span class="c1">// → 4660</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nf">parseInt</span><span class="p">(</span><span class="dl">"</span><span class="s2">7fff</span><span class="dl">"</span><span class="p">,</span> <span class="mi">16</span><span class="p">));</span> <span class="c1">// → 32767</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nf">parseInt</span><span class="p">(</span><span class="dl">"</span><span class="s2">01101101</span><span class="dl">"</span><span class="p">,</span> <span class="mi">2</span><span class="p">));</span> <span class="c1">// → 109</span>
+</code></pre></div></div>
+
+<h2 id="parsefloat-の場合">parseFloat の場合</h2>
+
+<p>さて、<code class="language-plaintext highlighter-rouge">parseFloat</code> はどうでしょうか。<code class="language-plaintext highlighter-rouge">parseFloat</code> と <code class="language-plaintext highlighter-rouge">Number</code> の違いはごくわずかです。まず一致する表現を見てみましょう。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nf">convert</span><span class="p">(</span><span class="nx">str</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span><span class="na">parseFloat</span><span class="p">:</span> <span class="nf">parseFloat</span><span class="p">(</span><span class="nx">str</span><span class="p">),</span> <span class="na">Number</span><span class="p">:</span> <span class="nc">Number</span><span class="p">(</span><span class="nx">str</span><span class="p">)};</span>
+<span class="p">}</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nf">convert</span><span class="p">(</span><span class="dl">"</span><span class="s2">   1234.567    </span><span class="dl">"</span><span class="p">));</span> <span class="c1">// {parseFloat: 1234.567, Number: 1234.567}</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nf">convert</span><span class="p">(</span><span class="dl">"</span><span class="s2">1e3</span><span class="dl">"</span><span class="p">));</span> <span class="c1">// {parseFloat: 1000, Number: 1000}</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nf">convert</span><span class="p">(</span><span class="dl">"</span><span class="s2">abcde</span><span class="dl">"</span><span class="p">));</span> <span class="c1">// {parseFloat: NaN, Number: NaN}</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nf">convert</span><span class="p">(</span><span class="dl">"</span><span class="s2">n111111</span><span class="dl">"</span><span class="p">));</span> <span class="c1">// {parseFloat: NaN, Number: NaN}</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nf">convert</span><span class="p">(</span><span class="dl">"</span><span class="s2">-Infinity</span><span class="dl">"</span><span class="p">));</span> <span class="c1">// {parseFloat: -Infinity, Number: -Infinity}</span>
+</code></pre></div></div>
+
+<p>次に一致しない表現です。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nf">convert</span><span class="p">(</span><span class="nx">str</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span><span class="na">parseFloat</span><span class="p">:</span> <span class="nf">parseFloat</span><span class="p">(</span><span class="nx">str</span><span class="p">),</span> <span class="na">Number</span><span class="p">:</span> <span class="nc">Number</span><span class="p">(</span><span class="nx">str</span><span class="p">)};</span>
+<span class="p">}</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nf">convert</span><span class="p">(</span><span class="dl">"</span><span class="s2">   1234.567x   </span><span class="dl">"</span><span class="p">));</span> <span class="c1">// {parseFloat: 1234.567, Number: NaN}</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nf">convert</span><span class="p">(</span><span class="dl">"</span><span class="s2">1e3x</span><span class="dl">"</span><span class="p">));</span> <span class="c1">// {parseFloat: 1000, Number: NaN}</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nf">convert</span><span class="p">(</span><span class="dl">"</span><span class="s2">11111n</span><span class="dl">"</span><span class="p">));</span> <span class="c1">// {parseFloat: 11111, Number: NaN}</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nf">convert</span><span class="p">(</span><span class="dl">"</span><span class="s2">123a45</span><span class="dl">"</span><span class="p">));</span> <span class="c1">// {parseFloat: 123, Number: NaN}</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nf">convert</span><span class="p">(</span><span class="dl">"</span><span class="s2">0x1234</span><span class="dl">"</span><span class="p">));</span> <span class="c1">// {parseFloat: 0, Number: 4660}</span>
+</code></pre></div></div>
+
+<p>簡単にまとめると、<code class="language-plaintext highlighter-rouge">parseFloat</code> は<span style="color:blue">文字列の先頭からとにかく数字であると判断出来るところまで数値化する（ただし 16 進数、8 進数、2 進数は扱えない）</span> のに対して、<code class="language-plaintext highlighter-rouge">Number</code> は<span style="color:blue">文字列全体が数値であれば数値化し、そうでなければ NaN を返す（16 進数、8 進数、2 進数も扱える）</span>という違いがあります。</p>
+
+<p><a href="https://262.ecma-international.org/12.0/#sec-parsefloat-string">parseFloatの仕様</a>としては、</p>
+
+<ul>
+  <li>まず文字列化し、前後の空白をトリミングする</li>
+  <li>文字列全体、もしくは先頭からの部分文字列が <a href="https://262.ecma-international.org/12.0/#sec-tonumber-applied-to-the-string-type">StrDecimalLiteral</a> の構文を満たさないなら NaN を返す</li>
+  <li>先頭から StrDecimalLiteral を満たす最も長い部分文字列を numberString とする</li>
+  <li>numberString を<a href="https://262.ecma-international.org/12.0/#sec-runtime-semantics-mv-s">この仕様（MV 仕様）にそって</a>数値化する</li>
+</ul>
+
+<p>という処理になるのですが、一方で <a href="https://262.ecma-international.org/12.0/#sec-tonumber">Number による文字列の数値化の仕様</a>は</p>
+
+<ul>
+  <li>文字列全体が <a href="https://262.ecma-international.org/12.0/#prod-StringNumericLiteral">StringNumericLiteral</a> 構文を満たさなければ NaN を返す</li>
+  <li>文字列全体を <a href="https://262.ecma-international.org/12.0/#sec-runtime-semantics-mv-s">この仕様（MV 仕様）にそって</a>数値化する</li>
+</ul>
+
+<p>という処理になります。違いは「文字列全体のみを対象とするか（Number）、それとも先頭からの部分文字列も対象とするか（parseFloat）」という点と、「StringNumericLiteral 構文を対象とするか（Number）、もしくは StrDecimalLiteral 構文を対象とするか（parseFloat）」の違いです。<span style="color:blue">parseFloat は先頭からの部分文字列が数値として認識出来れば無理やり数値化します</span>が、一方で StrDecimalLiteral 構文には含まれていない<span style="color:blue">16進数(0x)、8進数(0o)、2進数(0b)の prefix を受け付けません</span>。</p>
+
+<p>全体が数値でない場合は NaN が返ってくるべきなので、<span style="color:red">変換の意図を正確に表現するためにも、文字列からの数値化は Number を使うべき</span>です。<span style="color:red">全体が数値でなくても、先頭からの部分文字列が数値であれば無理やり数値にすることに意味があるシチュエーションに限って parseFloat を使ってもよい</span>と思います。例えば、<a href="https://twitter.com/petamoriken/status/1489094105439162373">petamoriken さんに指摘されたような</a>、以下のような例ですね。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">widthString</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">120px</span><span class="dl">"</span><span class="p">;</span> <span class="c1">// document.getElementById('element').style.width のような形で取得</span>
+<span class="kd">const</span> <span class="nx">width</span> <span class="o">=</span> <span class="nf">parseFloat</span><span class="p">(</span><span class="nx">widthString</span><span class="p">);</span> <span class="c1">// 120;</span>
+</code></pre></div></div>
+
+<h2 id="余談-数値変換のイディオム">余談: 数値変換のイディオム</h2>
+
+<p>なお、JavaScript で文字列を数値に変換するイディオムとして、Number 以外にも <code class="language-plaintext highlighter-rouge">+str</code> もしくは <code class="language-plaintext highlighter-rouge">str - 0</code> のような書き方があります。可読性に劣るので使わない方が良いですが、使っているプロジェクトは結構多いので読めるようにはなっておきましょう。内部動作は全て同じです。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">str</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">123</span><span class="dl">"</span><span class="p">;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="o">+</span><span class="nx">str</span><span class="p">,</span> <span class="nx">str</span> <span class="o">-</span> <span class="mi">0</span><span class="p">,</span> <span class="nc">Number</span><span class="p">(</span><span class="nx">str</span><span class="p">));</span> <span class="c1">// 123, 123, 123</span>
+</code></pre></div></div>
+
+<p>また、間違って <code class="language-plaintext highlighter-rouge">new Number</code> としないようにしましょう。一見正しく動いているように見えますが、実際には Primitive Object が作成されており、もしそれがどこかで悪さをすると発見するのが大変困難なバグに繋がります。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">str</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">123</span><span class="dl">"</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">num</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Number</span><span class="p">(</span><span class="nx">str</span><span class="p">);</span> <span class="c1">// よろしくない！！！！！！！</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">num</span> <span class="o">+</span> <span class="nx">num</span><span class="p">);</span> <span class="c1">// 246 一見正しく動いているように見えるが…</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">num</span><span class="p">);</span> <span class="c1">// object</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="k">typeof</span> <span class="nc">Number</span><span class="p">(</span><span class="nx">str</span><span class="p">));</span> <span class="c1">// number 本来はこうあるべき</span>
+</code></pre></div></div>
+
+<h1 id="まとめ">まとめ</h1>
+
+<p>以上が、JavaScript で parseInt / parseFloat を使わない方が良い理由です。JavaScript において、グローバル空間に生えている関数は基本ろくなものではない（暴論）ので、どうしても使わなければいけない理由がなければ別の手段にするのが良いと思います。グローバル空間の関数は <code class="language-plaintext highlighter-rouge">parseFloat</code>, <code class="language-plaintext highlighter-rouge">parseInt</code>, <code class="language-plaintext highlighter-rouge">isNaN</code>, <code class="language-plaintext highlighter-rouge">isFinite</code>, <code class="language-plaintext highlighter-rouge">eval</code> などがありますが、</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">parseFloat(str)</code> を使う場面では <code class="language-plaintext highlighter-rouge">Number(str)</code> を検討しよう</li>
+  <li><code class="language-plaintext highlighter-rouge">parseInt(num)</code> を使う場面では <code class="language-plaintext highlighter-rouge">Math.trunc(num)</code> を検討しよう</li>
+  <li>今回は説明していませんが、<code class="language-plaintext highlighter-rouge">isNaN(num)</code> を使う場面では <code class="language-plaintext highlighter-rouge">Number.isNaN(num)</code> を検討しよう</li>
+  <li>今回は説明していませんが、<code class="language-plaintext highlighter-rouge">isFinite(num)</code> を使う場面では <code class="language-plaintext highlighter-rouge">Number.isFinite(num)</code> を検討しよう</li>
+  <li>今回は説明していませんが、<code class="language-plaintext highlighter-rouge">eval</code> を使おうと思ったら<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval#never_use_eval!">悔い改めよう</a></li>
+</ul>
+
+<p>というように対処が可能です。グローバル空間の関数を使いたくなったら思い出してください。</p>
+
+<hr />
+
+<h2 id="余談-なぜ-string00000005--5e-7-になるのか読み飛ばし可">余談: なぜ <code class="language-plaintext highlighter-rouge">String(0.0000005) === "5e-7"</code> になるのか（読み飛ばし可）</h2>
+
+<p><code class="language-plaintext highlighter-rouge">parseInt</code> は引数に数値ではなくて文字列を取ります。正確には<a href="https://262.ecma-international.org/12.0/#sec-parseint-string-radix">仕様にある</a>通り、まず引数を <code class="language-plaintext highlighter-rouge">ToString</code> によって文字列に変換します。これはいわゆる <code class="language-plaintext highlighter-rouge">toString</code> ではなく、<a href="https://262.ecma-international.org/12.0/#sec-tostring">仕様のみに存在する抽象関数</a>で、<a href="https://262.ecma-international.org/12.0/#sec-numeric-types-number-tostring">数値型の場合の処理</a>はここに記されています。</p>
+
+<p>仕様にある <code class="language-plaintext highlighter-rouge">n k s</code> あたりの説明がわかりにくいかと思うのですが、簡単に解説すると x という数に対して小数点を無視した数字全体を s とし、その s の桁数 を k（最低でも 1）として、n は <code class="language-plaintext highlighter-rouge">x = s * 10^(n - k)</code> が成り立つ整数 n を用意する感じです。ただし s の最後が <code class="language-plaintext highlighter-rouge">0</code> になる場合は 10 で割ります。</p>
+
+<ul>
+  <li>たとえば <code class="language-plaintext highlighter-rouge">1234.56789</code> の場合、s は <code class="language-plaintext highlighter-rouge">123456789</code>、k は <code class="language-plaintext highlighter-rouge">9</code>（123456789 が 9 桁なので）、1234.56789 === 123456789 * 10^(-5) を満たすように n が <code class="language-plaintext highlighter-rouge">4</code> となります。</li>
+  <li><code class="language-plaintext highlighter-rouge">0.01234</code> の場合は s は <code class="language-plaintext highlighter-rouge">1234</code>、k は <code class="language-plaintext highlighter-rouge">4</code>、0.01234 === 1234 * (10^-5) なので、n は <code class="language-plaintext highlighter-rouge">-1</code> になります</li>
+  <li><code class="language-plaintext highlighter-rouge">12345000</code> の場合は、s は <code class="language-plaintext highlighter-rouge">12345</code>、k は <code class="language-plaintext highlighter-rouge">5</code>、12345000 === 12345 * 10^3 なので n は <code class="language-plaintext highlighter-rouge">8</code> になります</li>
+</ul>
+
+<p>これにより、<code class="language-plaintext highlighter-rouge">k &lt;= n</code> が成立するのは小数点がない場合のみになります。n がマイナスの場合、n の絶対値には小数点以下に 0 がいくつ続くかが入ります。その前提で再度 <code class="language-plaintext highlighter-rouge">Number::toString</code> の仕様を見ると、8 番目の処理で n が -5 以上であればゼロを続けることが明示されています。すなわち、小数点以下に 0 が 5 つまでであれば</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>String(0.000005) === '0.000005'
+</code></pre></div></div>
+
+<p>となるわけです。一方、小数点以下に 0 が 6 つ以上続く場合は 9 番、10 番の処理に入ります。<code class="language-plaintext highlighter-rouge">0.0000005</code> の場合は k === 1 ですので 9 番の処理に入ります。すなわち、s（この場合は <code class="language-plaintext highlighter-rouge">'5'</code>）を追加し、0x65の文字コードすなわち <code class="language-plaintext highlighter-rouge">'e'</code> を追加し、n === -6 ですので <code class="language-plaintext highlighter-rouge">'-'</code> 記号を追加した上で <code class="language-plaintext highlighter-rouge">abs(n - 1)</code> すなわち <code class="language-plaintext highlighter-rouge">'7'</code> を追加します。このような処理を経て、最終的に</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>String(0.0000005) === '5e-7'
+</code></pre></div></div>
+
+<p>が出力されるのです。</p>
+
+        </article>
+        <hr>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/2022-02-03-dont-use-parseInt&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="JavaScript で parseInt / parseFloat を使わない方が良い理由" data-url="http://nmi.jp/2022-02-03-dont-use-parseInt">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/2022-02-03-dont-use-parseInt" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="JavaScript で parseInt / parseFloat を使わない方が良い理由"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="JavaScript で parseInt / parseFloat を使わない方が良い理由" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+
+        
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+        
+
+        <div class="post-recent">
+    <div class="pre">
+
+    
+        <p><strong>前の投稿</strong> <a href="/2022-01-24-Bitwise-operation-with-JavaScript">JavaScript で学ぶビット演算の基礎</a></p>
+    
+    </div>
+    <div class="nex">
+
+        
+        <p><strong>次の投稿</strong> <a href="/2022-02-08-Porting-LibRaw-with-Emscripten">都会の星の撮り方本を出版しました。WebAssembly を使っています</a></p>
+        
+    </div>
+</div>
+
+
+    </div>
+    <button class="anchor"><i class="fa fa-anchor"></i></button>
+
+
+    <div class="right">
+        <div class="wrap">
+            <div class="side">
+                <div>
+                    <i class="fa fa-tags"></i>
+                    Top Popular Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2016-07-23-stock-strategy-for-early-startup-employee">スタートアップに転職する時に最低限知っておくべき株の話</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/582">生WebGL入門:初音ミクの美麗3Dモデルを表示する(前編)</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2017-10-06-Making_a-business_plan">事業計画書の作り方、新規ビジネスの考え方</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/902">Convertible Note / Convertible Equity とは？</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/488">JavaScript イディオム集</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/465">ExGameの製作で感じたこと</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                </ul>
+            </div>
+
+            <div class="side">
+                <div>
+                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                    Recent Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        <li><a href="/2024-08-28-Review-Binary-Hacks-Rebooted">書評 "Binary Hacks Rebooted"</a></li>
+                    
+                        <li><a href="/2024-06-10-Deep-Dive-into-ARM-JavaScript-Special-Instruction-FJCVTZS">ARM に存在する JavaScript 専用命令「FJCVTZS」を追う（ついでに V8 をビルドする）</a></li>
+                    
+                        <li><a href="/2024-06-03-Exploring-V8-JIT-Outputs">JavaScript 実行エンジン V8 の JIT 出力コードを読んでみよう</a></li>
+                    
+                </ul>
+            </div>
+
+            <!-- <div class="side">
+                <div>
+                    <i class="fa fa-external-link"></i>
+                    Links
+                </div>
+                <ul  class="content-ul">
+
+                </ul>
+            </div> -->
+        </div>
+    </div>
+
+
+
+</div>
+<script>
+/**
+ * target _blank
+ */
+(function() {
+    var aTags = document.querySelectorAll('article a:not([id])')
+    for (var i = 0; i < aTags.length; i++) {
+        aTags[i].setAttribute('target', '_blank')
+    }
+}());
+</script>
+<script src="/js/pageContent.js " charset="utf-8"></script>
+
+
+    <footer class="site-footer">
+
+
+    <div class="wrapper">
+
+        <p class="description">
+             Takuo Kihira 
+        </p>
+        <p class="contact">
+            Contact me at: 
+            <a href="https://github.com/tkihira" title="GitHub"><i class="fa fa-github" aria-hidden="true"></i></a>     
+            <a href="https://twitter.com/tkihira" title="Twitter"><i class="fa fa-twitter" aria-hidden="true"></i></a>  
+            <a href="https://www.facebook.com/takuo.kihira" title="Facebook"><i class="fa fa-facebook-official" aria-hidden="true"></i></a>    
+        </p>
+        <p class="power">
+            <span>
+                Site powered by <a href="https://jekyllrb.com/">Jekyll</a>.
+            </span>
+            <span>
+                Theme designed by <a href="https://github.com/Gaohaoyang">HyG</a>.
+            </span>
+        </p>
+    </div>
+</footer>
+
+    <div class="back-to-top">
+    <a href="#top" class="scroll">
+        <i class="fa fa-arrow-up" aria-hidden="true"></i>
+    </a>
+</div>
+
+    <script src=" /js/main.js " charset="utf-8"></script>
+    <script src=" /js/scroll.min.js " charset="utf-8"></script>
+  </body>
+
+</html>

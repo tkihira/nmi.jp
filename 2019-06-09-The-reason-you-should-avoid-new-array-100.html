@@ -1,0 +1,1611 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>高速化の観点から new Array(100) を使わない方が良い理由</title>
+    <meta name="description" content="別件で V8 の JIT コードの逆アセンブルを眺めている時に気づいたのですが、JavaScriptで new Array(100) という形で配列を作るのは、高速化の観点から言うと V8 においては避けるべき書き方です。高速化を求める方は、 new Array() や [] で作成して Array#push で...">
+
+    <link rel="stylesheet" href=" /css/fontawesome/css/font-awesome.min.css ">
+    <link rel="stylesheet" href=" /css/main.css ">
+    <link rel="canonical" href="http://nmi.jp/2019-06-09-The-reason-you-should-avoid-new-array-100">
+    <link rel="alternate" type="application/rss+xml" title="nmi.jp" href="http://nmi.jp/feed.xml">
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=3.0'></script>
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=1.1'></script>
+    <script>
+        if(location.href.match(/\.html$/)) {
+            location.href = location.href.match(/(.+)\.html/)[1];
+        }
+    </script>
+
+
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-229769-8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-229769-8');
+</script>
+</head>
+
+
+  <body>
+
+    <header id="top">
+    <div class="wrapper">
+        <a href="/" class="brand">nmi.jp</a>
+        <small>Twitter → <a href="https://twitter.com/tkihira" target="_blank">@tkihira</a></small>
+        <button id="headerMenu" class="menu"><i class="fa fa-bars"></i></button>
+        <nav id="headerNav">
+            <ul>
+                <li>
+                    
+                    <a href="/">
+                    
+                        <i class="fa fa-home"></i>Home
+                    </a>
+                </li>
+
+                
+                    
+                    <li>
+                        
+                        <a href="/archive/">
+                        
+                            <i class="fa fa-archive"></i>Archives
+                        </a>
+                    </li>
+                    
+                
+                    
+                    <li>
+                        
+                        <a href="/category/">
+                        
+                            <i class="fa fa-th-list"></i>Categories
+                        </a>
+                    </li>
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            </ul>
+        </nav>
+    </div>
+</header>
+
+
+        <div class="page clearfix" post>
+    <div class="left">
+        <div class="post-recent">
+    <table style="width:100%;border:0;padding:0;"><tbody><tr style="padding:0">
+        <td class="toppre" style="padding:0">
+        
+        <a href="/2019-01-09-Exit-of-Tombo-Inc">Tombo, Inc. をスマートニュース株式会社に売却しました</a>
+        
+        </td><td class="topnex" style="text-align:right;padding:0">
+        
+        <a href="/2020-03-30-Pomodoro">リモートワーク・テクニック「紀平式ポモドーロ」の紹介</a>
+        
+        </td>
+    </tr></tbody></table>
+</div>
+
+        <hr style="margin:0"/>
+        <h1 style="margin-top:10px">高速化の観点から new Array(100) を使わない方が良い理由</h1>
+<hr />
+        <div class="label">
+
+            <div class="label-card">
+                <i class="fa fa-calendar"></i>2019-06-09
+            </div>
+
+            <div class="label-card">
+                <i class="fa fa-user"></i>Takuo Kihira
+                
+            </div>
+
+            <div class="label-card">
+                
+            </div>
+
+            <div class="label-card">
+            
+
+
+<!-- <span class="point">•</span> -->
+<span class="categories">
+  <i class="fa fa-th-list"></i>
+  
+    
+        <a href="/category/#JavaScript" title="Category: JavaScript" rel="category">JavaScript</a>
+    
+  
+
+  <!-- <span class="point">•</span> -->
+</span>
+
+
+            </div>
+
+            <div class="label-card">
+                <a href="https://github.com/tkihira/nmi.jp/blob/master/_posts/2019-06-09-The-reason-you-should-avoid-new-array-100.md" target="_blank"><i class="fa fa-github"></i></a>
+            </div>
+
+        </div>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/2019-06-09-The-reason-you-should-avoid-new-array-100&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="高速化の観点から new Array(100) を使わない方が良い理由" data-url="http://nmi.jp/2019-06-09-The-reason-you-should-avoid-new-array-100">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/2019-06-09-The-reason-you-should-avoid-new-array-100" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="高速化の観点から new Array(100) を使わない方が良い理由"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="高速化の観点から new Array(100) を使わない方が良い理由" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+        <article itemscope itemtype="http://schema.org/BlogPosting">
+        <p>別件で V8 の JIT コードの逆アセンブルを眺めている時に気づいたのですが、JavaScriptで <code class="language-plaintext highlighter-rouge">new Array(100)</code> という形で配列を作るのは、高速化の観点から言うと V8 においては避けるべき書き方です。</p>
+
+<p>高速化を求める方は、 <code class="language-plaintext highlighter-rouge">new Array()</code> や <code class="language-plaintext highlighter-rouge">[]</code> で作成して <code class="language-plaintext highlighter-rouge">Array#push</code> で追加していくのが良いでしょう。この記事では、その理由を説明します。</p>
+
+<p>今回の記事は、以下の V8 のブログ記事を参考にしております。</p>
+
+<p><a href="https://v8.dev/blog/elements-kinds">https://v8.dev/blog/elements-kinds</a></p>
+
+<hr />
+
+<h2 id="詰まった配列packed-arrayと穴あき配列holey-array">「詰まった配列(Packed Array)」と「穴あき配列(Holey Array)」</h2>
+
+<p>v8 は内部的に、その配列がどういうタイプの配列であるかの状態を記録しており、その情報を利用して最適化を適用します。状態は<a href="https://cs.chromium.org/chromium/src/v8/src/elements-kind.h?l=14&amp;rcl=ec37390b2ba2b4051f46f153a8cc179ed4656f5d">内部的には21個ある</a>のですが、今回話題にするのは、その中でも「詰まっている」か「穴があいている」かの状態についてです。</p>
+
+<p>「詰まった配列」とは、以下のように間に空白のない配列です。V8 では <code class="language-plaintext highlighter-rouge">Packed Array</code> と呼んでいます。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">array</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">];</span>
+<span class="nx">array</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>一方、「穴あき配列」とは、以下のように間に空白のある配列です。V8 では <code class="language-plaintext highlighter-rouge">Holey Array</code> と呼んでいます。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">array</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">];</span>
+<span class="nx">array</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span> <span class="o">=</span> <span class="mi">8</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h2 id="new-array100-の問題"><code class="language-plaintext highlighter-rouge">new Array(100)</code> の問題</h2>
+
+<p><span style="color:blue">「普通にコードを書いていたら、穴あき配列なんてまず登場しないよね」</span>と思われる方がほとんどだと思います。自分もそう思いますが、ここに一つだけ落とし穴があるのです。それが <code class="language-plaintext highlighter-rouge">new Array(100)</code> のような形による配列の初期化です。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">array</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Array</span><span class="p">(</span><span class="mi">100</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>このコードは、当たり前ですが初期化されたばかりで要素が一つもないので、間に空白のある穴あき配列（Holey Array）になります。普通はこの後に要素を追加していくことになるでしょう。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">array</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Array</span><span class="p">(</span><span class="mi">100</span><span class="p">);</span>
+<span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">array</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">array</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">i</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>これで無事全ての要素が埋まりましたので、詰まった配列（Packed Array）になりました…と思いきや、実は、内部ではこれは穴あき配列（Holey Array）なのです！V8 のデバッグツール d8 のデバッグビルドで <code class="language-plaintext highlighter-rouge">--allow-natives-syntax</code> を追加することで、実際に確認することが出来ます。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ ~/v8/v8/out/x64.debug/d8 --allow-natives-syntax
+V8 version 7.4.288.28
+d8&gt; const array = new Array(100);
+undefined
+d8&gt; %DebugPrint(array);
+DebugPrint: 0xaa0a418da81: [JSArray]
+ - map: 0x0aa08b482e89 &lt;Map(HOLEY_SMI_ELEMENTS)&gt; [FastProperties]
+ - prototype: 0x0aa0fc510ff1 &lt;JSArray[0]&gt;
+ - elements: 0x0aa0a418dab1 &lt;FixedArray[100]&gt; [HOLEY_SMI_ELEMENTS]
+ - length: 100
+ （略）
+d8&gt; for(let i = 0; i &lt; array.length; i++) { array[i] = i; }
+99
+d8&gt; %DebugPrint(array);
+DebugPrint: 0xaa0a418da81: [JSArray]
+ - map: 0x0aa08b482e89 &lt;Map(HOLEY_SMI_ELEMENTS)&gt; [FastProperties]
+ - prototype: 0x0aa0fc510ff1 &lt;JSArray[0]&gt;
+ - elements: 0x0aa0a418dab1 &lt;FixedArray[100]&gt; [HOLEY_SMI_ELEMENTS]
+ - length: 100
+ （略）
+d8&gt;
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">%DebugPrint(array)</code> の出力で <code class="language-plaintext highlighter-rouge">HOLEY_SMI_ELEMENTS</code> と出ていることが確認出来ると思います（SMIというのは <em>SMall Integer</em> の略で、整数配列だよという情報で、これも最適化に利用されております）。</p>
+
+<p>ここで重要なのは、<span style="color:red">一度穴あき配列（Holey Array）の状態になってしまうと、その後二度と詰まった配列（Packed Array）に戻らない</span>ということです。</p>
+
+<p>恐ろしいことに <code class="language-plaintext highlighter-rouge">new Array(100)</code> のように、<code class="language-plaintext highlighter-rouge">Array</code> オブジェクトの引数で要素数を指定して配列を生成した瞬間に、その配列は穴あき配列（Holey Array）扱いされてしまい、二度と詰まった配列（Packed Array）には戻れず、結果として最適化の恩恵を受けることができなくなります。</p>
+
+<p>先程の例でいうと、次のようなコードを書けば、詰まった配列（Packed Array）にすることができます。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">array</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Array</span><span class="p">();</span>
+<span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">array</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">array</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="nx">i</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>余談ですが、今の V8 の実装だと <code class="language-plaintext highlighter-rouge">new Array(0)</code> で長さゼロの配列を作っても、なぜか穴あき配列（Holey Array）扱いされてしまうようです。もちろん <code class="language-plaintext highlighter-rouge">new Array(1, 2, 3)</code> のように初期化すると、詰まった配列（Packed Array）扱いされるので安心してください。なお <code class="language-plaintext highlighter-rouge">[...new Array(100)]</code> でも詰まった配列（Packed Array）でした。</p>
+
+<h2 id="パフォーマンスの差">パフォーマンスの差</h2>
+
+<p>では実際にどの程度の差が出るのでしょうか。jsperf で確認用のページを作成しました。</p>
+
+<p><a href="https://jsperf.com/packed-vs-holey">https://jsperf.com/packed-vs-holey</a></p>
+
+<p>Preparation code の初期配列の作り方だけが異なっていて、各テストケースの内容は完全に同じです。holey が穴あき配列、packed が詰まった配列、between がどちらに判断されるかコードから推測するのが難しい配列です。</p>
+
+<p>Chrome ユーザーの方は実際にご確認頂けます。私の環境だと、holey が 1428 ops/sec、packed と between が 1731 ops/sec となり、<span style="color:red">穴あき配列（Holey Array）が 17% も遅い</span>結果になりました。between は詰まった配列扱いされたようです。</p>
+
+<p>配列の作り方がほんの僅かに違うだけで、意外と大きな差がついたと思いませんか？</p>
+
+<h2 id="配列におけるその他の最適化を阻害する要因">配列における、その他の最適化を阻害する要因</h2>
+
+<p>今回、詰まった配列（Packed Array）から穴あき配列（Holey Array）には二度と復帰しないことを説明しましたが、ついでに他にも最適化を阻害する要因をご説明します。</p>
+
+<p>Packed Array から Holey Array に変わるタイミングは、<code class="language-plaintext highlighter-rouge">delete</code>で要素を消す、<code class="language-plaintext highlighter-rouge">length</code> の長さをいじる、<code class="language-plaintext highlighter-rouge">length</code> より大きな添字に代入する、などの動作によって発生します。Array の build-in functions でも起こりうるかもしれません。なお undefined を代入してもそれ自体が理由で Holey にはなりません。</p>
+
+<p>他に、配列の状態として、「整数」「数字」「それ以外」の3つの状態があります。先程ちらっと出てきた SMI が整数、DOUBLE が数字（浮動小数点）、それ以外の場合は特に記載が無くなります。 <code class="language-plaintext highlighter-rouge">PACKED_DOUBLE_ELEMENTS</code> とか <code class="language-plaintext highlighter-rouge">HOLEY_ELEMENTS</code> のように表され、[PACKED と HOLEY の2つの状態]×[SMI/DOUBLE/何もなしの3つの状態] の6種類の状態が存在します。</p>
+
+<p>そして、Packed &gt; Holey だったのと同じように、SMI &gt; Double &gt; (none) の順に最適化によって速度が出ます。</p>
+
+<p><a href="https://jsperf.com/smi-vs-double-vs-none">https://jsperf.com/smi-vs-double-vs-none</a></p>
+
+<p>上の jsperf で確認すると、なぜか SMI &gt; (none) &gt; Double の順のスピードになっていますが、これはおそらく Double の配列は最適化で計算時に強制的に浮動小数点扱いしてしまっている可能性が高いですね。その結果無駄に浮動小数点の足し算をしているのでしょう。一方、(none) は毎回型チェックし整数型に変換しているので逆に速度が出たと推測出来ます。V8 の最適化ミスですね。</p>
+
+<p><a href="https://jsperf.com/double-vs-none">https://jsperf.com/double-vs-none</a></p>
+
+<p>このように、浮動小数点のみのテストを見てみると、Double &gt; (none) の順に速度が出ていることが確認出来ます。</p>
+
+<p>そして Packed と Holey の関係と同じように、SMI から一度 Double や (none) に状態が変わったり、Double から (none) に状態が変わると、二度と再度 SMI や Double の状態に戻ることがありません。<span style="color:red">整数配列や数字配列に余計なものを一度代入するだけで、その後の最適化がすべて失われてしまいます<span>。気をつけましょう。</span></span></p>
+
+<p><code class="language-plaintext highlighter-rouge">var array = [];</code> もしくは <code class="language-plaintext highlighter-rouge">var array = new Array();</code> のような、何も代入していない状態の配列は、<code class="language-plaintext highlighter-rouge">SMI_PACKED_ELEMENTS</code> になっています。一番最適化の効く状態ですね。逆に一番最適化の効かない状態は、<code class="language-plaintext highlighter-rouge">HOLEY_ELEMENTS</code> です。<code class="language-plaintext highlighter-rouge">var a = []; a[1] = "";</code> みたいにしちゃったら出来ます。</p>
+
+<p>気をつけないといけないのは、<code class="language-plaintext highlighter-rouge">SMI_ELEMENTS</code> は <code class="language-plaintext highlighter-rouge">Infinity</code> や <code class="language-plaintext highlighter-rouge">NaN</code> などを代入すると <code class="language-plaintext highlighter-rouge">DOUBLE_ELEMENTS</code> に変わってしまいます。またあくまでも Small Integer のみ対象で、正確には 32bit 整数に限られます。<code class="language-plaintext highlighter-rouge">var a = [2147483647, -2147483648];</code> は SMI ですが、<code class="language-plaintext highlighter-rouge">var a = [2147483648]; var b = [-2147483649]</code> は Double になります。あと、普通のコードではまず登場することがありえないのですが <code class="language-plaintext highlighter-rouge">var a = [-0];</code> は Double になります。<code class="language-plaintext highlighter-rouge">+0</code> は SMI です。ここらへんは浮動小数点絡みですね。</p>
+
+<h2 id="まとめ">まとめ</h2>
+
+<p>極限まで高速化を考える時は、</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">new Array(100)</code> のように配列を初期化するのをやめましょう</li>
+  <li>整数の配列は整数のみ、数字の配列は数字のみを代入するようにしましょう</li>
+</ul>
+
+<p>ということでした！間違いなどありましたら、気軽に <a href="https://twitter.com/tkihira">@tkihira</a> までご連絡ください！</p>
+
+
+        </article>
+        <hr>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/2019-06-09-The-reason-you-should-avoid-new-array-100&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="高速化の観点から new Array(100) を使わない方が良い理由" data-url="http://nmi.jp/2019-06-09-The-reason-you-should-avoid-new-array-100">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/2019-06-09-The-reason-you-should-avoid-new-array-100" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="高速化の観点から new Array(100) を使わない方が良い理由"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="高速化の観点から new Array(100) を使わない方が良い理由" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+
+        
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+        
+
+        <div class="post-recent">
+    <div class="pre">
+
+    
+        <p><strong>前の投稿</strong> <a href="/2019-01-09-Exit-of-Tombo-Inc">Tombo, Inc. をスマートニュース株式会社に売却しました</a></p>
+    
+    </div>
+    <div class="nex">
+
+        
+        <p><strong>次の投稿</strong> <a href="/2020-03-30-Pomodoro">リモートワーク・テクニック「紀平式ポモドーロ」の紹介</a></p>
+        
+    </div>
+</div>
+
+
+    </div>
+    <button class="anchor"><i class="fa fa-anchor"></i></button>
+
+
+    <div class="right">
+        <div class="wrap">
+            <div class="side">
+                <div>
+                    <i class="fa fa-tags"></i>
+                    Top Popular Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2016-07-23-stock-strategy-for-early-startup-employee">スタートアップに転職する時に最低限知っておくべき株の話</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/582">生WebGL入門:初音ミクの美麗3Dモデルを表示する(前編)</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2017-10-06-Making_a-business_plan">事業計画書の作り方、新規ビジネスの考え方</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/902">Convertible Note / Convertible Equity とは？</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/488">JavaScript イディオム集</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/465">ExGameの製作で感じたこと</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                </ul>
+            </div>
+
+            <div class="side">
+                <div>
+                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                    Recent Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        <li><a href="/2024-08-28-Review-Binary-Hacks-Rebooted">書評 "Binary Hacks Rebooted"</a></li>
+                    
+                        <li><a href="/2024-06-10-Deep-Dive-into-ARM-JavaScript-Special-Instruction-FJCVTZS">ARM に存在する JavaScript 専用命令「FJCVTZS」を追う（ついでに V8 をビルドする）</a></li>
+                    
+                        <li><a href="/2024-06-03-Exploring-V8-JIT-Outputs">JavaScript 実行エンジン V8 の JIT 出力コードを読んでみよう</a></li>
+                    
+                </ul>
+            </div>
+
+            <!-- <div class="side">
+                <div>
+                    <i class="fa fa-external-link"></i>
+                    Links
+                </div>
+                <ul  class="content-ul">
+
+                </ul>
+            </div> -->
+        </div>
+    </div>
+
+
+
+</div>
+<script>
+/**
+ * target _blank
+ */
+(function() {
+    var aTags = document.querySelectorAll('article a:not([id])')
+    for (var i = 0; i < aTags.length; i++) {
+        aTags[i].setAttribute('target', '_blank')
+    }
+}());
+</script>
+<script src="/js/pageContent.js " charset="utf-8"></script>
+
+
+    <footer class="site-footer">
+
+
+    <div class="wrapper">
+
+        <p class="description">
+             Takuo Kihira 
+        </p>
+        <p class="contact">
+            Contact me at: 
+            <a href="https://github.com/tkihira" title="GitHub"><i class="fa fa-github" aria-hidden="true"></i></a>     
+            <a href="https://twitter.com/tkihira" title="Twitter"><i class="fa fa-twitter" aria-hidden="true"></i></a>  
+            <a href="https://www.facebook.com/takuo.kihira" title="Facebook"><i class="fa fa-facebook-official" aria-hidden="true"></i></a>    
+        </p>
+        <p class="power">
+            <span>
+                Site powered by <a href="https://jekyllrb.com/">Jekyll</a>.
+            </span>
+            <span>
+                Theme designed by <a href="https://github.com/Gaohaoyang">HyG</a>.
+            </span>
+        </p>
+    </div>
+</footer>
+
+    <div class="back-to-top">
+    <a href="#top" class="scroll">
+        <i class="fa fa-arrow-up" aria-hidden="true"></i>
+    </a>
+</div>
+
+    <script src=" /js/main.js " charset="utf-8"></script>
+    <script src=" /js/scroll.min.js " charset="utf-8"></script>
+  </body>
+
+</html>

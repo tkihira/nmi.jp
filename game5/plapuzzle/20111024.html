@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html><head><title>plapuzzle</title>
+<meta name="viewport" content="width=320,user-scalable=no">
+<script>
+;(function() {
+var config = {
+	width: 320,
+	height: 416,
+	ratio: 3/9
+};
+var status = {};
+var elements = {};
+var fragments = [
+	["dr", "d", "d", "d"],
+	["d", "d", "rd", "d"],
+	["r", "d", "r", "d", "r"],
+	["r", "u", "ur", "d"],
+	["ur", "u", "r", "d"],
+	["r", "d", "r", "u", "r"],
+	["ur", "d", "r", "u"],
+	["r", "du", "r", "d"],
+	["r", "du", "ur"],
+	["udr", "d", "r"],
+	["ur", "du", "u"],
+	["rd", "d", "r", "u"]
+];
+
+var createSVGElement = function(tag, attributes) {
+	var tag = document.createElementNS("http://www.w3.org/2000/svg", tag);
+	for(var key in attributes) {
+		if(attributes.hasOwnProperty(key)) {
+			tag.setAttribute(key, attributes[key]);
+		}
+	}
+	return tag;
+};
+var createUseElement = function(id, attributes) {
+	var use = createSVGElement("use", attributes);
+	use.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", "#" + id);
+	return use;
+};
+
+window.onload = function() {
+	elements.svg = createSVGElement("svg", {"stroke-linejoin": "round", "stroke-linecap": "round"});
+	document.body.appendChild(elements.svg);
+	elements.defs = createSVGElement("defs");
+	elements.svg.appendChild(elements.defs);
+	// create lefty triangle
+	var t1 = createSVGElement("g", {id: "t1"});
+	var poly = createSVGElement("polygon", {points: "0,0 86.6,-50 86.6,50", "stroke-width": "5"});
+	t1.appendChild(poly);
+	elements.defs.appendChild(t1);
+	// create righty triangle
+	var t2 = createSVGElement("g", {id: "t2"});
+	poly = createSVGElement("polygon", {points: "0,0 0,100 86.6,50", "stroke-width": "5"});
+	t2.appendChild(poly);
+	elements.defs.appendChild(t2);
+	// create parts
+	var part = createSVGElement("g", {id: "test"});
+	var debug = createUseElement("t1", {x:0, y:100});
+	part.appendChild(debug);
+	var debug = createUseElement("t2", {x:0, y:100});
+	part.appendChild(debug);
+	elements.defs.appendChild(part);
+	// create board
+	status.board = [];
+	for(var x = 0; x < 8; x++) {
+		status.board[x] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+	}
+	status.board[0][0] = -1;
+	status.board[0][1] = -1;
+	status.board[0][9] = -1;
+	status.board[1][0] = -1;
+	status.board[6][0] = -1;
+	status.board[7][0] = -1;
+	status.board[7][1] = -1;
+	status.board[7][9] = -1;
+	elements.board = createSVGElement("g", {id: "board", transform: "matrix(" + [config.ratio, 0, 0, config.ratio, 7, 7].join() + ")"});
+	elements.svg.appendChild(elements.board);
+	elements.board.onclick = function() { alert("hello"); };
+	for(var x = 0; x < 8; x++) {
+		for(var y = 0; y < 10; y++) {
+			if(status.board[x][y] == 0) {
+				var lefty = ((x + y) % 2 == 0);
+				var dx = x * 86.6;
+				var dy = ((x % 2 == 0)? 50: 0) + (((y + ((x % 2 == 0)? 0: 1)) / 2) | 0) * 100;
+				var p = createUseElement((lefty? "t1": "t2"), {x: dx, y: dy, fill: "rgb(192,192,192)", stroke: "rgb(128,128,128)"});
+				elements.board.appendChild(p);
+			}
+		}
+	}
+	// create flagments
+	var addTriangle = (function() {
+		var addLine = function(x1, y1, x2, y2) {
+			if(x1 > x2 || (x1 == x2 && y1 > y2)) {
+				var key = [x2, y2, x1, y1].join();
+			} else {
+				var key = [x1, y1, x2, y2].join();
+			}
+			if(lineMap[key]) {
+				delete lineMap[key];
+			} else {
+				lineMap[key] = true;
+			}
+		};
+		var addLines = function(x1, y1, x2, y2, x3, y3) {
+			addLine(x1, y1, x2, y2);
+			addLine(x2, y2, x3, y3);
+			addLine(x3, y3, x1, y1);
+		};
+		return function(x, y, lefty) {
+			if(lefty) {
+				addLines(x, y, x + 86.6, y - 50, x + 86.6, y + 50);
+			} else {
+				addLines(x, y, x, y + 100, x + 86.6, y + 50);
+			}
+		};
+	})();
+	var parseFragmentData = function(x, y, lefty, d) {
+		if(lefty) {
+			switch(d) {
+				case "r": x += 86.6; y -= 50; break;
+				case "d": break;
+				case "u": y -= 100; break;
+			}
+		} else {
+			switch(d) {
+				case "d": y += 100; break;
+				case "u": break;
+			}
+		}
+		addTriangle(x, y, !lefty);
+		return {x: x, y: y, lefty: !lefty};
+	};
+	var setListeners = function(element, id) {
+		element.ontouchstart = function(id) {
+			return function(e) {
+				if(status.currentDrag == null) {
+					status.currentDrag = id;
+					status.fromX = element.getAttribute("x") | 0;
+					status.fromY = element.getAttribute("y") | 0;
+					status.dragX = e.pageX;
+					status.dragY = e.pageY;
+					e.preventDefault();
+				}
+			};
+		}(id);
+	};
+	elements.pieceList = [];
+	for(var i = 0; i < fragments.length; i++) {
+		var fragment = fragments[i];
+		var lineMap = {};
+		var lefty = true;
+		var x = 0, y = 0, index = 0;
+		addTriangle(x, y, lefty);
+		for(var j = 0; j < fragment.length; j++) {
+			var ds = fragment[j];
+			for(var k = 0; k < ds.length; k++) {
+				var d = ds.charAt(k);
+				var ret = parseFragmentData(x, y, lefty, d);
+			}
+			x = ret.x;
+			y = ret.y;
+			lefty = ret.lefty;
+		}
+		// join lines
+		var lineList = [];
+		for(var key in lineMap) {
+			lineList.push(key.split(","));
+		}
+		var pointList = [];
+		x = y = 0;
+		while(pointList.length == 0 || x != 0 || y != 0) {
+			for(var j = 0; j < lineList.length; j++) {
+				var line = lineList[j];
+				if(line[0] == x && line[1] == y) {
+					x = line[2];
+					y = line[3];
+					line[0] = line[1] = line[2] = line[3] = null;
+					pointList.push([x, y].join());
+					break;
+				}
+				if(line[2] == x && line[3] == y) {
+					x = line[0];
+					y = line[1];
+					line[0] = line[1] = line[2] = line[3] = null;
+					pointList.push([x, y].join());
+					break;
+				}
+			}
+		}
+		// create fragment svg
+		var f = createSVGElement("g", {id: "f" + i});
+		poly = createSVGElement("polygon", {points: pointList.join(" "), "stroke-width": "5", transform: "rotate(0)"});
+		f.appendChild(poly);
+		//var test = createSVGElement("rect", {x: 43.3 -10, y: -10, width:20, height:20, fill:"blue"});
+		//f.appendChild(test);
+		elements.defs.appendChild(f);
+		var piece = createUseElement("f" + i, {transform: "scale(0.4444), translate(" + ((i % 6) * 100 + 10) + "," + (600 + ((i / 6) | 0) * 200) + "), rotate(0)", fill: "red", stroke: "#800"});
+		//var piece = createUseElement("f" + i, {x: (i % 6) * 100 + 10, y: 600 + ((i / 6) | 0) * 200, transform: "matrix(" + [config.ratio, 0, 0, config.ratio, 0, 0].join() + ")", fill: "red", stroke: "#800"});
+		setListeners(piece, i);
+		elements.svg.appendChild(piece);
+		elements.pieceList[i] = piece;
+	}
+	// document listeners
+	document.body.ontouchend = function() {
+		status.currentDrag = null;
+	};
+	document.body.ontouchmove = function(e) {
+		if(status.currentDrag != null) {
+			var element = elements.pieceList[status.currentDrag];
+			var x = status.fromX + (e.pageX - status.dragX) / config.ratio;
+			var y = status.fromY + (e.pageY - status.dragY) / config.ratio;
+			element.setAttribute("x", x);
+			element.setAttribute("y", y);
+		}
+	};
+	document.body.ontouchstart = function(e) {
+		if(e.touches.length == 2) {
+			alert("!");
+		}
+	};
+
+	setTimeout(function() { window.scrollTo(0, 0); }, 100);
+};
+})();
+</script></head>
+<body style="margin:0"></body></html>

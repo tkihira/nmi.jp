@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html manifest="rolling.manifest"><head><title>Rolling 2011</title>
+<meta name="viewport" content="width=400,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<link rel="apple-touch-icon" href="rolling_icon.png" />
+<script>
+(function() {
+	var config = {
+		width: 720,						// 仮想canvasの幅
+		height: 480,					// 仮想canvasの高さ
+		viewportWidth: 400,				// viewportの幅
+		canvasRatio: 0.5,				// 実際のcanvasサイズ
+		roadWidth: 100,					// 道幅は-100～100
+		roadMargin: 1.03,				// 道幅の余白
+		eyeHeight: 10,					// 始点のy座標（高さ）は10
+		eyeFocus: -20,					// 始点のz座標（焦点）は-10
+		roadCount: 3,					// 遠くの道の数
+		roadStepWidth: 15,				// 道の感覚の広さ
+		carWidth: 160,					// 車画像の横幅
+		carHeight: 58,					// 車画像の縦
+		carPosition: -18.85,			// 車の位置
+		carHover: 20,					// 車の浮きピクセル
+		carLength: 0.1,					// 車の全長
+		gateWidth: 30,					// ゲートの幅
+		gateHeight: 50,					// ゲートの高さ
+		gateVisibleLength: 200,			// ゲートの見える位置
+		timer: 6.5,						// 時間の減る速さ
+		acceleration: 9,				// 加速力
+		friction: 1,					// 摩擦力
+		maxSpeed: 511,					// 最大速度
+		fps: 15,						// 要求fps
+		skyColor: "#52CCFC",			// 空の色
+		gateColor: 240,					// ゲートの色（HSL色相）
+		carShadowColor: "#544545",		// 車の影
+		roadLightColor: "#FD7502",		// 道の明るい色
+		roadDarkColor: "#CDABAB",		// 道の暗い色
+		groundLightColor: "#998989",	// 外の明るい色
+		groundDarkColor: "#00AB02"		// 外の暗い色
+	};
+	var status = {};
+	var elements = {};
+	var gates = {};
+	window.ondevicemotion = function(e) {
+		if(status.state == "playing") {
+			var y = e.accelerationIncludingGravity.y * ((status.orientation == 90)? 1: -1);
+			if(y > 2) {
+				elements.car.style.top = (-config.carHeight * 2) + "px";
+				status.dx = 1;
+				return;
+			} else if(y < -2) {
+				elements.car.style.top = -config.carHeight + "px";
+				status.dx = -1;
+				return;
+			}
+			status.dx = 0;
+			elements.car.style.top = "0";
+		} else if(status.state == "ready") {
+			status.dx = 0;
+			elements.car.style.top = "0";
+		}
+	};
+	window.onorientationchange = function() {
+		elements.canvas && document.body.removeChild(elements.canvas);	// 一旦以前のcanvasを消す
+		elements.canvas = document.createElement("canvas");
+		elements.canvas.style.position = "absolute";
+		elements.canvas.style.left = "0";
+		elements.canvas.style.top = "0";
+		elements.canvas.style.webkitTransformOrigin = "0 0";
+		document.body.appendChild(elements.canvas);
+		
+		switch(window.orientation) {
+		case 0:
+			// 右に90度傾ける
+			var zoomRatio = config.viewportWidth / config.height / config.canvasRatio;	// viewport に合わせるための倍率
+			elements.canvas.width = config.height * config.canvasRatio;		// 実際のcanvasのサイズ
+			elements.canvas.height = config.width * config.canvasRatio;
+			elements.canvas.style.webkitTransform = "scale(" + zoomRatio + ")";
+			elements.cover.style.width = config.viewportWidth + "px";
+			elements.cover.style.height = config.viewportWidth * config.width / config.height + "px";
+			status.orientation = 90;										// 右に90度傾いた状態と同じにする
+			status.ctx = elements.canvas.getContext("2d");
+			status.ctx.transform(0, config.canvasRatio, -config.canvasRatio, 0, elements.canvas.width / 2, elements.canvas.height / 2);
+			status.ctx.save();
+			var ratio = config.canvasRatio * zoomRatio;
+			elements.overlay.style.webkitTransform = "matrix(0," + ratio + "," + (-ratio) + ",0," + ratio * config.height + ",0)";
+			var dy = Math.floor((config.width * ratio - config.safariPortrait / 320 * config.viewportWidth) / 2);
+			elements.timeContainer.style.left = (dy / ratio) + "px";
+			elements.gateContainer.style.right = (dy / ratio) + "px";
+			break;
+		default:
+		case 90:
+		case -90:
+			var zoomRatio = config.viewportWidth / config.width / config.canvasRatio;
+			elements.canvas.width = config.width * config.canvasRatio;
+			elements.canvas.height = config.height * config.canvasRatio;
+			elements.canvas.style.webkitTransform = "scale(" + zoomRatio + ")";
+			elements.cover.style.width = config.viewportWidth + "px";
+			elements.cover.style.height = Math.ceil(config.viewportWidth * config.height / config.width) + "px";
+			status.orientation = window.orientation;
+			status.ctx = elements.canvas.getContext("2d");
+			status.ctx.transform(config.canvasRatio, 0, 0, config.canvasRatio, elements.canvas.width / 2, elements.canvas.height / 2);
+			status.ctx.save();
+			var ratio = config.canvasRatio * zoomRatio;
+			elements.overlay.style.webkitTransform = "scale(" + ratio + ")";
+			var dy = Math.floor(config.height * ratio - config.safariLandscape / 480 * config.viewportWidth);
+			elements.timeContainer.style.left = "0px";
+			elements.gateContainer.style.right = "0px";
+			break;
+		}
+		status.scrollY = dy;
+		setTimeout(function() { window.scrollTo(0, status.scrollY); }, 200);	// 中心に移動するようにスクロールする
+	};
+	var cacheControl = function() {
+		var cache = window.applicationCache;
+		if(cache) {
+			cache.addEventListener("updateready", function() {
+				try {
+					cache.swapCache();
+				} catch(e) {}
+				window.location.reload();
+			});
+			if(window.navigator.onLine && cache.status != 0) {
+				try {
+					cache.update();
+				} catch(e) {}
+			}
+		}
+	};
+	window.onload = function() {
+		cacheControl();
+		config.safariPortrait = (window.navigator.standalone)? 460: 416;		// 縦の時、表示エリアは320x416
+		config.safariLandscape = (window.navigator.standalone)? 300: 268;		// 横の時、表示エリアは480x268
+		config.audio = new Audio("./rolling.mp3");
+		config.audio.addEventListener("timeupdate", function() {
+			if(config.audio.currentTime > 155.4) {
+				config.audio.currentTime = 6.240;
+			}
+		});
+		document.body.ontouchstart = function(e) {
+			status.accelerator = (e.touches.length > 0);
+			if(e.touches.length == 2 && status.state == "playing") {
+				status.state = "pause";
+				elements.pause.style.display = "block";
+			}
+ 			if(status.state == "ready") {
+				elements.stageName.style.display = "none";
+				status.carHover++;
+			}
+			e.preventDefault();
+		};
+		document.body.ontouchend = function(e) {
+			status.accelerator = (e.touches.length > 0);
+			if(status.state == "opening") {
+				config.audio.play();
+				init();
+			}
+		};
+		var elementsList = document.getElementsByTagName("*");
+		for(var i = 0; i < elementsList.length; i++) {
+			if(elementsList[i].id) {
+				elements[elementsList[i].id] = elementsList[i];
+			};
+		}
+		elements.retry.ontouchstart = elements.restart.ontouchstart = function() {
+			config.audio.currentTime = 0;
+			setTimeout(function() { init(); }, 100);
+		};
+		elements.resume.ontouchstart = function() {
+			elements.pause.style.display = "none";
+			status.state = "playing";
+		};
+		elements.tweet.ontouchstart = function() {
+			var referer = encodeURIComponent(window.location.href);
+			var text = encodeURIComponent("Stage clear! Left time: " + status.lefttime + ", Score: " + status.score + "pts. #rolling2011 #html5");
+			window.open("http://twitter.com/share?original_referer=" + referer + "&source=tweetbutton&text=" + text + "&url=" + referer, "_blank");
+		};
+		
+		elements.overlay.style.width = config.width + "px";
+		elements.overlay.style.height = config.height + "px";
+		window.onorientationchange();
+		
+		elements.carContainer.style.left = Math.floor((config.width - config.carWidth) / 2) + "px";
+		elements.carContainer.style.top = (config.height - config.carHover - config.carHeight) + "px";
+		elements.speedContainer.style.left = Math.floor((config.width + config.carWidth) / 2 + 30) + "px";;
+		
+		status.state = "opening";		// オープニング用の設定をする
+		status.startTime = status.maxZ = status.frameCount = status.carHover = status.mx = status.mz = status.rolling = 0;
+		// オープニング用のダミーのゲートを用意
+		var len = 2 * Math.PI * config.roadWidth * 8;
+		gates.cycle = len;
+		gates.list = [];
+		for(var i = 0.1; i < len; i += Math.random() * len / 40) {
+			var cx = -config.roadWidth * Math.sin((i - config.eyeFocus) / 100);
+			gates.list.push([i, cx - 30, cx + 30]);
+		}
+		mainLoop();
+	};
+	
+	var init = function() {
+		gates.list = [	// gateのデータ
+			[0, -30, 30], [75, -30, 30], [150, -30, 30], [225, -30, 30], [300, -15, 45], [375, 0, 60], [450, 15, 75], [525, 30, 90], 
+			[600, 45, 105], [675, 60, 120], [825, 22.5, 82.5], [900, 5, 62.5], [975, -12.5, 47.5], [1050, -30, 30], [1125, -47.5, 12.5], 
+			[1200, -65, -5], [1275, -85, -25], [1350, -120, -60], [1400, -120, -60], [1450, -100, -50], [1500, -85, -35], 
+			[1550, -70, -20], [1600, -60, -15], [1650, -50, -5], [1700, -40, 5], [1750, -30, 10], [1800, -20, 20], [1820, -22, 18], 
+			[1840, -24, 16], [1860, -26, 14], [1880, -28, 12], [1900, -30, 10], [1920, -32, 8], [1940, -34, 6], [1960, -36, 4], 
+			[1980, -38, 12], [2030, -40, 10], [2070, -80, -40], [2110, -45, 15], [2150, -90, -50], [2230, -50, 10]
+		];
+		gates.cycle = 2300;
+
+		status.state = "ready"; // ゲーム開始前状態に移行する
+		status.maxZ = -Number.MAX_VALUE;
+		status.velocity = status.carHover = status.mx = status.mz = status.rolling = status.rad = 0;
+		status.gate = 90;
+		status.time = 180 * config.timer;
+		status.score = Math.ceil(status.time) * 30;
+
+		elements.opening.style.display = "none";
+		elements.gameover.style.display = "none";
+		elements.stageName.style.display = "block";
+		elements.game.style.display = "block";
+		elements.pause.style.display = "none";
+		render();
+	};
+	
+	var mainLoop = function() {
+		status.draw = status.draw || 0;
+		var currentTime = Date.now();
+		var toFrame = Math.floor((currentTime - status.startTime) * config.fps / 1000) + 1;
+		if(toFrame - status.frameCount >= config.fps) {		// 1秒以上反応がない場合は、ブラウザが動いていないと判断
+			toFrame = status.frameCount + 1;
+			status.startTime = currentTime - toFrame / config.fps * 1000;
+		}
+		if(toFrame > status.frameCount) {
+			for(var frame = status.frameCount; frame < toFrame; frame++) {
+				control();
+				status.frameCount++;
+			}
+			status.draw++;
+			render();
+		}
+		(function() {
+			status.last = status.last || Date.now();
+			if(currentTime - status.last > 1000) {
+				console.log("fps:" + (status.draw) + " time:" + (currentTime - status.last) * 1000);
+				status.draw = 0;
+				status.last = currentTime;
+			}
+		})();
+		setTimeout(mainLoop, 0);
+	};
+	
+	var control = function() {
+		if(status.state == "playing") {
+			// 左右の移動をここで判定
+			if(status.dx && status.dx > 0) { status.rolling += 1.5 };
+			if(status.dx && status.dx < 0) { status.rolling -= 1.5 };
+			status.dx <= 0 && status.rolling && status.rolling > 0 && status.rolling--;
+			status.dx >= 0 && status.rolling && status.rolling < 0 && status.rolling++;
+			if(status.rolling > 0 && status.dx > 0 && status.mx <= config.roadWidth) { status.mx += 3; }
+			if(status.rolling < 0 && status.dx < 0 && status.mx >= -config.roadWidth) { status.mx -= 3; }
+			status.rolling = (status.rolling > 15)? 15: ((status.rolling < -15)? -15: status.rolling);
+			status.rad = Math.PI / 4 * status.rolling / 15;
+			// 速度と位置をここで判定
+			var a = (status.accelerator? config.acceleration + config.friction: 0) - (config.acceleration / config.maxSpeed) * status.velocity;
+			a += ((status.velocity > 0)? -config.friction: ((status.velocity < 0)? config.friction: 0));
+			status.velocity += a;
+			if(Math.abs(status.velocity) < 2) { status.velocity = 0; }
+			// 衝突判定
+			var currentPos = status.mz + config.carPosition;
+			var cz = status.mz % gates.cycle;
+			for(var i = 0; i < gates.list.length; i++) {
+				var gate = gates.list[i];
+				for(var j = 0; j < 2; j++) {
+					var z = (gate[0] + j * gates.cycle) - cz + status.mz;
+					if(z > status.maxZ && currentPos< z && z < currentPos + status.velocity / 60 ) {
+						// ゲートの位置を超えた
+						if(gate[1] <= -status.mx && -status.mx <= gate[2]) { status.gate--; }
+						if((gate[1] - config.gateWidth * 0.8 < -status.mx && -status.mx < gate[1])
+							|| (gate[2]< -status.mx && -status.mx < gate[2] + config.gateWidth * 0.8 )) {
+							status.velocity = -status.velocity * 0.5;
+						}
+					}
+				}
+			}
+			status.mz += (status.velocity / 60);
+			status.maxZ = Math.max(status.maxZ, status.mz + config.carPosition);
+			status.time--;
+			status.score -= 30;
+			if(status.gate <= 0) {
+				status.state = "gameover";
+				elements.gameover.style.display = "block";
+				elements.clear.style.display = "block";
+				elements.timeup.style.display = "none";
+				elements.tweet.style.display = "inline";
+				elements.score.innerHTML = status.score;
+				status.lefttime = Math.ceil(status.time / config.timer * 100) / 100;
+				elements.lefttime.innerHTML = status.lefttime;
+			} else if(status.time <= 0) {
+				status.state = "gameover";
+				elements.gameover.style.display = "block";
+				elements.clear.style.display = "none";
+				elements.timeup.style.display = "block";
+				elements.tweet.style.display = "none";
+			}
+		} else if(status.state == "opening") {
+			status.mz += 4;
+			status.mx = config.roadWidth * Math.sin(status.mz / 100);
+			status.rad = Math.PI / 4 * Math.cos(status.mz / 100);
+		} else if(status.state == "ready") {
+			status.carHover && status.carHover++;		// 車を浮き上がらせる
+			if(status.carHover >= 15) {
+				status.carHover = 15;
+				status.startFrame = status.frameCount;
+				status.state = "playing";				// ゲームスタート
+			}
+		}
+		
+	};
+	
+	var render = function() {
+		elements.speed.innerHTML = Math.ceil(status.velocity);
+		elements.gate.innerHTML = status.gate;
+		elements.time.innerHTML = Math.floor(status.time / config.timer);
+		// 描画リストを生成
+		var ctx = status.ctx;
+		var drawList = draw(ctx);
+		// まず空を塗る
+		ctx.fillStyle = config.skyColor;
+		ctx.fillRect(-config.width / 2, -config.height / 2, config.width, config.height);
+		
+		// 描画の前に、傾きによる車の位置を計算し、いつも同じ位置になるようにtransformする
+		if(status.rad > 0) {
+			var x = status.carLeft * Math.cos(status.rad) - status.carTop * Math.sin(status.rad);
+			var y = status.carLeft * Math.sin(status.rad) + status.carTop * Math.cos(status.rad) - status.carHover;
+		} else {
+			var x = status.carRight * Math.cos(status.rad) - status.carTop * Math.sin(status.rad) - config.carWidth;
+			var y = status.carRight * Math.sin(status.rad) + status.carTop * Math.cos(status.rad) - status.carHover;
+		}
+		
+		// 移動量を計算し、平行移動する
+		var dx = -config.carWidth / 2 - x;
+		var dy = config.height / 2 - config.carHover - y;
+		// 回転と平行移動を合わせたアフィン変換をここで適用する
+		ctx.save();
+		ctx.transform(Math.cos(status.rad), Math.sin(status.rad), -Math.sin(status.rad), Math.cos(status.rad), dx, dy);
+		for(var i = 0; i < drawList.length; i++) {
+			drawList[i]();
+		}
+		ctx.restore();
+	};
+	
+	var draw = function(ctx) {
+		var ret = [];		// 描画リスト
+		// まず地面と道を塗る
+		var f = config.eyeFocus;
+		ret.push(function() {
+			ctx.fillStyle = config.groundDarkColor;
+			ctx.fillRect(-config.width, 0, config.width * 2, config.height);
+		});
+		var x1 = f * (-config.roadWidth * config.roadMargin + status.mx) / -0.1;
+		var x2 = f * (config.roadWidth * config.roadMargin + status.mx) / -0.1;
+		var y = f * config.eyeHeight / -0.1;
+		ret.push(function(x1, x2, y) {
+			return function() {
+				ctx.beginPath();
+				ctx.moveTo(0,0);
+				ctx.lineTo(x1, y);
+				ctx.lineTo(x2, y);
+				ctx.fillStyle = config.roadDarkColor;
+				ctx.fill();
+			};
+		}(x1, x2, y));
+		
+		// 次に、先の道をconfig.roadCount本塗る
+		var n = Math.floor((status.mz + f) / config.roadStepWidth / 2) * 2; // 今自分のいる本数
+		var first = true;
+		var count = 0;
+		for(var i = n; count < config.roadCount; i++) {
+			var drawFlag = (!first) && (i % 2 == 0);
+			var rz = Math.max(i * config.roadStepWidth - status.mz, f + 0.1);
+			if(!drawFlag) {
+				// 描画する
+				var ox1 = x1, ox2 = x2, oy = y;
+			}
+			// 今回の座標を計算する
+			x1 = f * (-config.roadWidth * config.roadMargin + status.mx) / (f - rz);
+			x2 = f * (config.roadWidth * config.roadMargin + status.mx) / (f - rz);
+			y = f * config.eyeHeight / (f - rz);
+			if(!drawFlag) {
+				// 描画する
+				ret.push(function(ox1, ox2, oy, x1, x2, y) {
+					return function() {
+						//ctx.globalCompositeOperation = "lighter";
+						ctx.fillStyle = config.groundLightColor;
+						ctx.fillRect(-config.width, oy, config.width * 2, y - oy);
+						//ctx.globalCompositeOperation = "source-over";
+						ctx.beginPath();
+						ctx.moveTo(ox1, oy);
+						ctx.lineTo(ox2, oy);
+						ctx.lineTo(x2, y);
+						ctx.lineTo(x1, y);
+						ctx.fillStyle = config.roadLightColor;
+						ctx.fill();
+					};
+				}(ox1, ox2, oy, x1, x2, y));
+				count++;
+			}
+			
+			first = false;
+		}
+		
+		// 車の影を書く
+		var cw = config.carWidth / f / 2 * (f - config.carPosition + config.carLength) * Math.cos(status.rad);
+		var x1 = f * (-cw) / (f - config.carPosition - config.carLength);
+		var x2 = f * (cw) / (f - config.carPosition - config.carLength);
+		var x3 = f * (-cw) / (f - config.carPosition + config.carLength);
+		var x4 = f * (cw) / (f - config.carPosition + config.carLength);
+		var y1 = f * config.eyeHeight / (f - config.carPosition - config.carLength);
+		var y2 = f * config.eyeHeight / (f - config.carPosition + config.carLength);
+		status.carLeft = (status.rad > 0)? x3: -x3 - config.carWidth;
+		status.carRight = x4;
+		status.carTop = y2;
+		
+		if(status.state != "opening") {
+			// openingの場合は影は書かない
+			ret.push(function(x1, x2, x3, x4, y1, y2) {
+				return function() {
+					ctx.beginPath();
+					ctx.fillStyle = config.carShadowColor;
+					ctx.moveTo(x1, y1);
+					ctx.lineTo(x2, y1);
+					ctx.lineTo(x4, y2);
+					ctx.lineTo(x3, y2);
+					ctx.fill();
+				};
+			}(x1, x2, x3, x4, y1, y2));
+		}
+		
+		// 最後に、ゲートを描画する
+		var cz = status.mz % gates.cycle;
+		var visibleGates = [];
+		for(var i = 0; i < gates.list.length; i++) {
+			var gate = gates.list[i];
+			for(var j = 0; j < 2; j++) {
+				var z = gate[0] + j * gates.cycle;		// 一周して見えるゲートも含める
+				if(z - cz + status.mz > status.maxZ && z - cz > f && z - cz < config.gateVisibleLength) {
+					// このゲートは見える
+					visibleGates.push([z - cz, gate]);	// 距離とゲート情報をプッシュ
+				}
+			}
+		}
+		// 距離で逆順にソート
+		visibleGates.sort(function(a,b) { return b[0] - a[0]; });
+		// 遠くのゲートから描画
+		for(var i = 0; i < visibleGates.length; i++) {
+			var z = visibleGates[i][0];
+			var gate = visibleGates[i][1];
+			var x1 = f * (gate[1] + status.mx) / (f - z);
+			var x2 = f * (gate[2] + status.mx) / (f - z);
+			var x3 = f * (gate[1] - config.gateWidth + status.mx) / (f - z);
+			var x4 = f * (gate[2] + config.gateWidth + status.mx) / (f - z);
+			var y1 = f * config.eyeHeight / (f - z);
+			var y2 = f * (-config.gateHeight) / (f - z);
+			ret.push(function(x1, x2, x3, x4, y1, y2, z) {
+				return function() {
+					ctx.fillStyle = "hsl("+ config.gateColor + ",100%," + Math.ceil(50 + z / config.gateVisibleLength * 35) + "%)";
+					ctx.beginPath();
+					ctx.moveTo(x1, y2);
+					ctx.lineTo(x1, y1);
+					ctx.lineTo(x3, y1);
+					ctx.fill();
+					ctx.beginPath();
+					ctx.moveTo(x2, y2);
+					ctx.lineTo(x2, y1);
+					ctx.lineTo(x4, y1);
+					ctx.fill();
+				};
+			}(x1, x2, x3, x4, y1, y2, z));
+		}
+		
+		return ret;
+	};
+})();
+</script></head><body style="position:relative;margin:0;padding:0;font-family:Futura;">
+	<div id="cover" style="display:block;position:absolute;overflow:hidden;z-index:1">
+		<div id="overlay" style="position:absolute;-webkit-transform-origin:0 0">
+			<div id="opening" style="position:absolute;background-color:rgba(0,0,0,0.75);width:100%;height:100%;">
+				<div style="position:relative;height:225px"></div>
+				<div style="position:relative;text-align:center;color:#fff;font-size:50px">ROLLING 2011</div>
+				<div style="position:relative;text-align:center;color:#fff;font-size:20px">touch to start</div>
+			</div>
+			<div id="game" style="display:none">
+				<div id="stageName" style="position:absolute;top:175px;width:100%;text-align:center;color:#FFF;font-size:100px">Bio FIELD</div>
+				<div id="timeContainer" style="position:absolute;bottom:0;color:#fff;font-size:35px">
+					Time<br><span id="time" style="font-size:60px;line-height:50%">xxx</span></div>
+				<div id="gateContainer" style="position:absolute;bottom:0;right:0;text-align:right;color:#ff0;font-size:35px">
+					Gate<br><span id="gate" style="font-size:60px;line-height:50%">xx</span></div>
+				<div id="speedContainer" style="position:absolute;bottom:0;text-align:right;color:#000;font-size:35px">
+					<span id="speed">xxx</span><span style="font-size:20px">km/h</span></div>
+				<div id="carContainer" style="position:absolute;width:160px;height:58px;overflow:hidden">
+					<img id="car" src="car3.png" style="position:absolute;top:0">
+				</div>
+			</div>
+			<div id="gameover" style="display:none">
+				<div id="timeup" style="display:none">
+					<div style="position:relative;height:225px"></div>
+					<div style="position:relative;text-align:center;color:#000;font-size:50px">TIME UP</div>
+				</div>
+				<div id="clear" style="display:none">
+					<div style="position:relative;height:135px"></div>
+					<div style="position:relative;text-align:center;color:#f00;font-size:50px">CLEAR!!</div>
+					<div style="position:relative;text-align:center;color:#fff;font-size:35px">Lefttime = <span id="lefttime">xxx</span></div>
+					<div style="position:relative;text-align:center;color:#ff0;font-size:35px">Score = <span id="score">xxx</span>pts.</div>
+				</div>
+				<div style="position:relative;text-align:center;color:#000;font-size:35px">
+					<span id="retry" style="border:#000 1px solid;border-radius:15px">&nbsp;retry&nbsp;</span>
+					<span id="tweet" style="border:#000 1px solid;border-radius:15px">&nbsp;tweet this score!&nbsp;</span>
+				</div>
+			</div>
+			<div id="pause" style="display:none;position:absolute;background-color:rgba(0,0,0,0.75);width:100%;height:100%;">
+				<div style="position:relative;height:185px"></div>
+				<div style="position:relative;text-align:center;color:#fff;font-size:50px">pause</div>
+				<div style="position:relative;text-align:center;color:#fff;font-size:35px">
+					<span id="resume" style="border:#fff 1px solid;border-radius:15px">&nbsp;resume&nbsp;</span>
+					<span id="restart" style="border:#fff 1px solid;border-radius:15px">&nbsp;restart&nbsp;</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</body></html>

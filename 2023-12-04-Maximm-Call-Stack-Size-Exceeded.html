@@ -1,0 +1,1808 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Maximum call stack size exceeded について解説</title>
+    <meta name="description" content=""Maximum call stack size exceeded" というエラーに関する解説を書きます。JavaScript を前提に解説しております。ざっくり解説  Uncaught RangeError: Maximum call stack size exceededこれは、関数が何度も深く深く呼ばれてし...">
+
+    <link rel="stylesheet" href=" /css/fontawesome/css/font-awesome.min.css ">
+    <link rel="stylesheet" href=" /css/main.css ">
+    <link rel="canonical" href="http://nmi.jp/2023-12-04-Maximm-Call-Stack-Size-Exceeded">
+    <link rel="alternate" type="application/rss+xml" title="nmi.jp" href="http://nmi.jp/feed.xml">
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=3.0'></script>
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=1.1'></script>
+    <script>
+        if(location.href.match(/\.html$/)) {
+            location.href = location.href.match(/(.+)\.html/)[1];
+        }
+    </script>
+
+
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-229769-8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-229769-8');
+</script>
+</head>
+
+
+  <body>
+
+    <header id="top">
+    <div class="wrapper">
+        <a href="/" class="brand">nmi.jp</a>
+        <small>Twitter → <a href="https://twitter.com/tkihira" target="_blank">@tkihira</a></small>
+        <button id="headerMenu" class="menu"><i class="fa fa-bars"></i></button>
+        <nav id="headerNav">
+            <ul>
+                <li>
+                    
+                    <a href="/">
+                    
+                        <i class="fa fa-home"></i>Home
+                    </a>
+                </li>
+
+                
+                    
+                    <li>
+                        
+                        <a href="/archive/">
+                        
+                            <i class="fa fa-archive"></i>Archives
+                        </a>
+                    </li>
+                    
+                
+                    
+                    <li>
+                        
+                        <a href="/category/">
+                        
+                            <i class="fa fa-th-list"></i>Categories
+                        </a>
+                    </li>
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            </ul>
+        </nav>
+    </div>
+</header>
+
+
+        <div class="page clearfix" post>
+    <div class="left">
+        <div class="post-recent">
+    <table style="width:100%;border:0;padding:0;"><tbody><tr style="padding:0">
+        <td class="toppre" style="padding:0">
+        
+        <a href="/2023-01-11-Detecting-Intel-Arch-in-JavaScript">JavaScript で CPU が Intel かどうかを判定する（ついでに JIT を検知する）</a>
+        
+        </td><td class="topnex" style="text-align:right;padding:0">
+        
+        <a href="/2024-05-17-Avoid-then">JavaScript で then を使うのは避けよう（await / async の初級者まとめ）</a>
+        
+        </td>
+    </tr></tbody></table>
+</div>
+
+        <hr style="margin:0"/>
+        <h1 style="margin-top:10px">Maximum call stack size exceeded について解説</h1>
+<hr />
+        <div class="label">
+
+            <div class="label-card">
+                <i class="fa fa-calendar"></i>2023-12-04
+            </div>
+
+            <div class="label-card">
+                <i class="fa fa-user"></i>Takuo Kihira
+                
+            </div>
+
+            <div class="label-card">
+                
+            </div>
+
+            <div class="label-card">
+            
+
+
+<!-- <span class="point">•</span> -->
+<span class="categories">
+  <i class="fa fa-th-list"></i>
+  
+    
+        <a href="/category/#JavaScript" title="Category: JavaScript" rel="category">JavaScript</a>
+    
+  
+
+  <!-- <span class="point">•</span> -->
+</span>
+
+
+            </div>
+
+            <div class="label-card">
+                <a href="https://github.com/tkihira/nmi.jp/blob/master/_posts/2023-12-04-Maximm-Call-Stack-Size-Exceeded.md" target="_blank"><i class="fa fa-github"></i></a>
+            </div>
+
+        </div>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/2023-12-04-Maximm-Call-Stack-Size-Exceeded&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="Maximum call stack size exceeded について解説" data-url="http://nmi.jp/2023-12-04-Maximm-Call-Stack-Size-Exceeded">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/2023-12-04-Maximm-Call-Stack-Size-Exceeded" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="Maximum call stack size exceeded について解説"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="Maximum call stack size exceeded について解説" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+        <article itemscope itemtype="http://schema.org/BlogPosting">
+        <p><code class="language-plaintext highlighter-rouge">"Maximum call stack size exceeded"</code> というエラーに関する解説を書きます。JavaScript を前提に解説しております。</p>
+
+<h1 id="ざっくり解説">ざっくり解説</h1>
+
+<blockquote>
+  <p>Uncaught RangeError: Maximum call stack size exceeded</p>
+</blockquote>
+
+<p>これは、関数が何度も深く深く呼ばれてしまった場合に出るエラーです。</p>
+
+<p>大抵は、間違って自分自身の関数を呼んでしまった、もしくは再帰の終了条件をミスった場合に発生します。<span style="color:red"> <strong>ここに検索で来た方は、自分自身を呼んでいたり、関数同士が循環的に呼びあっていたりするミスを犯していないか確認してください</strong> </span>。</p>
+
+<p>図にすると、こんな感じです</p>
+
+<p><img src="./img/stackoverflow001.png" alt="再帰呼び出し、もしくは循環呼び出しの図" /></p>
+
+<p>ちなみに、関数呼び出しがなければこのエラーは発生しません。ただの無限ループでは決して発生しないエラーです。以下、解説を書きます。</p>
+
+<h2 id="関数を深く呼ぶとは">「関数を深く呼ぶ」とは？</h2>
+
+<p>ここでは、関数からリターンせず再度関数を呼び、その呼ばれた関数がさらに別の関数を呼び、その関数がさらに別の関数を…と、どの関数もリターンすることなく次々に関数を呼ばれる状態を「深く呼ぶ」と表現しています。</p>
+
+<p>例えば次のようなコードがあった場合を想像してみてください。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">f1</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span> <span class="nf">f2</span><span class="p">();</span> <span class="p">};</span>
+<span class="kd">const</span> <span class="nx">f2</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span> <span class="nf">f3</span><span class="p">();</span> <span class="p">};</span>
+<span class="kd">const</span> <span class="nx">f3</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span> <span class="nf">f4</span><span class="p">();</span> <span class="p">};</span>
+<span class="kd">const</span> <span class="nx">f4</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span> <span class="nf">f5</span><span class="p">();</span> <span class="p">};</span>
+<span class="c1">// ...</span>
+</code></pre></div></div>
+
+<p>このように、呼ばれた関数が次々に関数を呼んでいっている状態です。この場合 DevTools でパフォーマンスを確認すると、イメージとしてはこんな感じになります（実際の結果とは違います）。</p>
+
+<p><img src="./img/stackoverflow002.png" alt="深く呼ばれた関数の呼び出し図" /></p>
+
+<p>f1 の下に f2 があり、f2 の下に f3 があり…と、どんどん深く下に潜って言っているのがわかると思います。この例では、f30 まで呼ばれたらまた戻ってきています。「関数を深く呼ぶ」をイメージして頂けたでしょうか？</p>
+
+<p>この例では関数 f1、f2、f3、…と別々の関数を呼んでいるのですが、同じ関数で再帰することでも関数は深く呼ばれます。次のようなコードを想像してください。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">f</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span> <span class="nf">f</span><span class="p">();</span> <span class="p">};</span>
+</code></pre></div></div>
+
+<p>これは、関数 f がひたすら関数 f を呼びますので、動作としては無限ループと同じものになります。この場合 DevTools でパフォーマンスを確認すると、イメージとしてはこんな感じになります（実際の結果とは違います）。</p>
+
+<p><img src="./img/stackoverflow003.png" alt="無限呼び出しの図" /></p>
+
+<p>このようにどこまでも深く呼ばれ続けていきます。実際にブラウザ等で実行すると、一定の深さになったタイミングで <code class="language-plaintext highlighter-rouge">Maximum call stack size exceeded</code> エラーで止まるので、無限ループにはなりません。</p>
+
+<p>循環して呼び出している場合は、次のようなイメージになります。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">f</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span> <span class="nf">g</span><span class="p">();</span> <span class="p">};</span>
+<span class="kd">const</span> <span class="nx">g</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span> <span class="nf">f</span><span class="p">();</span> <span class="p">};</span>
+</code></pre></div></div>
+
+<p><img src="./img/stackoverflow004.png" alt="循環呼び出しの図" /></p>
+
+<p>この場合も、ある程度まで深く呼ばれた時点で <code class="language-plaintext highlighter-rouge">Maximum call stack size exceeded</code> エラーで止まります。</p>
+
+<h2 id="maximum-call-stack-size-exceeded-はどんな場合に起こる">Maximum call stack size exceeded はどんな場合に起こる？</h2>
+
+<p><code class="language-plaintext highlighter-rouge">Maximum call stack size exceeded</code> エラーは「関数が何度も深く深く呼ばれてしまった場合に出るエラー」です。関数をたくさん呼び出しても、深く呼ばない限り出ません。</p>
+
+<p>例えば次のコードを見てみましょう。再帰でフィボナッチ数列の n 番目の要素を求めるプログラムです。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">max</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">fib</span> <span class="o">=</span> <span class="p">(</span><span class="nx">n</span><span class="p">,</span> <span class="nx">depth</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">count</span><span class="o">++</span><span class="p">;</span>
+    <span class="nx">max</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nf">max</span><span class="p">(</span><span class="nx">max</span><span class="p">,</span> <span class="nx">depth</span><span class="p">);</span>
+    <span class="k">if </span><span class="p">(</span><span class="nx">n</span> <span class="o">===</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="mi">1</span><span class="p">;</span> <span class="p">};</span>
+    <span class="k">if </span><span class="p">(</span><span class="nx">n</span> <span class="o">===</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="mi">1</span><span class="p">;</span> <span class="p">};</span>
+    <span class="k">return</span> <span class="nf">fib</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="nf">fib</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+<span class="p">};</span>
+<span class="nf">fib</span><span class="p">(</span><span class="mi">30</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">({</span><span class="nx">count</span><span class="p">,</span> <span class="nx">max</span><span class="p">});</span>
+</code></pre></div></div>
+
+<p>これを実行すると、 <code class="language-plaintext highlighter-rouge">{count: 2692537, max: 30}</code> という出力が得られます。 <code class="language-plaintext highlighter-rouge">fib</code> 関数は 269 万回も呼ばれましたが、関数の深さは最大で 30 でした。30 であれば <code class="language-plaintext highlighter-rouge">Uncaught RangeError: Maximum call stack size exceeded</code> エラーはまず起こらないです。</p>
+
+<p>では、次のコードを見てみましょう。再帰で 0 から n までの数列の和を求めるプログラムです。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">max</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">sum</span> <span class="o">=</span> <span class="p">(</span><span class="nx">n</span><span class="p">,</span> <span class="nx">depth</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">count</span><span class="o">++</span><span class="p">;</span>
+    <span class="nx">max</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nf">max</span><span class="p">(</span><span class="nx">max</span><span class="p">,</span> <span class="nx">depth</span><span class="p">);</span>
+    <span class="k">if</span><span class="p">(</span><span class="nx">n</span> <span class="o">===</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="mi">0</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">return</span> <span class="nf">sum</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="nx">n</span><span class="p">;</span>
+<span class="p">};</span>
+<span class="nf">sum</span><span class="p">(</span><span class="mi">100000</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>これを実行すると、私の環境では <code class="language-plaintext highlighter-rouge">Uncaught RangeError: Maximum call stack size exceeded</code> エラーが発生しました。その時の count と max の値は、 <code class="language-plaintext highlighter-rouge">{count: 6893, max: 6892}</code> でした。呼び出し回数はたった 6893 回と <code class="language-plaintext highlighter-rouge">fib</code> に比べて圧倒的に少ないですが、関数の呼ばれた深さが <code class="language-plaintext highlighter-rouge">6892</code> と深いために、このエラーが発生してしまったのです。</p>
+
+<h2 id="コールスタックとは">コールスタックとは？</h2>
+
+<p>“Maximum call stack size exceeded” を直訳すると、「コールスタックの最大値を超えました」となります。さて、コールスタックとはなんでしょうか？</p>
+
+<p>プログラムは実行中、大抵たくさん関数を呼び出します。ある関数の途中から別の関数を呼び出した場合、その呼び出し先の関数の処理が終わったら、呼び出し元の場所に制御が戻ってきます。これを内部で管理するために、JavaScript エンジンが内部で使っているのが「コールスタック」です。</p>
+
+<p>JavaScript エンジンは、関数が呼ばれると、今の関数の戻る場所や現在の変数の状態などの情報を、まとめてコールスタックに積みます。そして、呼び出し先の関数に引き渡す引数情報などもコールスタックに積みます。これらの情報をまとめて「スタックフレーム」と呼びます。呼び出し先の関数は、コールスタックを利用して引数情報を参照したりします。呼び出し先の関数からリターンすると、先程積んだ情報（スタックフレーム）をスタックからポップし、元の関数に制御を戻します。</p>
+
+<p>同じ関数を呼び出す「再帰」は、コールスタックで実現されます。再帰で関数を呼ぶたびに新しい引数を含むスタックフレームをコールスタックに積むことで、同じ関数であっても何度でも呼び出せるようになっているのです。</p>
+
+<p>このスタックのサイズは、あらかじめ大抵のプログラムの実行には十分な大きさが確保されており、足りなくなりことはまずありません。しかし、バグなどで関数からリターンされることなく関数が呼ばれ続けると、コールスタックのサイズが足りなくなり、オーバーフローを起こします。いわゆる「<span style="color:red">Stack Overflow</span>」と呼ばれるのがこの状態です。その時に出てくるエラーが、今回の <code class="language-plaintext highlighter-rouge">"Maximum call stack size exceeded"</code> です。</p>
+
+<h2 id="コールスタックは固定長">コールスタックは固定長</h2>
+
+<p>「コールスタックが足りなくなったら、スタックサイズを拡張すればいいのでは？」と思う方もいらっしゃるかもしれません。おっしゃるとおりです。しかし、実際の実装ではほぼ固定長となっております。</p>
+
+<ul>
+  <li>コールスタックは最初から十分な大きさが確保されている</li>
+  <li>それにも関わらずコールスタックを使い尽くす場合、たいていはバグであり、そこで終了するのが望ましい</li>
+</ul>
+
+<p>という理由が考えられます。関数呼び出しは言語の基本機能であり、速度に大きな影響を与える要因になるので、それほど意味もないのに可変長の実装などしないほうが良いでしょう。</p>
+
+<h2 id="コールスタックはスタック領域に確保される">コールスタックはスタック領域に確保される</h2>
+
+<p>一般的に、プログラムの実行環境にはヒープ領域とスタック領域の 2 つのメモリ領域があります。</p>
+
+<p>プログラム中でメモリを確保する場合、大抵の場合は「ヒープ領域」からメモリが確保されます。例えば</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">cosnt</span> <span class="nx">a</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Array</span><span class="p">(</span><span class="mi">10000</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>などとやると、ヒープ領域から配列の領域が確保されることになります。</p>
+
+<p>一方で、スタック領域は、大抵の場合、関数の呼び出し時にのみ使われる領域です。関数の実行に必要な引数やローカル変数などのメモリを自動的に確保し、関数のリターンに伴って自動的に解放します。ヒープ領域に比べると、スタック領域は小さいです。スタック領域の存在を JavaScript プログラマが意識する必要は、普段はほとんどありません。また、スタックという構造上、メモリの確保・解放が高速です。</p>
+
+<h2 id="コールスタックは仕様にない">コールスタックは仕様にない</h2>
+
+<p>コールスタックは、JavaScript の仕様（ECMAScript の仕様）に書かれていません。あくまで JavaScript エンジンの内部仕様です。</p>
+
+<p>仕様にないので、出てくるエラーもブラウザによってまちまちです。Chrome や Safari は <code class="language-plaintext highlighter-rouge">RangeError</code> を出しますが、Firefox は <code class="language-plaintext highlighter-rouge">InternalError</code> を出します。当然ながら各ブラウザでスタックサイズも大きく違います。</p>
+
+<p>仕様にないので、コールスタックの状態確認も原則出来ません。そもそもコールスタックを持たない JavaScript 実装があってもおかしくないので、状態確認をするような標準関数もありません。<code class="language-plaintext highlighter-rouge">Error</code> オブジェクトの <code class="language-plaintext highlighter-rouge">stack</code> プロパティからコールスタックの状況を垣間見ることが出来るのですが、そもそもこのプロパティはブラウザの独自拡張であり、仕様にはありません。</p>
+
+<p>（なお、<a href="https://github.com/tc39/proposal-error-stacks">このプロパティを標準化する提案</a>が TC39 に出ておりますが、<a href="https://github.com/tc39/proposals/blob/main/stage-1-proposals.md">2017 年に提案されて未だ Stage1</a> のようなので、実現までの道のりは遠そうです。標準化の話は <a href="https://twitter.com/petamoriken">@petamoriken</a> さんに教えていただきました。いつもありがとうございます！）</p>
+
+<p>しかし現実として、世の中に存在する全ての JavaScript エンジンはコールスタックを利用しています、と言い切っても許されるのではないかと思うほど、コールスタックの存在は当たり前です。JavaScript に限らず、他の言語における実装でも一般的な概念ですので、知っておくことに大きな価値があります。</p>
+
+<h2 id="コールスタックは機械語で威力を発揮する">コールスタックは機械語で威力を発揮する</h2>
+
+<p>そもそも機械語が、コールスタックを前提にした設計になっています。例えば x86 だと SP（スタックポインタ）と呼ばれるレジスタがあり、コールスタックが効率的に実装出来るようになっています。</p>
+
+<p>JavaScript は JIT で機械語が生成され、それが実行されるようになります。そこで、機械語による効率的なコールスタックの実装が可能になり、関数呼び出しという言語のコア機能に関して高速な実行が期待出来るようになります。興味のある方は、<a href="https://v8.dev/blog/adaptor-frame">V8 における実装の詳細な説明</a>などを参考にしてみてください。</p>
+
+<h1 id="実験">実験</h1>
+
+<p>ではまず、故意に Stack Overflow を起こしてみましょう。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">counter</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">f</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">counter</span><span class="o">++</span><span class="p">;</span>
+    <span class="nf">f</span><span class="p">();</span>
+<span class="p">};</span>
+<span class="nf">f</span><span class="p">();</span>
+</code></pre></div></div>
+
+<p>この関数は、無限に f を呼び続けます。Chrome で実行すると次のような結果になりました。</p>
+
+<p><img src="./img/stackoverflow005.png" alt="シンプルな無限再帰" /></p>
+
+<p>関数からリターンすることなく関数を呼び続けているため、コールスタックを使い尽くしてエラーを出しました。エラーを出すまでの間、11029 回関数が呼ばれたようです。</p>
+
+<p>では、この 11029 回という結果に対して、何をすれば回数が減っていくのか確認していきましょう。</p>
+
+<h2 id="引数を増やす">引数を増やす</h2>
+
+<p>上の説明で、「引数情報などもコールスタックに積みます」と書きました。実際、引数やローカル変数が増えると、その分スタックに積まれる情報量が増えるため、スタックを多く消費します。実験してみましょう。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">counter</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">args</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Array</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+
+<span class="kd">const</span> <span class="nx">f</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">counter</span><span class="o">++</span><span class="p">;</span>
+    <span class="nf">f</span><span class="p">(...</span><span class="nx">args</span><span class="p">);</span>
+<span class="p">};</span>
+<span class="nf">f</span><span class="p">();</span>
+</code></pre></div></div>
+
+<p>このコードは、引数を 10 個用意して f 関数を再帰的に呼んでいます。その引数はプログラム中では全く使われていないのですが、スタックには（最適化で消されない限り）積まれます。</p>
+
+<p><img src="./img/stackoverflow006.png" alt="引数 10 個で無限再帰" /></p>
+
+<p>実行してみた結果がこちらです。ご覧の通り、5013 回まで減りました。</p>
+
+<h2 id="ローカル変数を増やす">ローカル変数を増やす</h2>
+
+<p>さて、引数同様、ローカル変数もスタックに乗ることを確認してみましょう。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">counter</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">f</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">r0</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nf">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">10</span><span class="p">;</span>
+    <span class="kd">let</span> <span class="nx">r1</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nf">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">10</span><span class="p">;</span>
+    <span class="kd">let</span> <span class="nx">r2</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nf">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">10</span><span class="p">;</span>
+    <span class="kd">let</span> <span class="nx">r3</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nf">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">10</span><span class="p">;</span>
+    <span class="kd">let</span> <span class="nx">r4</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nf">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">10</span><span class="p">;</span>
+    <span class="kd">let</span> <span class="nx">r5</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nf">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">10</span><span class="p">;</span>
+    <span class="kd">let</span> <span class="nx">r6</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nf">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">10</span><span class="p">;</span>
+    <span class="kd">let</span> <span class="nx">r7</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nf">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">10</span><span class="p">;</span>
+    <span class="kd">let</span> <span class="nx">r8</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nf">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">10</span><span class="p">;</span>
+    <span class="kd">let</span> <span class="nx">r9</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nf">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">10</span><span class="p">;</span>
+    <span class="nx">counter</span><span class="o">++</span><span class="p">;</span>
+    <span class="nf">f</span><span class="p">();</span>
+<span class="p">};</span>
+<span class="nf">f</span><span class="p">();</span>
+</code></pre></div></div>
+
+<p>最適化で消えないように、無駄に乱数を保存しています。実行結果は次の通りです。</p>
+
+<p><img src="./img/stackoverflow007.png" alt="ローカル変数 10 個で無限再帰" /></p>
+
+<p>呼び出し回数は 5012 回でした。なお、ローカル変数の数を半分の 5 個まで減らしたら、6892 回の呼び出しが出来ました</p>
+
+<h2 id="大体-5000-の深さくらいは関数を呼べるの">大体 5000 の深さくらいは関数を呼べるの？</h2>
+
+<p><strong>必ずしもそうとも限りません</strong> 。ブラウザの実装に左右されますが、スタック領域に大量のデータを置く実装が無いわけでもないです。</p>
+
+<p>わかりやすい例を出してみましょう。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">counter</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">args</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Array</span><span class="p">(</span><span class="mi">10000</span><span class="p">);</span>
+
+<span class="kd">const</span> <span class="nx">f</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">counter</span><span class="o">++</span><span class="p">;</span>
+    <span class="nf">f</span><span class="p">(...</span><span class="nx">args</span><span class="p">);</span>
+<span class="p">};</span>
+<span class="nf">f</span><span class="p">();</span>
+</code></pre></div></div>
+
+<p>極端ですが、10000 個の引数を呼ぶ関数です。実行結果はこちらです。</p>
+
+<p><img src="./img/stackoverflow008.png" alt="引数 10000 個で無限再帰" /></p>
+
+<p><span style="color:red">なんとわずか 12 回しか呼べませんでした</span>。さすがに 10000 もの引数を持つ関数はない、と思われるかも知れませんが、一昔前の JavaScript では比較的よく使われるテクニックだったりするので油断できません。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">String</span><span class="p">.</span><span class="nf">fromCharCode</span><span class="p">(</span><span class="mi">72</span><span class="p">,</span> <span class="mi">101</span><span class="p">,</span> <span class="mi">108</span><span class="p">,</span> <span class="mi">108</span><span class="p">,</span> <span class="mi">111</span><span class="p">,</span> <span class="mi">44</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">119</span><span class="p">,</span> <span class="mi">111</span><span class="p">,</span> <span class="mi">114</span><span class="p">,</span> <span class="mi">108</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">33</span><span class="p">);</span>
+<span class="c1">// "Hello, world!"</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">String.fromCharCode</code> は、引数で複数の文字コードを与えると、一括で文字列に変換してくれます。なので配列にある charCode を一括で文字列に変換したい場合は、このようなコードを書く必要がありました。このコードは大量のスタック領域を消費する可能性があり、ネストの深い関数で呼ばれた時に Stack Overflow が起こる可能性は否定できません。</p>
+
+<p>例えば Pex という 2011 年当時に作成された Flash Player では、<a href="https://github.com/PexJS/PexJS/blob/72e33c91d0331e0e511a601d7e82ffef701babfb/src/parser/image_manager.js#L296">このようなコード</a>がありました。このコードでは分割して処理していますが、そうしなかった場合、引数の数は数千個は当然、下手すれば十万個を超える場合すらあります。TypedArray などが整備された現在このようなコードを新規で書くことはないでしょうが、頭の片隅においておくと良いかも知れません。</p>
+
+<p>なお、これを利用すると 1 つの関数呼び出しのみで <code class="language-plaintext highlighter-rouge">Maximum call stack size exceeded</code> を引き起こせます（<a href="https://bsky.app/profile/gfx.bsky.social">gfx</a> さんに教えてもらいました、ありがとうございます！）</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">String</span><span class="p">.</span><span class="nf">fromCharCode</span><span class="p">(...</span><span class="k">new</span> <span class="nc">Array</span><span class="p">(</span><span class="mi">1000000</span><span class="p">).</span><span class="nf">fill</span><span class="p">(</span><span class="mi">97</span><span class="p">));</span>
+</code></pre></div></div>
+
+<p><img src="./img/stackoverflow009.png" alt="関数呼び出し 1 回で Stack Overflow" /></p>
+
+<h1 id="まとめ">まとめ</h1>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">"Maximum call stack size exceeded"</code> というエラーは、関数を深く深く呼びすぎた場合に起こる
+    <ul>
+      <li>大抵は、自分自身を呼び出す再帰の終了条件のミスか、関数を循環的に呼んでしまうミスのどちらか</li>
+      <li>しかし、きちんとした終了条件の存在する再帰処理の場合でも、深く呼びすぎた場合には発生する</li>
+    </ul>
+  </li>
+  <li>JavaScript エンジンの実装で起こる問題であり、JavaScript の仕様では定義されていない</li>
+  <li>大抵は 5000 くらいの深さまでは呼べるのだけれど、条件によっては 10 程度の深さで起こることもあり得る</li>
+</ul>
+
+<p>特に JavaScript の場合は、ユーザーの端末によって実装がバラバラであり、スタックサイズも一定ではありません。それが原因で、特定のごく小数のユーザーのみで問題が起こるバグとなることもあります。</p>
+
+<p>個人的な意見ではありますが、JavaScript ではスタックサイズが読めないので、そもそも <span style="color:blue">JavaScript では極力再帰を使わずにコードを書くのをお勧めしたい</span>ところです。どうしても再帰が必要な場面では、自前でスタックを用意して、ヒープ領域をつかって再帰と同等の処理を書くことをお勧めします。例えば拙作の<a href="https://www.youtube.com/watch?v=owbrN-Mb4gg#t=6m40">ニコニコプログラミングの迷路回</a>でも、同じ懸念から私は再帰を使わずに、自前でスタックを用意して処理を書いておりました。6 分 40 秒あたりです。</p>
+
+<p><a href="https://www.youtube.com/watch?v=owbrN-Mb4gg#t=6m40"><img src="./img/stackoverflow012.png" alt="YouTube 切り抜き" /></a></p>
+
+<p><a href="https://bsky.app/profile/gfx.bsky.social">gfx</a> さんも、同じようなことを言っていました</p>
+
+<blockquote>
+  <p>JavaScriptのコールスタックは環境によって違いがある上にまったく読めないので、ぼくはブラウザ用のJSコードでは絶対に再帰は書きませんね…。昔treeのtraverseのために再帰したら、かなり浅い再帰のはずなのに特定の環境で稀にMaximum call stack size exceededで死んでループで書き直したことがあります。</p>
+</blockquote>
+
+<h1 id="おまけ-それでもブラウザで深い再帰をしたい場合">おまけ: それでもブラウザで深い再帰をしたい場合</h1>
+
+<p>C などの場合、コンパイラオプションなどでスタック領域のサイズを変更できたりしますが、JavaScript では基本的にスタックサイズを変更することは出来ません。どうしても再帰を使いたい、しかしスタックサイズを超えてしまう、とはいえ書き直すのは面倒くさい（？）、みたいな状況に陥った時に使える裏技がありますのでご紹介します。</p>
+
+<p>上でも書いた、このコードを元に説明しましょう。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">sum</span> <span class="o">=</span> <span class="p">(</span><span class="nx">n</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">count</span><span class="o">++</span><span class="p">;</span>
+    <span class="k">if</span><span class="p">(</span><span class="nx">n</span> <span class="o">===</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="mi">0</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">return</span> <span class="nf">sum</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="nx">n</span><span class="p">;</span>
+<span class="p">};</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nf">sum</span><span class="p">(</span><span class="mi">100000</span><span class="p">));</span>
+</code></pre></div></div>
+
+<p>再帰を無駄に使って 0 から n までの数列の和を求めるプログラムです。 10 万まで求めようとしているので、大抵の JavaScript 実装では Stack Overflow が起こってしまいます。完全に余談ですが、C 言語であれば 10 万回くらいであればコンパイラのデフォルト設定でも耐えられる印象を持っています。</p>
+
+<p>これを、次のように書き換えます。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">sum</span> <span class="o">=</span> <span class="k">async </span><span class="p">(</span><span class="nx">n</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">count</span><span class="o">++</span><span class="p">;</span>
+    <span class="k">if</span><span class="p">(</span><span class="nx">n</span> <span class="o">===</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="mi">0</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">try</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="nf">sum</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="nx">n</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">await</span> <span class="nb">Promise</span><span class="p">.</span><span class="nf">resolve</span><span class="p">();</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="nf">sum</span><span class="p">(</span><span class="nx">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="nx">n</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="k">await</span> <span class="nf">sum</span><span class="p">(</span><span class="mi">100000</span><span class="p">));</span>
+</code></pre></div></div>
+
+<p>簡単にいうと、例外が発生した場合に、一旦 <code class="language-plaintext highlighter-rouge">await Promise.resolve()</code> を呼び出すことで現在の実行コンテキストを強制的に終了し、一時的に返値を pending 状態の Promise にします。次の実行コンテキストに移った際にはスタックが空になっているので、そこから再帰の続きが可能になります。</p>
+
+<p>この方法は完全に邪道です。そもそも Stack Overflow の時に例外が投げられる仕様はありませんし、 <code class="language-plaintext highlighter-rouge">Promise.resolve()</code> の呼び出し時に再度例外が起こってもおかしくないです（もっともこのコードの場合、それでもおそらく動いちゃうのですが）。上記コードの場合、投げられた例外は全部拾ってしまうのですが、どのような例外が投げられるのかはブラウザ依存なので、このようなやり方にせざるを得ません。例外の message もブラウザで違います（Firefox の場合は <code class="language-plaintext highlighter-rouge">InternalError: too much recursion</code> となります）。</p>
+
+<p>ただ一方で、合法なプログラムでもあるので、こういう逃げ方が出来る、ということを覚えておくと、ちょっとした計算をさせている時などに役に立つかもしれないですね。プロダクションなど大事なプログラムでは、このようなコードは書かないことを強く勧めます。</p>
+
+<h1 id="追記-末尾再帰について">追記: 末尾再帰について</h1>
+
+<p>はてブのコメントで指摘されたので、末尾再帰についても書いておきます。</p>
+
+<p>末尾再帰（<a href="https://ja.wikipedia.org/wiki/%E6%9C%AB%E5%B0%BE%E5%86%8D%E5%B8%B0">Wikipedia のリンク</a>）と呼ばれる、関数の最後で再帰が呼ばれるパターンについては、機械的にループに置き換えられることが知られています。ループに変換してしまえば、Stack Overflow は起こり得ません。一部の処理系では言語仕様レベルで導入されています。</p>
+
+<p>JavaScript では、過去に言語レベルで末尾再帰をループに変換する仕様が議論されたことがあったようですが、残念ながら今のところ実現されていないようです。</p>
+
+<iframe class="speakerdeck-iframe" frameborder="0" src="https://speakerdeck.com/player/b7efe2f944a84c468b77d28f094a3085" title="末尾呼び出し最適化とJavaScript" allowfullscreen="true" style="border: 0px; background: padding-box padding-box rgba(0, 0, 0, 0.1); margin: 0px; padding: 0px; border-radius: 6px; box-shadow: rgba(0, 0, 0, 0.2) 0px 5px 40px; width: 100%; height: auto; aspect-ratio: 560 / 315;" data-ratio="1.7777777777777777"></iframe>
+
+<p><a href="https://twitter.com/kota_yata">@kota_yata</a> さんが素晴らしい資料を用意されているので、興味のある方は是非ご一読ください。このスライドは、 <a href="https://twitter.com/h_sakurai">@h_sakurai</a> さんに情報をいただきました！ありがとうございます！</p>
+
+        </article>
+        <hr>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/2023-12-04-Maximm-Call-Stack-Size-Exceeded&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="Maximum call stack size exceeded について解説" data-url="http://nmi.jp/2023-12-04-Maximm-Call-Stack-Size-Exceeded">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/2023-12-04-Maximm-Call-Stack-Size-Exceeded" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="Maximum call stack size exceeded について解説"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="Maximum call stack size exceeded について解説" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+
+        
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+        
+
+        <div class="post-recent">
+    <div class="pre">
+
+    
+        <p><strong>前の投稿</strong> <a href="/2023-01-11-Detecting-Intel-Arch-in-JavaScript">JavaScript で CPU が Intel かどうかを判定する（ついでに JIT を検知する）</a></p>
+    
+    </div>
+    <div class="nex">
+
+        
+        <p><strong>次の投稿</strong> <a href="/2024-05-17-Avoid-then">JavaScript で then を使うのは避けよう（await / async の初級者まとめ）</a></p>
+        
+    </div>
+</div>
+
+
+    </div>
+    <button class="anchor"><i class="fa fa-anchor"></i></button>
+
+
+    <div class="right">
+        <div class="wrap">
+            <div class="side">
+                <div>
+                    <i class="fa fa-tags"></i>
+                    Top Popular Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2016-07-23-stock-strategy-for-early-startup-employee">スタートアップに転職する時に最低限知っておくべき株の話</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/582">生WebGL入門:初音ミクの美麗3Dモデルを表示する(前編)</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2017-10-06-Making_a-business_plan">事業計画書の作り方、新規ビジネスの考え方</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/902">Convertible Note / Convertible Equity とは？</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/488">JavaScript イディオム集</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/465">ExGameの製作で感じたこと</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                </ul>
+            </div>
+
+            <div class="side">
+                <div>
+                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                    Recent Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        <li><a href="/2024-08-28-Review-Binary-Hacks-Rebooted">書評 "Binary Hacks Rebooted"</a></li>
+                    
+                        <li><a href="/2024-06-10-Deep-Dive-into-ARM-JavaScript-Special-Instruction-FJCVTZS">ARM に存在する JavaScript 専用命令「FJCVTZS」を追う（ついでに V8 をビルドする）</a></li>
+                    
+                        <li><a href="/2024-06-03-Exploring-V8-JIT-Outputs">JavaScript 実行エンジン V8 の JIT 出力コードを読んでみよう</a></li>
+                    
+                </ul>
+            </div>
+
+            <!-- <div class="side">
+                <div>
+                    <i class="fa fa-external-link"></i>
+                    Links
+                </div>
+                <ul  class="content-ul">
+
+                </ul>
+            </div> -->
+        </div>
+    </div>
+
+
+
+</div>
+<script>
+/**
+ * target _blank
+ */
+(function() {
+    var aTags = document.querySelectorAll('article a:not([id])')
+    for (var i = 0; i < aTags.length; i++) {
+        aTags[i].setAttribute('target', '_blank')
+    }
+}());
+</script>
+<script src="/js/pageContent.js " charset="utf-8"></script>
+
+
+    <footer class="site-footer">
+
+
+    <div class="wrapper">
+
+        <p class="description">
+             Takuo Kihira 
+        </p>
+        <p class="contact">
+            Contact me at: 
+            <a href="https://github.com/tkihira" title="GitHub"><i class="fa fa-github" aria-hidden="true"></i></a>     
+            <a href="https://twitter.com/tkihira" title="Twitter"><i class="fa fa-twitter" aria-hidden="true"></i></a>  
+            <a href="https://www.facebook.com/takuo.kihira" title="Facebook"><i class="fa fa-facebook-official" aria-hidden="true"></i></a>    
+        </p>
+        <p class="power">
+            <span>
+                Site powered by <a href="https://jekyllrb.com/">Jekyll</a>.
+            </span>
+            <span>
+                Theme designed by <a href="https://github.com/Gaohaoyang">HyG</a>.
+            </span>
+        </p>
+    </div>
+</footer>
+
+    <div class="back-to-top">
+    <a href="#top" class="scroll">
+        <i class="fa fa-arrow-up" aria-hidden="true"></i>
+    </a>
+</div>
+
+    <script src=" /js/main.js " charset="utf-8"></script>
+    <script src=" /js/scroll.min.js " charset="utf-8"></script>
+  </body>
+
+</html>

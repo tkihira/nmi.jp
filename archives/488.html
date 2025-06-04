@@ -1,0 +1,1750 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>JavaScript イディオム集</title>
+    <meta name="description" content="JavaScriptでは、初見の人にはさっぱりわからないけれども、ある程度慣れた人は当たり前に使うイディオムが結構たくさんあります。知ってしまえば何てことはないので、私の知っている限りのイディオムとその意味を解説します。（7/3追記: twitter等で教えていただいた内容を追加しました）">
+
+    <link rel="stylesheet" href=" /css/fontawesome/css/font-awesome.min.css ">
+    <link rel="stylesheet" href=" /css/main.css ">
+    <link rel="canonical" href="http://nmi.jp/archives/488">
+    <link rel="alternate" type="application/rss+xml" title="nmi.jp" href="http://nmi.jp/feed.xml">
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=3.0'></script>
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=1.1'></script>
+    <script>
+        if(location.href.match(/\.html$/)) {
+            location.href = location.href.match(/(.+)\.html/)[1];
+        }
+    </script>
+
+
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-229769-8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-229769-8');
+</script>
+</head>
+
+
+  <body>
+
+    <header id="top">
+    <div class="wrapper">
+        <a href="/" class="brand">nmi.jp</a>
+        <small>Twitter → <a href="https://twitter.com/tkihira" target="_blank">@tkihira</a></small>
+        <button id="headerMenu" class="menu"><i class="fa fa-bars"></i></button>
+        <nav id="headerNav">
+            <ul>
+                <li>
+                    
+                    <a href="/">
+                    
+                        <i class="fa fa-home"></i>Home
+                    </a>
+                </li>
+
+                
+                    
+                    <li>
+                        
+                        <a href="/archive/">
+                        
+                            <i class="fa fa-archive"></i>Archives
+                        </a>
+                    </li>
+                    
+                
+                    
+                    <li>
+                        
+                        <a href="/category/">
+                        
+                            <i class="fa fa-th-list"></i>Categories
+                        </a>
+                    </li>
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            </ul>
+        </nav>
+    </div>
+</header>
+
+
+        <div class="page clearfix" post>
+    <div class="left">
+        <div class="post-recent">
+    <table style="width:100%;border:0;padding:0;"><tbody><tr style="padding:0">
+        <td class="toppre" style="padding:0">
+        
+        <a href="/archives/476">JavaScriptの+演算子の謎挙動に迫る</a>
+        
+        </td><td class="topnex" style="text-align:right;padding:0">
+        
+        <a href="/archives/506">自分がフリーランスの時に気をつけていた3つのこと</a>
+        
+        </td>
+    </tr></tbody></table>
+</div>
+
+        <hr style="margin:0"/>
+        <h1 style="margin-top:10px">JavaScript イディオム集</h1>
+<hr />
+        <div class="label">
+
+            <div class="label-card">
+                <i class="fa fa-calendar"></i>2013-07-03
+            </div>
+
+            <div class="label-card">
+                <i class="fa fa-user"></i>Takuo Kihira
+                
+            </div>
+
+            <div class="label-card">
+                
+            </div>
+
+            <div class="label-card">
+            
+
+
+<!-- <span class="point">•</span> -->
+<span class="categories">
+  <i class="fa fa-th-list"></i>
+  
+    
+        <a href="/category/#JavaScript" title="Category: JavaScript" rel="category">JavaScript</a>
+    
+  
+
+  <!-- <span class="point">•</span> -->
+</span>
+
+
+            </div>
+
+            <div class="label-card">
+                <a href="https://github.com/tkihira/nmi.jp/blob/master/_posts/2013-07-03-488.md" target="_blank"><i class="fa fa-github"></i></a>
+            </div>
+
+        </div>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/archives/488&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="JavaScript イディオム集" data-url="http://nmi.jp/archives/488">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/archives/488" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="JavaScript イディオム集"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="JavaScript イディオム集" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+        <article itemscope itemtype="http://schema.org/BlogPosting">
+        <p>JavaScriptでは、初見の人にはさっぱりわからないけれども、ある程度慣れた人は当たり前に使うイディオムが結構たくさんあります。知ってしまえば何てことはないので、私の知っている限りのイディオムとその意味を解説します。</p>
+<p>（7/3追記: twitter等で教えていただいた内容を追加しました）<br />
+<a id="more"></a><a id="more-488"></a></p>
+<hr />
+
+<h3>+v （数値化）</h3>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">v</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">123</span><span class="dl">"</span><span class="p">;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="o">+</span><span class="nx">v</span> <span class="o">+</span> <span class="mi">100</span><span class="p">)</span> <span class="c1">// 223</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">v</span> <span class="o">+</span> <span class="mi">100</span><span class="p">)</span> <span class="c1">// 123100</span>
+</code></pre></div></div>
+<p>
+vを数値化する方法では最もメジャーです。parseFloat(v) に比べて高速なのに加えて、parseFloatとは細かい挙動が異なります（例えば空文字列の場合、parseFloatならば NaN になりますが、 +v の場合はゼロになります）。必ず数値になることが保証されており、文字列などで数値化出来ない場合はNaNが返ります。</p>
+<hr />
+
+<h3>v - 0 （数値化）</h3>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">v</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">123</span><span class="dl">"</span><span class="p">;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">((</span><span class="nx">v</span> <span class="o">-</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">100</span><span class="p">)</span> <span class="c1">// 223</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">v</span> <span class="o">+</span> <span class="mi">100</span><span class="p">)</span> <span class="c1">// 123100</span>
+</code></pre></div></div>
+<p>
+こちらも数値化です。+v に比べてあまり使われることはありませんが、初見でもある程度意味が理解しやすいメリットはあるかもしれません。個人的な印象ですが、+v が大変メジャーなので v - 0 を使うよりは +v を使ったほうが良いかと思います。</p>
+<hr />
+
+<h3>v + "" （文字列化）</h3>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">n</span> <span class="o">=</span> <span class="mi">123</span><span class="p">;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">n</span> <span class="o">+</span> <span class="mi">123</span><span class="p">);</span> <span class="c1">//246</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">n</span> <span class="o">+</span> <span class="dl">""</span> <span class="o">+</span> <span class="mi">123</span><span class="p">);</span> <span class="c1">//123123</span>
+</code></pre></div></div>
+<p>
+文字列化するためのイディオムです。頻繁に使われますが、パッと見れば意味がわかるかと思います。</p>
+<p>ただ文字列化は、あまりよろしくない文字列化のコードを書く方が多い印象があります。例えば、<br />
+</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">n</span> <span class="o">=</span> <span class="mi">123</span><span class="p">;</span>
+<span class="nx">n</span> <span class="o">=</span> <span class="nx">n</span><span class="p">.</span><span class="nf">toString</span><span class="p">();</span>
+</code></pre></div></div>
+<p>
+というコードがありますが、これは実行時の最適化を阻害する要素の多いコードであり、可読性が同程度であるv + ""を使うことをおすすめします。</p>
+<p>他にも稀にみるのが <code class="language-plaintext highlighter-rouge">String()</code> です。<br /></p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">n</span> <span class="o">=</span> <span class="mi">123</span><span class="p">;</span>
+<span class="nx">n</span> <span class="o">=</span> <span class="nc">String</span><span class="p">(</span><span class="nx">n</span><span class="p">);</span>
+</code></pre></div></div>
+<p>これは速度的には問題がないですが、よく間違えて <code class="language-plaintext highlighter-rouge">new String(n)</code> と書く人がいて、しかも<code class="language-plaintext highlighter-rouge">new String</code>でも一見正しく動いてしまう問題があるので、積極的に避けるべき書き方だと考えております。<code class="language-plaintext highlighter-rouge">new String</code>で作られたStringオブジェクトは、そもそもObjectでありStringではありません。このObjectを文字列として評価しようとする際には、毎回内部的に<code class="language-plaintext highlighter-rouge">toString</code>関数（もしくは<code class="language-plaintext highlighter-rouge">valueOf</code>関数）が呼ばれてObjectからStringに変換されることになり、無駄の極みとなります。<br /></p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">String</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">valueOf</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="dl">"</span><span class="s2">aaa</span><span class="dl">"</span><span class="p">;</span> <span class="p">};</span>
+<span class="kd">var</span> <span class="nx">n</span> <span class="o">=</span> <span class="mi">123</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">strobj</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">String</span><span class="p">(</span><span class="nx">n</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">str</span> <span class="o">=</span> <span class="nc">String</span><span class="p">(</span><span class="nx">n</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">[</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">strobj</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">]</span><span class="dl">"</span><span class="p">);</span> <span class="c1">// [aaa]</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">[</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">str</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">]</span><span class="dl">"</span><span class="p">);</span> <span class="c1">// [123]</span>
+</code></pre></div></div>
+
+<p>というわけで、文字列化する場合は <code class="language-plaintext highlighter-rouge">v + ""</code> を使うのが大抵の場合望ましいのではないかと思います。</p>
+<hr />
+
+<h3>if(v != null) （nullとundefinedのチェック）</h3>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">o</span> <span class="o">=</span> <span class="p">{</span> <span class="na">value</span><span class="p">:</span> <span class="mi">0</span> <span class="p">};</span>
+<span class="k">if</span><span class="p">(</span><span class="nx">o</span><span class="p">.</span><span class="nx">value</span> <span class="o">!=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span> <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">value property exists</span><span class="dl">"</span><span class="p">);</span> <span class="p">}</span>
+</code></pre></div></div>
+<p>これは、さらっと書かれているので見逃しがちですが、nullとundefinedをチェックする大変重要なイディオムです。ある程度JavaScriptに慣れてくると、プロパティの存在確認をbooleanの自動変換に頼って書きがちになります。例えば<br /></p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span><span class="p">(</span><span class="nx">o</span><span class="p">.</span><span class="nx">value</span><span class="p">)</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
+</code></pre></div></div>
+<p>
+という感じですね。valueがオブジェクトなどであればこれで問題ないのですが、ここのvalueが数値や文字列を取る場合には、たまたまそのvalueが0や空文字列であった場合にそれを検知できず、発覚しにくいバグとして残ってしまいます。</p>
+<p><code class="language-plaintext highlighter-rouge">if(v != null)</code> で比較した場合、vがnullの場合とundefinedの場合のみ弾き、vが0の場合や空文字列の場合は引っかからずに通します。このイディオムで書かれている場合は、たいていそのことを意識して書かれていることがほとんどですので、決して <code class="language-plaintext highlighter-rouge">if(v != null)</code> を <code class="language-plaintext highlighter-rouge">if(v)</code> と書き換えないように気をつけましょう。vがたまたまゼロの場合などにしか発覚しない、大変面倒なバグになってしまいます。</p>
+<hr />
+
+<h3>(function(){ ... })(); // スコープ化</h3>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">;(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">x</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">hello world</span><span class="dl">"</span><span class="p">;</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">x</span><span class="p">);</span>
+<span class="p">})();</span>
+</code></pre></div></div>
+
+<p>ソースコードの最初と最後にオマジナイのように書かれる、わからない人にとっては謎のfunction文です。JavaScriptは関数の中に書かない変数宣言は全てグローバル変数として扱われてしまうので、グローバルスコープを汚さないように関数式でコード全体を囲っています。</p>
+<p>関数式を宣言し、その関数を実行する処理を全部まとめて書いてしまっていますので、わかりやすく書くと<br />
+</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">f</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">x</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">hello world</span><span class="dl">"</span><span class="p">;</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">x</span><span class="p">);</span>
+<span class="p">};</span>
+<span class="nf">f</span><span class="p">();</span>
+</code></pre></div></div>
+<p>
+というようなコードを書いているのと同じです（この場合、fがグローバル変数になってしまっていますが）。なぜfunctionの前に括弧「(」があるかというと、これがないと関数式ではなく普通の関数宣言だと構文解析されてしまい、その結果構文エラーに成ってしまうためです。</p>
+<p>一番最初のセミコロンは無くても大丈夫です。しかし、自分の知らないところでライブラリ等でファイル結合された場合、直前のファイルの最後にセミコロンが抜けていると構文エラーになってしまうので、念の為にセミコロンをつけた方が良いかもしれません。</p>
+<p>なお、この関数のスコープ化にはいくつか流派があります。興味のあるかたはこちらをどうぞ→ <a href="http://blog.niw.at/post/25330545602" target="_blank">http://blog.niw.at/post/25330545602</a></p>
+<hr />
+
+<h3> &amp;&amp; （if文の省略）</h3>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">o</span> <span class="o">=</span> <span class="p">{</span> <span class="na">f</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">hello world</span><span class="dl">"</span><span class="p">);</span> <span class="p">}</span> <span class="p">};</span>
+<span class="nx">o</span> <span class="o">&amp;&amp;</span> <span class="nx">o</span><span class="p">.</span><span class="nx">f</span> <span class="o">&amp;&amp;</span> <span class="nx">o</span><span class="p">.</span><span class="nf">f</span><span class="p">();</span>
+</code></pre></div></div>
+<p>&amp;&amp; 演算子は、<del datetime="2013-07-03T13:15:24+00:00">C++</del>Javaなどでは boolean型にしか使えないですが、JavaScriptではどのような型にでも使えます。それを利用して、if文を書かずにオブジェクトの存在判定をするときに大変頻繁に使われるイディオムです。</p>
+<p>例えば上記の例を if 文を使って書くと、以下のようになります。<br />
+</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">o</span> <span class="o">=</span> <span class="p">{</span> <span class="na">f</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">hello world</span><span class="dl">"</span><span class="p">);</span> <span class="p">}</span> <span class="p">};</span>
+<span class="k">if</span><span class="p">(</span><span class="nx">o</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="nx">o</span><span class="p">.</span><span class="nx">f</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">o</span><span class="p">.</span><span class="nf">f</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>
+このように冗長なif文を書かないために、&amp;&amp;を使って短縮しているわけです。特に関数の先頭などで、オブジェクトが特定のプロパティを持っているのか確認し、持っている場合はそれを実行する、というような処理をするときに頻繁に使われます。</p>
+<p>中に代入を書く時は、代入を括弧でくくらないとパースエラーになるので気をつけてください。<br />
+</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">o</span> <span class="o">&amp;&amp;</span> <span class="nx">o</span><span class="p">.</span><span class="nx">options</span> <span class="o">&amp;&amp;</span> <span class="nx">o</span><span class="p">.</span><span class="nx">options</span><span class="p">.</span><span class="nx">players</span> <span class="o">&gt;</span> <span class="mi">50</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="nx">massiveFlag</span> <span class="o">=</span> <span class="kc">true</span><span class="p">);</span>
+</code></pre></div></div>
+<p>なお、このイディオムは数値や文字列、オブジェクトが内部で暗黙にbooleanに変換されるのを利用しております。数値の0やNaN、空文字列、null、undefinedがfalseに変換されますが、このイディオムを自分が使う場合は予期せぬ自動変換を避けるためにも null や undefined のチェックに留めておくのが良いと思います。</p>
+<hr />
+
+<h3> || （if文の省略）</h3>
+<p>こちらも if文 の省略になります。<br /></p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">v</span> <span class="o">=</span> <span class="p">(</span><span class="nx">o</span> <span class="o">&amp;&amp;</span> <span class="nx">o</span><span class="p">.</span><span class="nx">f</span><span class="p">)</span> <span class="o">||</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">hello world</span><span class="dl">"</span><span class="p">);</span> <span class="p">};</span>
+<span class="nf">v</span><span class="p">();</span>
+</code></pre></div></div>
+
+<p>&amp;&amp;と同じように、if文を省略して書くときに使われます。変数の代入時にundefinedを避けるのに使われるのが多いです。</p>
+<p>こちらをif文で書くと、<br />
+</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">v</span><span class="p">;</span>
+<span class="k">if</span><span class="p">(</span><span class="nx">o</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="nx">o</span><span class="p">.</span><span class="nx">f</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">v</span> <span class="o">=</span> <span class="nx">o</span><span class="p">.</span><span class="nx">f</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">v</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">v</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">hello world</span><span class="dl">"</span><span class="p">);</span> <span class="p">};</span>
+<span class="p">}</span>
+<span class="nf">v</span><span class="p">();</span>
+</code></pre></div></div>
+<p>
+となります。&amp;&amp;と同じように使えるので、両者が同時に使われる状況は多いです。</p>
+<p>こちらも暗黙の型変換を利用しているので、どの値がtrueになり、どの値がfalseになるのかはきちんと把握されると良いと思います。</p>
+<p>なお、&amp;&amp;や||を使うとif文を使うより速くなるかというと、スマートフォンにおいては昔はその傾向があったのですが、今ではほとんど差がなくなっています。可読性を犠牲にしてまで使うイディオムではなくなりつつあるイメージです。</p>
+<hr />
+
+<h3>v = v || {}</h3>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nf">f</span><span class="p">(</span><span class="nx">o</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">o</span> <span class="o">=</span> <span class="nx">o</span> <span class="o">||</span> <span class="p">{};</span>
+    <span class="p">...</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>関数の先頭などで、デフォルト引数の設定などに大変良く使われるイディオムです。例えばoがundefinedの時などに、デフォルト値として空のオブジェクトを設定する、というような用法で使われます。上記の||と同じなのですが、特にたくさん見るので別項目に分けました。</p>
+<hr />
+
+<h3>+v || 0 （数値化、かつNaN以外を保証）</h3>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">n</span> <span class="o">=</span> <span class="o">+</span><span class="nx">v</span> <span class="o">||</span> <span class="mi">0</span><span class="p">;</span>
+</code></pre></div></div>
+<p>vの数値化に失敗した場合に、NaNではなくてゼロにするイディオムです。vがゼロだった場合もゼロになるので安心です。</p>
+<hr />
+
+<h3>v | 0 （整数化）</h3>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="nx">v</span> <span class="o">|</span> <span class="mi">0</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>vを整数にします。JavaScriptではビット演算は整数型に対してしか適用出来ないので、それを利用して強制的に整数にするイディオムです。vが文字列の場合でも、まず数値化され、その後整数化されます。</p>
+
+<p>なお、<code class="language-plaintext highlighter-rouge">Math.floor</code> でも似たような処理になりますが、マイナス数値を扱った場合の挙動が違うので気をつけてください。<br /></p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="o">-</span><span class="mf">2.1</span> <span class="o">|</span> <span class="mi">0</span><span class="p">);</span> <span class="c1">// -2</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nf">floor</span><span class="p">(</span><span class="o">-</span><span class="mf">2.1</span><span class="p">));</span> <span class="c1">// -3</span>
+</code></pre></div></div>
+
+<p>あと、細かい話ですが、ビット演算子は演算子の優先順位を間違える人が大変多いので、数式の中で使う際には括弧で囲って書いたほうが良いと思います。</p>
+<hr />
+
+<h3>~~v （整数化）</h3>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="o">~~</span><span class="p">(</span><span class="mf">2.1</span><span class="p">));</span> <span class="c1">// 2</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">v | 0</code> と同じように整数化するイディオムです。個人的な印象ですが、<code class="language-plaintext highlighter-rouge">v | 0</code> の方がメジャーですし初見で理解できる可能性がまだ高いので、<code class="language-plaintext highlighter-rouge">v | 0</code>を使う方が良いのではないかなと思います。似たようなイディオムで <code class="language-plaintext highlighter-rouge">v &gt;&gt; 0</code> （ビットシフト）もありますね。</p>
+<hr />
+
+<h3>!! （論理化）</h3>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">b</span> <span class="o">=</span> <span class="o">!!</span><span class="nx">v</span><span class="p">;</span>
+</code></pre></div></div>
+<p>vの値をbooleanに変換するイディオムです。例えば空文字列、ゼロ、NaN、undefined、nullなどをfalseにし、それ以外をtrueにします。</p>
+<p>実際は、true/falseを明確にしなければいけない状況はあまりないとは思うのですが、他言語からの移植などのライブラリなどでは散見されます。</p>
+<hr />
+
+<h3>if(v != v) （NaNチェック）</h3>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">v</span> <span class="o">=</span> <span class="o">+</span><span class="dl">"</span><span class="s2">a</span><span class="dl">"</span><span class="p">;</span> <span class="c1">// NaN</span>
+<span class="k">if</span><span class="p">(</span><span class="nx">v</span> <span class="o">!=</span> <span class="nx">v</span><span class="p">)</span> <span class="p">{</span> <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">v is Not a Number!</span><span class="dl">"</span><span class="p">);</span> <span class="p">}</span>
+</code></pre></div></div>
+
+<p>NaNチェックです。NaNはJavaScriptの中で、唯一自分自身との比較に失敗する値となっています（NaNとの比較は相手がどんな値でも必ず失敗する）。よって、数値型の場合でもゼロとNaNを比較する際にこのイディオムを使うことがあります。</p>
+<p>しかし、言うまでもなく、これはisNaN関数と同じ処理になります。スピードが大変重要である局面でなければ、NaNチェックにはisNaNを使ったほうが、読んだ人は意図が通りやすいんじゃないかなと思います。</p>
+<p>（追記: isNaN関数は、例えば"a"の文字列など、数値化した際にNaNに変換されるものもNaNと判定します。一方、v != v だと純粋にNaNのみを判定出来ます。数値以外の値に対しては、isNaNと v != v の動作が大きく違うのでご注意ください）</p>
+<hr />
+
+<h3>~array.indexOf() （配列の値探索）</h3>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">];</span>
+<span class="k">if</span><span class="p">(</span><span class="o">!~</span><span class="nx">a</span><span class="p">.</span><span class="nf">indexOf</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span> <span class="p">{</span> <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">0 is not in a</span><span class="dl">"</span><span class="p">);</span> <span class="p">}</span>
+<span class="k">if</span><span class="p">(</span><span class="o">!~</span><span class="nx">a</span><span class="p">.</span><span class="nf">indexOf</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span> <span class="p">{</span> <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">3 is not in a</span><span class="dl">"</span><span class="p">);</span> <span class="p">}</span>
+<span class="k">if</span><span class="p">(</span><span class="o">~</span><span class="nx">a</span><span class="p">.</span><span class="nf">indexOf</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span> <span class="p">{</span> <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">5 is in a</span><span class="dl">"</span><span class="p">);</span> <span class="p">}</span>
+</code></pre></div></div>
+
+<p>indexOf限定のイディオムです。indexOf関数は、要素が存在しなかった場合に-1を返し、存在した場合には要素のindexを返します。簡単に言うと、失敗==-1、成功&gt;=0、となります。</p>
+<p>そこにビット否定を入れます。ビット否定でなぜそうなるかの詳細は省きますが、-1のビット否定は0になり、0を含むその他すべての値のビット否定は0以外になります。</p>
+<p>よって、indexOfの返値にビット否定をかけた場合、失敗時（-1）の場合のみゼロ、成功時はゼロ以外となるので、それを利用して配列の中に要素があるかどうかを知ることが出来ます。</p>
+
+<p>これは極めて可読性の悪いイディオムであり、かつ普通に <code class="language-plaintext highlighter-rouge">a.indexOf(v) != -1</code> と比較した場合に比べて速度的に全く恩恵がないと言い切っても問題ないほどの差しかありません。一部のオープンソースプロジェクトで多様されているので、意味は知っておいたほうが良いかもしれませんが、自分で書くのはあまりおすすめしません。</p>
+
+<p>ちなみに文字列の場合でも利用できますが、最近のブラウザではそもそもindexOfを使うより正規表現を使ったほうが高速だと思います。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">s</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">Hello world</span><span class="dl">"</span><span class="p">;</span>
+<span class="k">if</span><span class="p">(</span><span class="sr">/e/</span><span class="p">.</span><span class="nf">test</span><span class="p">(</span><span class="nx">s</span><span class="p">))</span> <span class="p">{</span> <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">e exists</span><span class="dl">"</span><span class="p">);</span> <span class="p">}</span>
+</code></pre></div></div>
+
+<hr />
+
+<h3>new Function("return this;")() （グローバルオブジェクトの取得）</h3>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nb">global</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Function</span><span class="p">(</span><span class="dl">"</span><span class="s2">return this;</span><span class="dl">"</span><span class="p">)();</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nb">global</span><span class="p">.</span><span class="nx">JSON</span><span class="p">);</span>
+</code></pre></div></div>
+<p>グローバルオブジェクトの取得です。一般的にブラウザのグローバルオブジェクトはwindowで取得出来るのですが、例えばnode.jsなどではそれが利用できないので、両者で利用される環境を想定した場合にはこのようなイディオムで取得することになります。</p>
+
+<p>以前はもっと簡単に<br />
+</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nb">global</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(){</span> <span class="k">return</span> <span class="k">this</span><span class="p">;</span> <span class="p">}();</span>
+</code></pre></div></div>
+<p>
+で取得することが出来たのですが、Strict Modeでは関数内のthisがundefinedを返すようになるのでこの方法は利用できません。今のご時世、常にstrict modeがあることを前提にすべきだと思うので、new Functionを使った方法を使うようにするとよいと思います。</p>
+<p>ちなみに蛇足ですが、なぜStrict Modeでもnew Functionの場合にはグローバルオブジェクトが入ってくるかについては、Strict Modeの伝搬などの細かい仕様を調べてもらえるとおわかりになると思います。</p>
+<hr />
+
+<h3>function() { return !this; }() （Strict Modeチェック）</h3>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">isStrict</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="o">!</span><span class="k">this</span><span class="p">;</span> <span class="p">}();</span>
+</code></pre></div></div>
+
+<p>現在strict modeかどうかをチェックするイディオムです。上記の、strict mode内ではthisがundefinedになることを利用しております。</p>
+<p>しかし紹介しておいてなんですが、現在strict modeかどうかをチェックすることってめったにないと思いますね。</p>
+
+<hr />
+
+<h3>typeof(v) == "undefined" （undefinedチェック）</h3>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="nx">o</span><span class="p">)</span> <span class="o">==</span> <span class="dl">"</span><span class="s2">undefined</span><span class="dl">"</span><span class="p">)</span> <span class="p">{</span> <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">undefined detected</span><span class="dl">"</span><span class="p">);</span> <span class="p">}</span>
+</code></pre></div></div>
+<p>undefinedチェックで頻繁に見られる構文ですが、この構文ならではの意図があります。例えば同じようにundefinedをチェックしたいときに、<br /></p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span><span class="p">(</span><span class="nx">o</span> <span class="o">===</span> <span class="k">void</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">undefined detected</span><span class="dl">"</span><span class="p">);</span> <span class="p">}</span>
+</code></pre></div></div>
+
+<p>と書いてもundefinedのチェックは可能です（voidは何を引数にとってもundefinedを返す構文であり、===チェックはnullとundefinedを区別して比較します）。しかし、o自体がローカルスコープでもグローバルスコープでも宣言されていない場合、この書き方だとoの参照の時点でリファレンスエラーが起こってしまいます。</p>
+<p>例えばよくあるのが、ブラウザが用意したビルトインオブジェクトの存在をチェックするときです。古いJavaScriptでは存在しないJSONオブジェクトが存在するかどうかを確認したいときに、ただ単純にJSONを参照してしまうとリファレンスエラーになってしまいます。かといって、window.JSONで確認すると、node.jsなどのwindowがない環境での動作ができなくなってしまいます。ただの存在チェックで、上記のグローバルオブジェクトの取得まで頑張るのはちょっとありえないので、そういう際にはこのtypeof方式をつかって存在確認をする方法がベストになるでしょう。</p>
+<p>なおスピードを気にする方も多いかと思いますが、typeofは高速ですし、固定文字列同士の比較なのでそちらの速度もかなり速く最適化されるのが一般的です。あまり気にしすぎることはないと思います。</p>
+
+<p>なお、undefinedを<code class="language-plaintext highlighter-rouge">void 0</code>ではなくてundefinedと書いて参照するのは、内部的にはwindow.undefinedを参照することになるので、あまり好まれない書き方となります。さすがにwindow.undefinedの値が書き換えられることはないと考えてよいとは思いますが…。</p>
+
+<hr />
+
+<h3>v &gt;&gt;&gt; 0 （符号なし整数化）</h3>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">n</span> <span class="o">=</span> <span class="mh">0x80000000</span><span class="p">;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">n</span><span class="p">);</span> <span class="c1">// 2147483648 == 0x80000000</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">n</span> <span class="o">|</span> <span class="mi">0</span><span class="p">)</span> <span class="c1">// -2147483648</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">n</span> <span class="o">|</span> <span class="mi">1</span><span class="p">)</span> <span class="c1">// -2147483647</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">((</span><span class="nx">n</span> <span class="o">|</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&gt;&gt;&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="c1">// 2147483649</span>
+</code></pre></div></div>
+<p>32ビットの整数値を、強制的に符号なしに変換するイディオムです。JavaScriptでバイナリを扱う人にしか役立たないと思います。</p>
+<p>JavaScriptは数値はすべて浮動小数点型（float型）で扱われるのですが、ビット演算をする際には内部的にToInt32が呼ばれて32ビットの整数値に変換されます。この際の変換が符号付きで行われるので、一番上のビットが立ってしまった場合にはマイナスの値として処理されてしまい、その後の計算に支障を起こすことがあります。そういうときにこのイディオムを使うことによって、内部的にToUint32を呼ぶことによって符号なしの整数型に一度変換してやり、その値をその後の計算に利用することが出来るようになります。</p>
+<p>ほとんど目にすることはないでしょうが、バイナリを扱ったり、極限までビット計算を効率化しようとすると、かなり高い頻度で扱うことになるでしょう。</p>
+<hr />
+
+<p>もし追加で「これも…」というものがあれば、 Twitter の <a href="https://twitter.com/tkihira" target="_blank">@tkihira</a> までお知らせください。</p>
+
+        </article>
+        <hr>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/archives/488&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="JavaScript イディオム集" data-url="http://nmi.jp/archives/488">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/archives/488" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="JavaScript イディオム集"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="JavaScript イディオム集" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+
+        
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+        
+
+        <div class="post-recent">
+    <div class="pre">
+
+    
+        <p><strong>前の投稿</strong> <a href="/archives/476">JavaScriptの+演算子の謎挙動に迫る</a></p>
+    
+    </div>
+    <div class="nex">
+
+        
+        <p><strong>次の投稿</strong> <a href="/archives/506">自分がフリーランスの時に気をつけていた3つのこと</a></p>
+        
+    </div>
+</div>
+
+
+    </div>
+    <button class="anchor"><i class="fa fa-anchor"></i></button>
+
+
+    <div class="right">
+        <div class="wrap">
+            <div class="side">
+                <div>
+                    <i class="fa fa-tags"></i>
+                    Top Popular Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2016-07-23-stock-strategy-for-early-startup-employee">スタートアップに転職する時に最低限知っておくべき株の話</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/582">生WebGL入門:初音ミクの美麗3Dモデルを表示する(前編)</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2017-10-06-Making_a-business_plan">事業計画書の作り方、新規ビジネスの考え方</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/902">Convertible Note / Convertible Equity とは？</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/488">JavaScript イディオム集</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/465">ExGameの製作で感じたこと</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                </ul>
+            </div>
+
+            <div class="side">
+                <div>
+                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                    Recent Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        <li><a href="/2024-08-28-Review-Binary-Hacks-Rebooted">書評 "Binary Hacks Rebooted"</a></li>
+                    
+                        <li><a href="/2024-06-10-Deep-Dive-into-ARM-JavaScript-Special-Instruction-FJCVTZS">ARM に存在する JavaScript 専用命令「FJCVTZS」を追う（ついでに V8 をビルドする）</a></li>
+                    
+                        <li><a href="/2024-06-03-Exploring-V8-JIT-Outputs">JavaScript 実行エンジン V8 の JIT 出力コードを読んでみよう</a></li>
+                    
+                </ul>
+            </div>
+
+            <!-- <div class="side">
+                <div>
+                    <i class="fa fa-external-link"></i>
+                    Links
+                </div>
+                <ul  class="content-ul">
+
+                </ul>
+            </div> -->
+        </div>
+    </div>
+
+
+
+</div>
+<script>
+/**
+ * target _blank
+ */
+(function() {
+    var aTags = document.querySelectorAll('article a:not([id])')
+    for (var i = 0; i < aTags.length; i++) {
+        aTags[i].setAttribute('target', '_blank')
+    }
+}());
+</script>
+<script src="/js/pageContent.js " charset="utf-8"></script>
+
+
+    <footer class="site-footer">
+
+
+    <div class="wrapper">
+
+        <p class="description">
+             Takuo Kihira 
+        </p>
+        <p class="contact">
+            Contact me at: 
+            <a href="https://github.com/tkihira" title="GitHub"><i class="fa fa-github" aria-hidden="true"></i></a>     
+            <a href="https://twitter.com/tkihira" title="Twitter"><i class="fa fa-twitter" aria-hidden="true"></i></a>  
+            <a href="https://www.facebook.com/takuo.kihira" title="Facebook"><i class="fa fa-facebook-official" aria-hidden="true"></i></a>    
+        </p>
+        <p class="power">
+            <span>
+                Site powered by <a href="https://jekyllrb.com/">Jekyll</a>.
+            </span>
+            <span>
+                Theme designed by <a href="https://github.com/Gaohaoyang">HyG</a>.
+            </span>
+        </p>
+    </div>
+</footer>
+
+    <div class="back-to-top">
+    <a href="#top" class="scroll">
+        <i class="fa fa-arrow-up" aria-hidden="true"></i>
+    </a>
+</div>
+
+    <script src=" /js/main.js " charset="utf-8"></script>
+    <script src=" /js/scroll.min.js " charset="utf-8"></script>
+  </body>
+
+</html>

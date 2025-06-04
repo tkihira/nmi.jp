@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html><head><title>game</title>
+<meta name="viewport" content="width=480,user-scalable=no">
+<script>
+(function() {
+	var config = {
+		width: 480,
+		height: 300,
+		caveHeight: 80,
+		currentX: 30,
+		maxChange: 10,
+		a: 0.15
+	};
+	var status = {};
+	
+	var init = function() {
+		var canvas = document.createElement("canvas");
+		canvas.width = config.width;
+		canvas.height = config.height;
+		
+		canvas.style.top = "0";
+		canvas.style.left = "0";
+		canvas.style.position = "relative";
+		
+		status.canvas = canvas;
+		status.ctx = canvas.getContext("2d");
+		document.body.appendChild(canvas);
+		reset();
+	};
+	var reset = function() {
+		status.frontCanvas = 0; // 前のcanvas index
+		status.line = 0; // 今まで進んだline
+		status.currentPos = (config.height - config.caveHeight) / 2; // 今の洞窟の高さ位置
+		status.a = 0; // 上下動の加速度
+		status.v = 0; // 上下動の速度
+		status.y = config.height / 2; // 現在位置
+		rect("#fff", 0, 0, config.width, config.height);
+		rect("#000", 0, status.currentPos, config.width, config.caveHeight);
+		for(var i = 0; i < config.width - config.currentX * 2; i++) {
+			//makeCave();
+		}
+		status.state = "playing";
+	};
+	var rect = function(color, x, y, w, h) {
+		status.ctx.fillStyle = color;
+		status.ctx.fillRect(x, y, w, h);
+	};
+	var makeCave = function() {
+		// ここで自分の場所に点を打つ
+		rect("#ff0", config.currentX, status.y, 1, 1);
+		// 左に1px移動
+		status.ctx.drawImage(status.canvas, -1, 0);
+		// 一番右に新しい空間を作る
+		rect("#fff", config.width - 1, 0, 1, config.height);
+		status.currentPos += Math.random() * config.maxChange * 2 - config.maxChange;
+		status.currentPos = Math.min(Math.max(status.currentPos, 1), config.height - config.caveHeight - 1);
+		rect("#000", config.width - 1, status.currentPos, 1, config.caveHeight);
+	};
+	window.onload = function() {
+		init();
+		status.canvas.ontouchstart = function(e) {
+			if(e.touches.length > 0) {
+				status.a = -config.a;
+			}
+			if(status.state == "playing") {
+				e.preventDefault();
+			}
+		};
+		status.canvas.onmousedown = function() {
+			status.a = -config.a;
+		};
+		status.canvas.ontouchend = function(e) {
+			if(e.touches.length == 0) {
+				status.a = config.a;
+			}
+			if(status.state == "score") {
+				status.restart();
+			}
+		};
+		status.canvas.onmouseup = function() {
+			status.a = config.a;
+			if(status.state == "score") {
+				status.restart();
+			}
+		};
+		var game = function() {
+			var play = true;
+			if(status.state == "playing") {
+				makeCave();
+				// 自機の移動
+				status.v += status.a;
+				status.y += status.v;
+				// ピクセル情報の取得
+				var pixel = status.ctx.getImageData(config.currentX, status.y, 1, 1);
+				if(pixel.data[0] != 0 || pixel.data[3] == 0) {
+					status.state = "gameover";
+					status.r = 0;
+					// game over
+				} else {
+				}
+				status.line++;
+			} else if(status.state == "gameover") {
+				status.r += 3;
+				status.ctx.beginPath();
+				status.ctx.fillStyle = "rgba(255, 0, 0, 0.2)";
+				status.ctx.arc(config.currentX, status.y, status.r, 0, Math.PI * 2, false);
+				status.ctx.fill();
+				if(status.r >= 30) {
+					rect("rgba(0, 0, 0, 0.8)", 0, config.height / 2 - 16, config.width, 32);
+					status.ctx.font = "32px Futura";
+					status.ctx.textBaseline = "middle";
+					status.ctx.textAlign = "center";
+					status.ctx.fillStyle = "#fff";
+					status.ctx.fillText("Score: " + status.line, config.width / 2, config.height / 2);
+					status.state = "score";
+					play = false;
+				}
+			}
+			if(play) {
+				setTimeout(game, 1000 / 60);
+			}
+		};
+		status.restart = function() {
+			reset();
+			game();
+		};
+		setTimeout(function() {
+			window.scrollTo(0, 0);
+			game();
+		},200)
+	};
+})();
+</script></head><body style="margin:0">
+</body></html>

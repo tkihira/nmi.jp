@@ -1,0 +1,1679 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>embona - ブラウザで動くBonanzaを作ってみた(その4)</title>
+    <meta name="description" content="前の記事では、ブラウザ上でBonanzaの起動に成功しました。この記事では、実際にBonanzaをJavaScript側から操作することで、よりEmscriptenの深い使い方を学んでみようと思います。。前の記事はこちら→ embona - ブラウザで動くBonanzaを作ってみた(その3)とりあえず遊んでみたい...">
+
+    <link rel="stylesheet" href=" /css/fontawesome/css/font-awesome.min.css ">
+    <link rel="stylesheet" href=" /css/main.css ">
+    <link rel="canonical" href="http://nmi.jp/archives/792">
+    <link rel="alternate" type="application/rss+xml" title="nmi.jp" href="http://nmi.jp/feed.xml">
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=3.0'></script>
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=1.1'></script>
+    <script>
+        if(location.href.match(/\.html$/)) {
+            location.href = location.href.match(/(.+)\.html/)[1];
+        }
+    </script>
+
+
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-229769-8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-229769-8');
+</script>
+</head>
+
+
+  <body>
+
+    <header id="top">
+    <div class="wrapper">
+        <a href="/" class="brand">nmi.jp</a>
+        <small>Twitter → <a href="https://twitter.com/tkihira" target="_blank">@tkihira</a></small>
+        <button id="headerMenu" class="menu"><i class="fa fa-bars"></i></button>
+        <nav id="headerNav">
+            <ul>
+                <li>
+                    
+                    <a href="/">
+                    
+                        <i class="fa fa-home"></i>Home
+                    </a>
+                </li>
+
+                
+                    
+                    <li>
+                        
+                        <a href="/archive/">
+                        
+                            <i class="fa fa-archive"></i>Archives
+                        </a>
+                    </li>
+                    
+                
+                    
+                    <li>
+                        
+                        <a href="/category/">
+                        
+                            <i class="fa fa-th-list"></i>Categories
+                        </a>
+                    </li>
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            </ul>
+        </nav>
+    </div>
+</header>
+
+
+        <div class="page clearfix" post>
+    <div class="left">
+        <div class="post-recent">
+    <table style="width:100%;border:0;padding:0;"><tbody><tr style="padding:0">
+        <td class="toppre" style="padding:0">
+        
+        <a href="/archives/780">embona - ブラウザで動くBonanzaを作ってみた(その3)</a>
+        
+        </td><td class="topnex" style="text-align:right;padding:0">
+        
+        <a href="/archives/872">IoTの超素人から素人を目指す</a>
+        
+        </td>
+    </tr></tbody></table>
+</div>
+
+        <hr style="margin:0"/>
+        <h1 style="margin-top:10px">embona - ブラウザで動くBonanzaを作ってみた(その4)</h1>
+<hr />
+        <div class="label">
+
+            <div class="label-card">
+                <i class="fa fa-calendar"></i>2015-01-19
+            </div>
+
+            <div class="label-card">
+                <i class="fa fa-user"></i>Takuo Kihira
+                
+            </div>
+
+            <div class="label-card">
+                
+            </div>
+
+            <div class="label-card">
+            
+
+
+<!-- <span class="point">•</span> -->
+<span class="categories">
+  <i class="fa fa-th-list"></i>
+  
+    
+        <a href="/category/#HTML5" title="Category: HTML5" rel="category">HTML5</a>&nbsp;
+    
+        <a href="/category/#JavaScript" title="Category: JavaScript" rel="category">JavaScript</a>&nbsp;
+    
+        <a href="/category/#Emscripten" title="Category: Emscripten" rel="category">Emscripten</a>
+    
+  
+
+  <!-- <span class="point">•</span> -->
+</span>
+
+
+            </div>
+
+            <div class="label-card">
+                <a href="https://github.com/tkihira/nmi.jp/blob/master/_posts/2015-01-19-792.md" target="_blank"><i class="fa fa-github"></i></a>
+            </div>
+
+        </div>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/archives/792&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="embona - ブラウザで動くBonanzaを作ってみた(その4)" data-url="http://nmi.jp/archives/792">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/archives/792" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="embona - ブラウザで動くBonanzaを作ってみた(その4)"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="embona - ブラウザで動くBonanzaを作ってみた(その4)" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+        <article itemscope itemtype="http://schema.org/BlogPosting">
+        <p>前の記事では、ブラウザ上でBonanzaの起動に成功しました。この記事では、実際にBonanzaをJavaScript側から操作することで、よりEmscriptenの深い使い方を学んでみようと思います。。</p>
+<p>前の記事はこちら→ <a href="http://nmi.jp/archives/780" target="_blank">embona - ブラウザで動くBonanzaを作ってみた(その3)</a><br />
+とりあえず遊んでみたい、という方は<a href="http://nmi.jp/archives/763" target="_blank">その1</a>の記事の最初にリンクを用意しておきました。そちらをご参照ください。<br />
+<a id="more"></a><a id="more-792"></a></p>
+<h2>標準入出力をフェッチする</h2>
+<p>前の記事で何が嫌だって、毎回標準入力のプロンプトが出てくることです。プログラム側では入力があるかどうか確認しているだけなのに、標準入力に問い合わせがあると律儀にダイアログを出すので、結果的に何度も何度もダイアログが出てくることになります。</p>
+<p>そして、ダイアログをキャンセルすると内部では恐らく-1（EOF）が送られてしまい、Bonanzaは勘違いして終了しようとします。その1でビルドしたCのBonanzaは1手に10秒かけていたのに、今回のブラウザBonanzaは1手をミリ秒で処理し、駆け足で終了しようとしているのにお気づきになったでしょうか？それはここの入力のせいなのです。</p>
+<p>というわけで、標準入出力をEmscriptenではなくプログラム側で処理する必要があります。Emscriptenではプログラム起動前に呼ばれるプログラムファイルを指定することができるので、これらを処理するために、pre.js というファイルを作り、そこのプログラムで対応してみます。<br />
+</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">stdin_buffer</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">limit time 0 1</span><span class="se">\n</span><span class="s2">stress off</span><span class="se">\n</span><span class="s2">move 9999</span><span class="se">\n</span><span class="dl">"</span><span class="p">;</span>
+<span class="kd">function</span> <span class="nf">input_callback</span> <span class="p">(){</span>
+    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">stdin_buffer</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="dl">"</span><span class="se">\n</span><span class="dl">"</span><span class="p">.</span><span class="nf">charCodeAt</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span> <span class="c1">// no input</span>
+    <span class="p">}</span>
+    <span class="kd">var</span> <span class="nx">c</span> <span class="o">=</span> <span class="nx">stdin_buffer</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+    <span class="nx">stdin_buffer</span> <span class="o">=</span> <span class="nx">stdin_buffer</span><span class="p">.</span><span class="nf">substr</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">c</span><span class="p">.</span><span class="nf">charCodeAt</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="kd">var</span> <span class="nx">stdout_buffer</span> <span class="o">=</span> <span class="dl">""</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">crflag</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+<span class="kd">function</span> <span class="nf">output_callback</span> <span class="p">(</span><span class="nx">_char</span><span class="p">){</span>
+    <span class="k">if</span><span class="p">(</span><span class="nx">_char</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="nx">_char</span> <span class="o">==</span> <span class="mh">0x0a</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">stdout_buffer</span><span class="p">);</span>
+        <span class="nx">stdout_buffer</span> <span class="o">=</span> <span class="dl">""</span><span class="p">;</span>
+        <span class="nx">crflag</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">if</span><span class="p">(</span><span class="nx">_char</span> <span class="o">==</span> <span class="mh">0x0d</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">crflag</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">if</span><span class="p">(</span><span class="nx">crflag</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">crflag</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+        <span class="nx">stdout_buffer</span> <span class="o">=</span> <span class="dl">""</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nx">stdout_buffer</span> <span class="o">+=</span> <span class="nb">String</span><span class="p">.</span><span class="nf">fromCharCode</span><span class="p">(</span><span class="nx">_char</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="kd">var</span> <span class="nx">stderr_buffer</span> <span class="o">=</span> <span class="dl">""</span><span class="p">;</span>
+<span class="kd">function</span> <span class="nf">error_callback</span> <span class="p">(</span><span class="nx">_char</span><span class="p">){</span>
+    <span class="k">if</span><span class="p">(</span><span class="nx">_char</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="nx">_char</span> <span class="o">==</span> <span class="mh">0x0a</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="nx">stderr_buffer</span><span class="p">);</span>
+        <span class="nx">stderr_buffer</span> <span class="o">=</span> <span class="dl">""</span><span class="p">;</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nx">stderr_buffer</span> <span class="o">+=</span> <span class="nb">String</span><span class="p">.</span><span class="nf">fromCharCode</span><span class="p">(</span><span class="nx">_char</span><span class="p">);</span>
+<span class="p">}</span>
+ 
+<span class="k">if</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">Module</span> <span class="o">!==</span> <span class="dl">"</span><span class="s2">undefined</span><span class="dl">"</span><span class="p">)</span> <span class="p">{</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">Module</span> <span class="o">=</span> <span class="p">{};</span>
+    <span class="nx">Module</span><span class="p">[</span><span class="dl">"</span><span class="s2">preRun</span><span class="dl">"</span><span class="p">]</span> <span class="o">=</span> <span class="p">[];</span>
+<span class="p">}</span>
+<span class="nx">Module</span><span class="p">[</span><span class="dl">"</span><span class="s2">preRun</span><span class="dl">"</span><span class="p">].</span><span class="nf">push</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">FS</span><span class="p">.</span><span class="nf">init</span><span class="p">(</span><span class="nx">input_callback</span><span class="p">,</span> <span class="nx">output_callback</span><span class="p">,</span> <span class="nx">error_callback</span><span class="p">)</span>
+<span class="p">});</span>
+</code></pre></div></div>
+<p>Emscriptenでは、Moduleというグローバル変数を通して、Emscriptenのシステムに関する様々な設定をすることが出来ます。今回はModuleのpreRunを利用して、プログラム起動前の処理を書きます。やることは単純で、標準入出力のコールバック関数（input_callback、output_callback、error_callback）を設定するだけです。</p>
+<p>なお、世の中のEmscriptenのサンプルは自前でModuleを再定義している例が多いですが、<span style="color:red">既にEmscriptenによりModuleが準備されている場合は、決して上書きしないようにしましょう</span>。知らずに上書きすると、ビルドオプションを変えても全然反映されなくなり途方にくれることになります。注意してください。ネットのサンプルではpreRunに関数を代入している例もありますが、preRunは配列なので関数をpushするのが正しい使い方です。</p>
+<p>input_callbackでは、あらかじめ設定した文字列を一方的に送り、それが尽きたらずっと改行を送るようにしています。残念ながら現状のEmscriptenでは標準入力のPeekに来た問い合わせに対し「入力内容なし」と答えることが出来ないので、情けない話ですが比較的害のない改行押しっぱなし状態にしておきます。</p>
+<p>output_callbackとerror_callbackは単純な実装ですね。Bonanzaは出力にcarriage returnを多用しているので、汚いコードですがそれに対応するようにしています。 これで自前の実装でconsole.logに出力出来るようになりました。ついでにembona.htmlを自前で用意しちゃいます。<br />
+</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;!doctype html&gt;
+&lt;html&gt;&lt;head&gt;&lt;title&gt;embona&lt;/title&gt;
+&lt;script src="bonanza.js"&gt;&lt;/script&gt;
+&lt;/head&gt;&lt;body&gt;&lt;/body&gt;&lt;/html&gt;
+</code></pre></div></div>
+<p>
+超シンプル。出力はコンソールで確認しましょう、という割り切った手法です。結果はこちらです。</p>
+<p><a href="http://nmi.jp/wp-content/uploads/2015/01/embona5.png"><img src="http://nmi.jp/wp-content/uploads/2015/01/embona5.png" alt="" title="embona5" width="1000" height="818" class="aligncenter size-full wp-image-808" /></a></p>
+<h2>ファイルを自前で準備し、Workerで起動する</h2>
+<p>さて、今のところブラウザで動いてはおりますが、JavaScriptがメインループをずっと占有しており、ブラウザのタブを閉じることが出来ないほどの重さです。こんな状況ではサービスでは使い物になりません。そこで、WebWorkersを使い、Bonanzaをバックグラウンドで起動することにしましょう。</p>
+<p>Workerで起動するためには、Emscriptenの出力をhtmlではなくてjsにすると出来そうです。しかしそうすると、今まで --preload-file でロードしていたfv.bin を自前でEmscriptenのファイルシステムにロードしなければいけません。ちょっと面倒そうですが、実際そこまで面倒ではありません。</p>
+<p>ファイルシステム絡みは本体プログラムが起動する前に完了させたいので、pre.jsの中身に記述することにします。上記のファイルの続きに以下を追記します。<br />
+</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">Module</span><span class="p">[</span><span class="dl">"</span><span class="s2">noInitialRun</span><span class="dl">"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+ 
+<span class="kd">var</span> <span class="nx">xhr</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">XMLHttpRequest</span><span class="p">();</span>
+<span class="nx">xhr</span><span class="p">.</span><span class="nf">open</span><span class="p">(</span><span class="dl">"</span><span class="s2">GET</span><span class="dl">"</span><span class="p">,</span> <span class="dl">"</span><span class="s2">fv.bin</span><span class="dl">"</span><span class="p">);</span>
+<span class="nx">xhr</span><span class="p">.</span><span class="nx">responseType</span> <span class="o">=</span> <span class="dl">"</span><span class="s2">arraybuffer</span><span class="dl">"</span><span class="p">;</span>
+<span class="nx">xhr</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+<span class="nx">xhr</span><span class="p">.</span><span class="nx">onreadystatechange</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="nx">xhr</span><span class="p">.</span><span class="nx">readyState</span> <span class="o">==</span> <span class="mi">4</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">xhr</span><span class="p">.</span><span class="nx">status</span> <span class="o">==</span> <span class="mi">200</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span><span class="p">(</span><span class="nx">xhr</span><span class="p">.</span><span class="nx">response</span> <span class="o">!=</span> <span class="kc">undefined</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">FS</span><span class="p">.</span><span class="nf">writeFile</span><span class="p">(</span><span class="dl">"</span><span class="s2">fv.bin</span><span class="dl">"</span><span class="p">,</span> <span class="k">new</span> <span class="nc">Uint8Array</span><span class="p">(</span><span class="nx">xhr</span><span class="p">.</span><span class="nx">response</span><span class="p">),</span> <span class="p">{</span><span class="na">encoding</span><span class="p">:</span> <span class="dl">"</span><span class="s2">binary</span><span class="dl">"</span><span class="p">});</span>
+                <span class="nx">Module</span><span class="p">[</span><span class="dl">"</span><span class="s2">_main</span><span class="dl">"</span><span class="p">]();</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div></div>
+<p>noInitialRunをtrueにすることで、ファイルが準備される前に自動的にmain関数が実行されるのを防ぎます。そしてXHRでファイルをダウンロードし、完了したら<a href="http://kripken.github.io/emscripten-site/docs/api_reference/Filesystem-API.html" target="_blank">FS.writeFile</a>で既存のFS上に出力し準備完了です。全ての準備が完了したので、ここでBonanzaのプログラム（_main）を実行します。</p>
+<p>Workerの処理の部分も追加しましょう。embona.htmlを次のように変更します。<br />
+</p>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;!doctype html&gt;</span>
+<span class="nt">&lt;html&gt;&lt;head&gt;&lt;title&gt;</span>embona<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;script&gt;</span>
+<span class="nx">onload</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">worker</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Worker</span><span class="p">(</span><span class="dl">"</span><span class="s2">bonanza.js</span><span class="dl">"</span><span class="p">);</span>
+<span class="p">};</span>
+<span class="nt">&lt;/script&gt;</span>
+<span class="nt">&lt;/head&gt;&lt;body&gt;&lt;/body&gt;&lt;/html&gt;</span>
+</code></pre></div></div>
+<p>Makefileも忘れずに更新します。<br />
+</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bonanza.js : $(OBJS) pre.js
+    $(CC) $(LDFLAG1) -o bonanza.html $(OBJS) $(LDFLAG2) -s TOTAL_MEMORY=671088640 --pre-js pre.js
+</code></pre></div></div>
+<p>
+必要の無くなったフラグを消去します。これでリビルドすれば完成です。</p>
+<p><a href="http://nmi.jp/wp-content/uploads/2015/01/embona6.png"><img src="http://nmi.jp/wp-content/uploads/2015/01/embona6.png" alt="" title="embona6" width="917" height="860" class="aligncenter size-full wp-image-809" /></a></p>
+<p>見た目は上の画像と同じですが、「Show all messages」というオプションが出ているところで、これがWorkerで起動していることが確認出来ます。リロードしてもサクサクリロード出来て、ユーザー体感は比較にならないほど良くなりました。</p>
+<h2>メインループをsetTimeoutに変更する</h2>
+<p>さて、Workerに移したのでメインループが無限ループをしたところでブラウザが止まったりすることはなくなりました。しかし、この状態だと本体からWorkerに通信することが出来ません。本体からpostMessageをしても、Worker側でそれを受け取るためにはループから外れなければいけないからです。</p>
+<p>Emscriptenのこの問題に対する一般的な解決方法は、今のところありません。将来的に<a href="https://www.google.co.jp/webhp?sourceid=chrome-instant&amp;ion=1&amp;espv=2&amp;es_th=1&amp;ie=UTF-8#q=SharedArrayBuffer" target="_blank">SharedArrayBuffer</a>が実装されたり、同期的かつWorker内部で扱えるStorageが実装されれば問題解決の可能性が出てくるのですが、残念ながら今は両方とも対応していないようです。</p>
+<p>今回は、自分でEmscriptenの出力ファイルの Bonanza.js を直接編集して、メインループをsetTimeoutで書きなおしました。</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="kd">function</span> <span class="nf">__main_loop</span><span class="p">()</span> <span class="p">{</span>
+ <span class="nx">HEAP32</span><span class="p">[</span><span class="mi">34181088</span><span class="o">&gt;&gt;</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+ <span class="nx">$3</span> <span class="o">=</span> <span class="p">(</span><span class="nf">_ponder</span><span class="p">(</span><span class="mi">220526688</span><span class="p">)</span><span class="o">|</span><span class="mi">0</span><span class="p">);</span>
+ <span class="nx">$4</span> <span class="o">=</span> <span class="p">(</span><span class="nx">$3</span><span class="o">|</span><span class="mi">0</span><span class="p">)</span><span class="o">&lt;</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+ <span class="k">if </span><span class="p">(</span><span class="nx">$4</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">$$0$i</span> <span class="o">=</span> <span class="nx">$3</span><span class="p">;</span>
+ <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+  <span class="nx">$5</span> <span class="o">=</span> <span class="nx">HEAP32</span><span class="p">[</span><span class="mi">34180920</span><span class="o">&gt;&gt;</span><span class="mi">2</span><span class="p">]</span><span class="o">|</span><span class="mi">0</span><span class="p">;</span>
+  <span class="nx">$6</span> <span class="o">=</span> <span class="nx">$5</span> <span class="o">&amp;</span> <span class="mi">16</span><span class="p">;</span>
+  <span class="nx">$7</span> <span class="o">=</span> <span class="p">(</span><span class="nx">$6</span><span class="o">|</span><span class="mi">0</span><span class="p">)</span><span class="o">==</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+  <span class="k">if </span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="nx">$7</span><span class="p">))</span> <span class="p">{</span>
+   <span class="k">return</span><span class="p">;</span>
+   <span class="c1">//break;</span>
+  <span class="p">}</span>
+  <span class="nx">$8</span> <span class="o">=</span> <span class="p">(</span><span class="nx">$3</span><span class="o">|</span><span class="mi">0</span><span class="p">)</span><span class="o">==</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+  <span class="k">if </span><span class="p">(</span><span class="nx">$8</span><span class="p">)</span> <span class="p">{</span>
+   <span class="nf">setTimeout</span><span class="p">(</span><span class="nx">__main_loop</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span><span class="k">return</span><span class="p">;</span>
+   <span class="c1">//continue;</span>
+  <span class="p">}</span>
+  <span class="nx">$9</span> <span class="o">=</span> <span class="nx">HEAP32</span><span class="p">[</span><span class="mi">34181088</span><span class="o">&gt;&gt;</span><span class="mi">2</span><span class="p">]</span><span class="o">|</span><span class="mi">0</span><span class="p">;</span>
+  <span class="nx">$10</span> <span class="o">=</span> <span class="p">(</span><span class="nx">$9</span><span class="o">|</span><span class="mi">0</span><span class="p">)</span><span class="o">==</span><span class="p">(</span><span class="o">-</span><span class="mi">33554432</span><span class="p">);</span>
+  <span class="k">if </span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="nx">$10</span><span class="p">))</span> <span class="p">{</span>
+   <span class="nf">_show_prompt</span><span class="p">();</span>
+  <span class="p">}</span>
+  <span class="nx">$11</span> <span class="o">=</span> <span class="p">(</span><span class="nf">_next_cmdline</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">|</span><span class="mi">0</span><span class="p">);</span>
+  <span class="nx">$12</span> <span class="o">=</span> <span class="p">(</span><span class="nx">$11</span><span class="o">|</span><span class="mi">0</span><span class="p">)</span><span class="o">&lt;</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+  <span class="k">if </span><span class="p">(</span><span class="nx">$12</span><span class="p">)</span> <span class="p">{</span>
+   <span class="nx">$$0$i</span> <span class="o">=</span> <span class="nx">$11</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+   <span class="nx">$13</span> <span class="o">=</span> <span class="nx">HEAP32</span><span class="p">[</span><span class="mi">34180920</span><span class="o">&gt;&gt;</span><span class="mi">2</span><span class="p">]</span><span class="o">|</span><span class="mi">0</span><span class="p">;</span>
+   <span class="nx">$14</span> <span class="o">=</span> <span class="nx">$13</span> <span class="o">&amp;</span> <span class="mi">16</span><span class="p">;</span>
+   <span class="nx">$15</span> <span class="o">=</span> <span class="p">(</span><span class="nx">$14</span><span class="o">|</span><span class="mi">0</span><span class="p">)</span><span class="o">==</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+   <span class="k">if </span><span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="nx">$15</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">return</span><span class="p">;</span>
+    <span class="c1">//break;</span>
+   <span class="p">}</span>
+   <span class="nx">$16</span> <span class="o">=</span> <span class="p">(</span><span class="nf">_procedure</span><span class="p">(</span><span class="mi">220526688</span><span class="p">)</span><span class="o">|</span><span class="mi">0</span><span class="p">);</span>
+   <span class="nx">$17</span> <span class="o">=</span> <span class="p">(</span><span class="nx">$16</span><span class="o">|</span><span class="mi">0</span><span class="p">)</span><span class="o">&lt;</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+   <span class="k">if </span><span class="p">(</span><span class="nx">$17</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">$$0$i</span> <span class="o">=</span> <span class="nx">$16</span><span class="p">;</span>
+   <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="nx">$18</span> <span class="o">=</span> <span class="nx">HEAP32</span><span class="p">[</span><span class="mi">34180920</span><span class="o">&gt;&gt;</span><span class="mi">2</span><span class="p">]</span><span class="o">|</span><span class="mi">0</span><span class="p">;</span>
+    <span class="nx">$19</span> <span class="o">=</span> <span class="nx">$18</span> <span class="o">&gt;&gt;&gt;</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="nx">$20</span> <span class="o">=</span> <span class="nx">$19</span> <span class="o">&amp;</span> <span class="mi">4</span><span class="p">;</span>
+    <span class="nx">$21</span> <span class="o">=</span> <span class="nx">$20</span> <span class="o">^</span> <span class="mi">4</span><span class="p">;</span>
+    <span class="nx">$22</span> <span class="o">=</span> <span class="p">((</span><span class="nx">$21</span><span class="p">)</span> <span class="o">+</span> <span class="o">-</span><span class="mi">3</span><span class="p">)</span><span class="o">|</span><span class="mi">0</span><span class="p">;</span>
+    <span class="nx">$$0$i</span> <span class="o">=</span> <span class="nx">$22</span><span class="p">;</span>
+   <span class="p">}</span>
+  <span class="p">}</span>
+ <span class="p">}</span>
+ <span class="k">if </span><span class="p">(((</span><span class="nx">$$0$i</span><span class="o">|</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="p">{</span>
+  <span class="nx">label</span> <span class="o">=</span> <span class="mi">13</span><span class="p">;</span>
+  <span class="k">return</span><span class="p">;</span>
+  <span class="c1">//break;</span>
+ <span class="p">}</span> <span class="k">else</span> <span class="k">if </span><span class="p">(((</span><span class="nx">$$0$i</span><span class="o">|</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">3</span><span class="p">))</span> <span class="p">{</span>
+  <span class="k">return</span><span class="p">;</span>
+  <span class="c1">//break;</span>
+ <span class="p">}</span> <span class="k">else</span> <span class="k">if </span><span class="p">(</span><span class="o">!</span><span class="p">(((</span><span class="nx">$$0$i</span><span class="o">|</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">2</span><span class="p">)))</span> <span class="p">{</span>
+  <span class="nf">setTimeout</span><span class="p">(</span><span class="nx">__main_loop</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span><span class="k">return</span><span class="p">;</span>
+  <span class="c1">//continue;</span>
+ <span class="p">}</span>
+ <span class="nx">$24</span> <span class="o">=</span> <span class="nx">HEAP32</span><span class="p">[</span><span class="mi">220526664</span><span class="o">&gt;&gt;</span><span class="mi">2</span><span class="p">]</span><span class="o">|</span><span class="mi">0</span><span class="p">;</span>
+ <span class="nx">HEAP32</span><span class="p">[</span><span class="nx">$vararg_buffer4</span><span class="o">&gt;&gt;</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="nx">$24</span><span class="p">;</span>
+ <span class="nf">_out_warning</span><span class="p">(</span><span class="mi">221111352</span><span class="p">,</span><span class="nx">$vararg_buffer4</span><span class="p">);</span>
+ <span class="nf">_shutdown_all</span><span class="p">();</span>
+ <span class="nf">setTimeout</span><span class="p">(</span><span class="nx">__main_loop</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span>
+<span class="p">})();</span>
+</code></pre></div></div>
+
+<p>while(1) になっていた内部を 名前付き関数式 __main_loopで囲い、breakされた場合はreturnを、continueされた場合やループの最後に到達した場合は再度__main_loopをsetTimeoutで呼んでいます。これで最悪メインループ1回ごとにpostMessageが処理出来るようになります。</p>
+<p>実際の所、ここの部分はもう少し努力することが出来たと思います。例えばですが、Bonanzaの思考ルーチンのコードの中にsleepを入れ、<a href="https://github.com/kripken/emscripten/wiki/Asyncify" target="_blank">Emscripten Asyncify</a>を利用してEmscripten側で非同期処理を実現するのが良い解決策になりそうだと思っています。しかし今回、敢えてBonanza本体のコードには手を入れないという縛りのもとでやっていたので、上記のような解決策になりました。</p>
+<p>上記のように、Emscriptenの出力を編集するのは下策です。Emscriptenでビルドするたびにパッチを当てなければいけませんし、将来Emscriptenの出力が変わる可能性は大いにあります。なによりこれだとClosure Compilerを通すことも出来ません。出力コードを理解しそれを編集出来る事は大切ですが、実際のプロダクト等では取りづらい選択肢になるでしょう。そういった意味でもAsyncifyは便利なので、興味のある方は是非調べてみてください。</p>
+<h2>ブラウザ版Bonanzaの完成</h2>
+<p>以上でEmscriptenに関わる話はおしまいで、残りは純粋なJavaScriptの話になります。embona.htmlとpre.jsにmessageを受け取るリスナを付けて通信しつつ、Bonanzaのstdinに適宜文字列を放り込んで処理し、出力をstdoutからパースしてそれを見た目よく出力すれば、ブラウザ版Bonanzaの完成です。簡単ですね！<span style="color:#888">私は将棋のUIを舐めていて、適当に作りはじめたら思いの外苦戦し、今でも相当のバグが残る状態になりました。お恥ずかしい。</span></p>
+<p><a href="http://nmi.jp/archives/763" target="_blank">その1</a>でお見せしたブラウザ版Bonanzaは、一度fv.binを読み込んだらそのまま保存し続けるようにしたり、少しでもダウンロード時間を減らすためにgzip圧縮をかけてクライアント側で解凍したり、というような修正を入れております。</p>
+<p>Bonanzaがこういった移植を念頭に置かれていたおかげで、ビルド周りではほとんどトラブルが無かったのが幸いでした。一方、将棋エンジンの一般的な特性ではありますが、プログラムがメモリを大量に消費したり、起動に180Mbyteものファイルを必要とするあたりはブラウザ向きではなかったと思います。しかし、そのようなプログラムでもブラウザに簡単に移植出来るのは素晴らしいことで、夢が広がります。</p>
+<p>日本語のEmscriptenの資料が少なかったので、今回の記事は詳細に書いたつもりです。ちょっとしつこいくらいだったかもしれませんが、もしみなさんの参考になれば幸いです。何か不明点やコメント等あれば、お気軽にTwitter <a href="https://twitter.com/tkihira">@tkihira</a> までご連絡ください。</p>
+
+        </article>
+        <hr>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/archives/792&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="embona - ブラウザで動くBonanzaを作ってみた(その4)" data-url="http://nmi.jp/archives/792">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/archives/792" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="embona - ブラウザで動くBonanzaを作ってみた(その4)"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="embona - ブラウザで動くBonanzaを作ってみた(その4)" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+
+        
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+        
+
+        <div class="post-recent">
+    <div class="pre">
+
+    
+        <p><strong>前の投稿</strong> <a href="/archives/780">embona - ブラウザで動くBonanzaを作ってみた(その3)</a></p>
+    
+    </div>
+    <div class="nex">
+
+        
+        <p><strong>次の投稿</strong> <a href="/archives/872">IoTの超素人から素人を目指す</a></p>
+        
+    </div>
+</div>
+
+
+    </div>
+    <button class="anchor"><i class="fa fa-anchor"></i></button>
+
+
+    <div class="right">
+        <div class="wrap">
+            <div class="side">
+                <div>
+                    <i class="fa fa-tags"></i>
+                    Top Popular Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2016-07-23-stock-strategy-for-early-startup-employee">スタートアップに転職する時に最低限知っておくべき株の話</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/582">生WebGL入門:初音ミクの美麗3Dモデルを表示する(前編)</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2017-10-06-Making_a-business_plan">事業計画書の作り方、新規ビジネスの考え方</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/902">Convertible Note / Convertible Equity とは？</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/488">JavaScript イディオム集</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/465">ExGameの製作で感じたこと</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                </ul>
+            </div>
+
+            <div class="side">
+                <div>
+                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                    Recent Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        <li><a href="/2024-08-28-Review-Binary-Hacks-Rebooted">書評 "Binary Hacks Rebooted"</a></li>
+                    
+                        <li><a href="/2024-06-10-Deep-Dive-into-ARM-JavaScript-Special-Instruction-FJCVTZS">ARM に存在する JavaScript 専用命令「FJCVTZS」を追う（ついでに V8 をビルドする）</a></li>
+                    
+                        <li><a href="/2024-06-03-Exploring-V8-JIT-Outputs">JavaScript 実行エンジン V8 の JIT 出力コードを読んでみよう</a></li>
+                    
+                </ul>
+            </div>
+
+            <!-- <div class="side">
+                <div>
+                    <i class="fa fa-external-link"></i>
+                    Links
+                </div>
+                <ul  class="content-ul">
+
+                </ul>
+            </div> -->
+        </div>
+    </div>
+
+
+
+</div>
+<script>
+/**
+ * target _blank
+ */
+(function() {
+    var aTags = document.querySelectorAll('article a:not([id])')
+    for (var i = 0; i < aTags.length; i++) {
+        aTags[i].setAttribute('target', '_blank')
+    }
+}());
+</script>
+<script src="/js/pageContent.js " charset="utf-8"></script>
+
+
+    <footer class="site-footer">
+
+
+    <div class="wrapper">
+
+        <p class="description">
+             Takuo Kihira 
+        </p>
+        <p class="contact">
+            Contact me at: 
+            <a href="https://github.com/tkihira" title="GitHub"><i class="fa fa-github" aria-hidden="true"></i></a>     
+            <a href="https://twitter.com/tkihira" title="Twitter"><i class="fa fa-twitter" aria-hidden="true"></i></a>  
+            <a href="https://www.facebook.com/takuo.kihira" title="Facebook"><i class="fa fa-facebook-official" aria-hidden="true"></i></a>    
+        </p>
+        <p class="power">
+            <span>
+                Site powered by <a href="https://jekyllrb.com/">Jekyll</a>.
+            </span>
+            <span>
+                Theme designed by <a href="https://github.com/Gaohaoyang">HyG</a>.
+            </span>
+        </p>
+    </div>
+</footer>
+
+    <div class="back-to-top">
+    <a href="#top" class="scroll">
+        <i class="fa fa-arrow-up" aria-hidden="true"></i>
+    </a>
+</div>
+
+    <script src=" /js/main.js " charset="utf-8"></script>
+    <script src=" /js/scroll.min.js " charset="utf-8"></script>
+  </body>
+
+</html>

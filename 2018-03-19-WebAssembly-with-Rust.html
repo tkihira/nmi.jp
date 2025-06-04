@@ -1,0 +1,1832 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Rust で WebAssembly を出力する</title>
+    <meta name="description" content="もう結構前になりますが、Rust で Emscripten を利用することなく WebAssembly の出力ができるようになりました。それにより、Rust を使った WebAssembly の開発が現実的な選択肢としてさらに力を帯びてきました。自分の勉強で Rust から WebAssembly に出力するプロ...">
+
+    <link rel="stylesheet" href=" /css/fontawesome/css/font-awesome.min.css ">
+    <link rel="stylesheet" href=" /css/main.css ">
+    <link rel="canonical" href="http://nmi.jp/2018-03-19-WebAssembly-with-Rust">
+    <link rel="alternate" type="application/rss+xml" title="nmi.jp" href="http://nmi.jp/feed.xml">
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=3.0'></script>
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=1.1'></script>
+    <script>
+        if(location.href.match(/\.html$/)) {
+            location.href = location.href.match(/(.+)\.html/)[1];
+        }
+    </script>
+
+
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-229769-8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-229769-8');
+</script>
+</head>
+
+
+  <body>
+
+    <header id="top">
+    <div class="wrapper">
+        <a href="/" class="brand">nmi.jp</a>
+        <small>Twitter → <a href="https://twitter.com/tkihira" target="_blank">@tkihira</a></small>
+        <button id="headerMenu" class="menu"><i class="fa fa-bars"></i></button>
+        <nav id="headerNav">
+            <ul>
+                <li>
+                    
+                    <a href="/">
+                    
+                        <i class="fa fa-home"></i>Home
+                    </a>
+                </li>
+
+                
+                    
+                    <li>
+                        
+                        <a href="/archive/">
+                        
+                            <i class="fa fa-archive"></i>Archives
+                        </a>
+                    </li>
+                    
+                
+                    
+                    <li>
+                        
+                        <a href="/category/">
+                        
+                            <i class="fa fa-th-list"></i>Categories
+                        </a>
+                    </li>
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            </ul>
+        </nav>
+    </div>
+</header>
+
+
+        <div class="page clearfix" post>
+    <div class="left">
+        <div class="post-recent">
+    <table style="width:100%;border:0;padding:0;"><tbody><tr style="padding:0">
+        <td class="toppre" style="padding:0">
+        
+        <a href="/2018-02-17-How-to-use-chrome_tracing">Chrome の隠し機能 chrome://tracing (about:tracing) の使い方</a>
+        
+        </td><td class="topnex" style="text-align:right;padding:0">
+        
+        <a href="/2018-08-06-Flight_thru_Hawaii">実質無料でハワイを楽しむ！ハワイ経由でサンフランシスコに行く方法</a>
+        
+        </td>
+    </tr></tbody></table>
+</div>
+
+        <hr style="margin:0"/>
+        <h1 style="margin-top:10px">Rust で WebAssembly を出力する</h1>
+<hr />
+        <div class="label">
+
+            <div class="label-card">
+                <i class="fa fa-calendar"></i>2018-03-19
+            </div>
+
+            <div class="label-card">
+                <i class="fa fa-user"></i>Takuo Kihira
+                
+            </div>
+
+            <div class="label-card">
+                
+            </div>
+
+            <div class="label-card">
+            
+
+
+<!-- <span class="point">•</span> -->
+<span class="categories">
+  <i class="fa fa-th-list"></i>
+  
+    
+        <a href="/category/#HTML5" title="Category: HTML5" rel="category">HTML5</a>&nbsp;
+    
+        <a href="/category/#JavaScript" title="Category: JavaScript" rel="category">JavaScript</a>&nbsp;
+    
+        <a href="/category/#Canvas" title="Category: Canvas" rel="category">Canvas</a>&nbsp;
+    
+        <a href="/category/#Emscripten" title="Category: Emscripten" rel="category">Emscripten</a>
+    
+  
+
+  <!-- <span class="point">•</span> -->
+</span>
+
+
+            </div>
+
+            <div class="label-card">
+                <a href="https://github.com/tkihira/nmi.jp/blob/master/_posts/2018-03-19-WebAssembly-with-Rust.md" target="_blank"><i class="fa fa-github"></i></a>
+            </div>
+
+        </div>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/2018-03-19-WebAssembly-with-Rust&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="Rust で WebAssembly を出力する" data-url="http://nmi.jp/2018-03-19-WebAssembly-with-Rust">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/2018-03-19-WebAssembly-with-Rust" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="Rust で WebAssembly を出力する"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="Rust で WebAssembly を出力する" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+        <article itemscope itemtype="http://schema.org/BlogPosting">
+        <p>もう結構前になりますが、Rust で Emscripten を利用することなく WebAssembly の出力ができるようになりました。それにより、Rust を使った WebAssembly の開発が現実的な選択肢としてさらに力を帯びてきました。</p>
+
+<p>自分の勉強で Rust から WebAssembly に出力するプログラムを書いてみたので、その道筋をご紹介することで自分のような Rust 初心者の方々の WebAssembly 開発の助けになればと思い、この記事を投稿しました。</p>
+
+<p>もし記事中に間違い等がありましたら、是非 <a href="https://twitter.com/tkihira">@tkihira</a> までご連絡ください。</p>
+
+<hr />
+
+<h2 id="emscripten-との依存関係を切った-rust">Emscripten との依存関係を切った Rust</h2>
+
+<p>つい最近まで、WebAssembly の出力は Emscripten を使うことがほとんどでした。Emscripten は、元々は他言語のプログラムを JavaScript に変換することを目的に開発されていましたが、高速化のために asm.js に対応し、その流れで WebAssembly にいち早く対応し、今でも幅広く利用されています。</p>
+
+<p>LLVM 上の言語は Emscripten で JavaScript に変換するのが楽で、ガベージコレクションのない言語であれば特に相性が良いです。Rust は Emscritpen と相性が良く、当初は Emscripten を利用して WebAssembly を出力していました。</p>
+
+<p>Emscripten は信頼性のあるフロントエンドに加えて豊富な機能、強力な各種バインディングがあるので、過去の資産を JavaScript に変換する際には大変便利です。一方で、ランタイムが大きくなりがちでどうしてもファイルサイズが大きくなるデメリットもありました（今はそれも結構解消されています）。</p>
+
+<p>Rust が Emscripten を経由せずに WebAssembly を出力できるようになったので、Emscripten の特性に左右されない出力ファイルを手にすることが出来るようになりました。</p>
+
+<hr />
+
+<h2 id="今回の作品">今回の作品</h2>
+
+<p>有名な JavaScript のデモを移植してみました。クリックすると動きます。</p>
+
+<script>
+function minecraftStart() {
+    var d = document.getElementById('minecraft_preview');
+    d.innerHTML = '<iframe style="position:relative" width="400" height="400" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" allowtransparency="true" src="https://tkihira.github.io/Minecraft4kRust/"></iframe><div style="position:absolute;left:0;top:0;width:400px;height:400px;cursor:pointer;background-color:rgba(0,0,0,0);" onclick="minecraftStop()"></div>';
+};
+function minecraftStop() {
+    var d = document.getElementById('minecraft_preview');
+    d.innerHTML = '<a href="#" style="text-decoration:none" onclick="minecraftStart();return false;"><img width="400" height="400" src="./img/minecraft.png"></a>';
+}
+</script>
+
+<div style="position:relative" id="minecraft_preview"><a href="#" style="text-decoration:none" onclick="minecraftStart();return false;"><img width="400" height="400" src="./img/minecraft.png" /></a></div>
+
+<p>ソースコードは <a href="https://github.com/tkihira/Minecraft4kRust">https://github.com/tkihira/Minecraft4kRust</a> こちらです。HTMLは <a href="https://tkihira.github.io/Minecraft4kRust/">https://tkihira.github.io/Minecraft4kRust/</a> こちらに用意しました。移植元は <a href="http://jsdo.it/notch/dB1E">http://jsdo.it/notch/dB1E</a> こちらの JavaScript 作品です。</p>
+
+<hr />
+
+<h2 id="準備">準備</h2>
+
+<p>私は最初、直接コマンドラインからコンパイラの <code class="language-plaintext highlighter-rouge">rustc</code> を呼んでいましたが、それは標準のやり方から大きく外れています。普通は Cargo というビルドシステム＆パッケージマネージャを利用するので、その準備を説明します。</p>
+
+<p>基本は <a href="https://www.hellorust.com/setup/wasm-target/">https://www.hellorust.com/setup/wasm-target/</a> このサイトのやり方に沿って作業しました。当時は nightly の導入が必要だったようですが、今は nightly を入れなくても動いています。</p>
+
+<p>自分は brew で Rust をインストールしていたので、<code class="language-plaintext highlighter-rouge">rustup</code> を使うために一旦 brew からアンインストールしました。入っていない方は不要です。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ brew uninstall rust
+</code></pre></div></div>
+
+<p>そして <a href="https://www.rustup.rs/">rustup</a> をインストールし、target に <code class="language-plaintext highlighter-rouge">wasm32-unknown-unknown</code> を追加します。ついでに <a href="https://github.com/alexcrichton/wasm-gc">wasm-gc</a> も入れました。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ curl https://sh.rustup.rs -sSf | sh
+$ source ~/.cargo/env
+$ rustup update
+$ rustup target add wasm32-unknown-unknown
+$ cargo install --git https://github.com/alexcrichton/wasm-gc
+</code></pre></div></div>
+
+<p>環境設定は以上です。実際にプロジェクトを作ってみましょう。まず</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ cargo new --lib project_name
+</code></pre></div></div>
+
+<p>で Rust のプロジェクトを作ります（<code class="language-plaintext highlighter-rouge">project_name</code> はプロジェクト名）。Rust の main 関数から実行されるプロジェクトの場合は <code class="language-plaintext highlighter-rouge">--bin project_name</code> としますが、今回は JavaScript から呼ばれるライブラリのような形の WebAssembly を作りたかったので、<code class="language-plaintext highlighter-rouge">--lib</code> を指定しました。</p>
+
+<p>これで、カレントディレクトリに <code class="language-plaintext highlighter-rouge">project_name</code> フォルダが出来ています。中には Cargo の設定ファイル <code class="language-plaintext highlighter-rouge">Cargo.toml</code> と、スタブのソースコード <code class="language-plaintext highlighter-rouge">src/lib.rs</code> が生成されています。</p>
+
+<p>WebAssembly に対応するために、<code class="language-plaintext highlighter-rouge">Cargo.toml</code> を編集して下記を追記します。別言語から呼ばれるライブラリであることを指定します。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[lib]
+crate-type = ["cdylib"]
+</code></pre></div></div>
+
+<p>スタブのソースコードがあるので、一度ビルドしてみましょう。ビルド時にターゲット <code class="language-plaintext highlighter-rouge">wasm32-unknown-unknown</code> を指定します。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ cargo build --target=wasm32-unknown-unknown
+</code></pre></div></div>
+
+<p>これで <code class="language-plaintext highlighter-rouge">./target/wasm32-unknown-unknown/debug/project_name.wasm</code> がビルドされていることが確認出来ると思います。リリースビルドを作りたい時は <code class="language-plaintext highlighter-rouge">--release</code> オプションを追加するだけです。</p>
+
+<p>さて、ついでに <a href="https://github.com/rust-lang-nursery/rustfmt">rustfmt</a> を導入しましょう。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ rustup component add rustfmt-preview
+$ cargo fmt
+</code></pre></div></div>
+
+<p>これで <code class="language-plaintext highlighter-rouge">cargo fmt</code> だけで src 以下のファイルを整形してくれるようになります。今回自分が書いたコードだと、<a href="https://github.com/tkihira/Minecraft4kRust/commit/5474cc9af97edb3e91bddc87bd76c8abb3237b51">こんな感じで整形されました</a>。</p>
+
+<hr />
+
+<h2 id="rust-で-webassembly-を扱う">Rust で WebAssembly を扱う</h2>
+
+<p>準備が整ったので、JavaScript から Rust にガリガリ移植します。文法などは以下のサイトが役に立ちました。</p>
+
+<ul>
+  <li><a href="https://rust-lang-ja.github.io/the-rust-programming-language-ja/1.6/book/README.html">プログラミング言語Rust</a></li>
+  <li><a href="https://qiita.com/EqualL2/items/a232ab0855f145bd5997#%E9%85%8D%E5%88%97">C++erのためのRust入門</a></li>
+</ul>
+
+<p>JavaScript はすべての数値型が <code class="language-plaintext highlighter-rouge">f64</code> 型ですが、移植に合わせて整数型と浮動小数点型を区別しました。そのため型変換が多く、<code class="language-plaintext highlighter-rouge">let mut initial = ox - ox as i32 as f64;</code> などというコードを書かざるを得なかったところもありました（元のコードは <code class="language-plaintext highlighter-rouge">var initial = ox - (ox | 0);</code>）。</p>
+
+<p>私は Rust 言語自体はド素人ですので、コードにおかしい点があれば<a href="https://twitter.com/tkihira">是非ご連絡ください</a>。ここでは WebAssembly 独特の話に絞って書きたいと思います。</p>
+
+<h3 id="javascript-から-rust-の呼び出し">JavaScript から Rust の呼び出し</h3>
+
+<p>JavaScript から Rust の関数を呼び出すためには、次のような関数の宣言が必要です。</p>
+
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="nd">#[no_mangle]</span>
+<span class="k">pub</span> <span class="k">extern</span> <span class="s">"C"</span> <span class="k">fn</span> <span class="nf">hoge</span><span class="p">(</span><span class="n">v</span><span class="p">:</span> <span class="nb">f64</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="nb">f64</span> <span class="p">{</span>
+    <span class="n">v</span> <span class="o">+</span> <span class="mf">1.0</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">#[no_mangle]</code> と <code class="language-plaintext highlighter-rouge">pub extern "C"</code> によって、この関数がマングリングされずに出力されるようになります。この <code class="language-plaintext highlighter-rouge">hoge</code> 関数を JavaScript から呼ぶには次のようにします。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">fetch</span><span class="p">(</span><span class="dl">'</span><span class="s1">hoge.wasm</span><span class="dl">'</span><span class="p">).</span><span class="nf">then</span><span class="p">(</span><span class="nx">response</span> <span class="o">=&gt;</span> <span class="nx">response</span><span class="p">.</span><span class="nf">arrayBuffer</span><span class="p">())</span>
+    <span class="p">.</span><span class="nf">then</span><span class="p">(</span><span class="nx">bytes</span> <span class="o">=&gt;</span> <span class="nx">WebAssembly</span><span class="p">.</span><span class="nf">instantiate</span><span class="p">(</span><span class="nx">bytes</span><span class="p">,</span> <span class="p">{}))</span>
+    <span class="p">.</span><span class="nf">then</span><span class="p">(</span><span class="nx">results</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">results</span><span class="p">.</span><span class="nx">instance</span><span class="p">.</span><span class="nx">exports</span><span class="p">.</span><span class="nf">hoge</span><span class="p">(</span><span class="mi">41</span><span class="p">));</span>
+    <span class="p">});</span>
+</code></pre></div></div>
+
+<h3 id="rust-から-javascript-の呼び出し">Rust から JavaScript の呼び出し</h3>
+
+<p>JavaScript から WebAssembly を呼び出すコストと同様に、<span style="color:blue">WebAssembly から JavaScript 関数を呼び出すコストも通常は極めて低い</span>ので、必要に応じてガンガン呼び出しちゃいましょう。今回の移植では、<code class="language-plaintext highlighter-rouge">Math.random</code>、<code class="language-plaintext highlighter-rouge">Math.sqrt</code>、<code class="language-plaintext highlighter-rouge">Math.sin</code>、<code class="language-plaintext highlighter-rouge">Math.cos</code>、<code class="language-plaintext highlighter-rouge">Date.now</code> を Rust 側から呼び出しています。</p>
+
+<p>Rust 側では次のように書きます。</p>
+
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">extern</span> <span class="s">"C"</span> <span class="p">{</span>
+    <span class="k">fn</span> <span class="nf">hoge1</span><span class="p">()</span> <span class="k">-&gt;</span> <span class="nb">f64</span><span class="p">;</span>
+    <span class="k">fn</span> <span class="nf">hoge2</span><span class="p">(</span><span class="n">_</span><span class="p">:</span> <span class="nb">f64</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="nb">f64</span><span class="p">;</span>
+    <span class="k">fn</span> <span class="nf">hoge3</span><span class="p">(</span><span class="n">_</span><span class="p">:</span> <span class="nb">f64</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="nb">f64</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>この関数を Rust 内で使う時は、次のように unsafe ブロックで囲う必要がある点に注意してください。</p>
+
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">fn</span> <span class="nf">test</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">unsafe</span> <span class="p">{</span>
+        <span class="nf">hoge1</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">fn</span> <span class="k">unsafe</span> <span class="nf">test2</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nf">hoge2</span><span class="p">(</span><span class="mf">2.0</span><span class="p">);</span>
+    <span class="nf">hoge3</span><span class="p">(</span><span class="mf">3.0</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>JavaScript 側は次のような形になります。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">imports</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="na">env</span><span class="p">:</span> <span class="p">{</span>
+        <span class="na">hoge1</span><span class="p">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="mf">3.14</span> <span class="p">},</span>
+        <span class="na">hoge2</span><span class="p">:</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">sqrt</span><span class="p">,</span>
+        <span class="na">hoge3</span><span class="p">:</span> <span class="nx">hoge3</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+<span class="nf">fetch</span><span class="p">(</span><span class="dl">'</span><span class="s1">hoge.wasm</span><span class="dl">'</span><span class="p">).</span><span class="nf">then</span><span class="p">(</span><span class="nx">response</span> <span class="o">=&gt;</span> <span class="nx">response</span><span class="p">.</span><span class="nf">arrayBuffer</span><span class="p">())</span>
+    <span class="p">.</span><span class="nf">then</span><span class="p">(</span><span class="nx">bytes</span> <span class="o">=&gt;</span> <span class="nx">WebAssembly</span><span class="p">.</span><span class="nf">instantiate</span><span class="p">(</span><span class="nx">bytes</span><span class="p">,</span> <span class="nx">imports</span><span class="p">))</span>
+    <span class="p">.</span><span class="nf">then</span><span class="p">(</span><span class="nx">results</span> <span class="o">=&gt;</span> <span class="nf">start</span><span class="p">(</span><span class="nx">results</span><span class="p">.</span><span class="nx">instance</span><span class="p">.</span><span class="nx">exports</span><span class="p">));</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">WebAssembly.instantiate</code> の第2引数でインポートする関数を指定することで Rust から呼び出すことが可能になります。</p>
+
+<h3 id="javascript-と-rust-の間でのメモリの共有">JavaScript と Rust の間でのメモリの共有</h3>
+
+<p>数値のやり取りの仕方は上記で良いとして、配列や文字列などはどうやってやり取りすればよいのでしょうか？一般的に WebAssembly と JavaScript がメモリのやり取りをするのは結構たいへんなのですが、Rust の場合も例外ではありません。</p>
+
+<p>Rust の WebAssembly 出力では、すべてのデータを一つのメモリ上に格納します。巨大な配列にプログラム上で使われるすべてのデータが格納されている、みたいな感じです。JavaScript 側からはそのメモリにアクセスすることが出来るので、Rust からメモリのアドレス（巨大な配列のオフセット）を JavaScript に渡すことで両者間のデータのやり取りが可能になります。</p>
+
+<p>実例で見てみましょう。Rust から JavaScript に配列を渡してみましょう。</p>
+
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">static</span> <span class="n">ARRAY_SHARE</span><span class="p">:</span> <span class="p">[</span><span class="nb">i8</span><span class="p">;</span> <span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">];</span>
+
+<span class="nd">#[no_mangle]</span>
+<span class="k">pub</span> <span class="k">extern</span> <span class="s">"C"</span> <span class="k">fn</span> <span class="nf">get_address</span><span class="p">()</span> <span class="k">-&gt;</span> <span class="o">*</span><span class="k">const</span> <span class="nb">i8</span> <span class="p">{</span>
+   <span class="o">&amp;</span><span class="n">ARRAY_SHARE</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Rust では static 宣言された配列はアドレスが変わらないことが保証されます。<code class="language-plaintext highlighter-rouge">get_address</code> 関数で、メモリ上の配列のアドレスを JavaScript に渡します。</p>
+
+<p>JavaScript 側は次のようになります。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">fetch</span><span class="p">(</span><span class="dl">'</span><span class="s1">array.wasm</span><span class="dl">'</span><span class="p">).</span><span class="nf">then</span><span class="p">(</span><span class="nx">response</span> <span class="o">=&gt;</span> <span class="nx">response</span><span class="p">.</span><span class="nf">arrayBuffer</span><span class="p">())</span>
+    <span class="p">.</span><span class="nf">then</span><span class="p">(</span><span class="nx">bytes</span> <span class="o">=&gt;</span> <span class="nx">WebAssembly</span><span class="p">.</span><span class="nf">instantiate</span><span class="p">(</span><span class="nx">bytes</span><span class="p">,</span> <span class="p">{}))</span>
+    <span class="p">.</span><span class="nf">then</span><span class="p">(</span><span class="nx">results</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="kd">const</span> <span class="nx">offset</span> <span class="o">=</span> <span class="nx">results</span><span class="p">.</span><span class="nx">instance</span><span class="p">.</span><span class="nx">exports</span><span class="p">.</span><span class="nf">get_address</span><span class="p">();</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">results</span><span class="p">.</span><span class="nx">instance</span><span class="p">.</span><span class="nx">exports</span><span class="p">.</span><span class="nx">memory</span><span class="p">);</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">offset</span><span class="p">);</span>
+        <span class="kd">const</span> <span class="nx">array</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Uint8Array</span><span class="p">(</span><span class="nx">results</span><span class="p">.</span><span class="nx">instance</span><span class="p">.</span><span class="nx">exports</span><span class="p">.</span><span class="nx">memory</span><span class="p">.</span><span class="nx">buffer</span><span class="p">,</span> <span class="nx">offset</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">array</span><span class="p">);</span>
+    <span class="p">});</span>
+</code></pre></div></div>
+
+<p>メモリは Rust により <code class="language-plaintext highlighter-rouge">exports.memory</code> にエクスポートされています。JavaScript 上での実態は TypedArray (ArrayBuffer) で実装されております。<code class="language-plaintext highlighter-rouge">get_address</code> でメモリ上のアドレス（TypedArray のオフセット）を取得し、それを <code class="language-plaintext highlighter-rouge">Uint8Array</code> の形で 5 サイズ分取得します。これで晴れて、Rust 上の配列 <code class="language-plaintext highlighter-rouge">[1, 2, 3, 4, 5]</code> を JavaScript 側で受け取ることが出来るようになりました。</p>
+
+<p>文字列も全く同じような形になります。Stack Overflow に<a href="https://stackoverflow.com/questions/47529643/how-to-return-a-string-or-similar-from-rust-in-webassembly">良い質問</a>があるので参照してみてください。コードだけ書くと次のような形です。</p>
+
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">use</span> <span class="nn">std</span><span class="p">::</span><span class="nn">ffi</span><span class="p">::</span><span class="n">CString</span><span class="p">;</span>
+<span class="k">use</span> <span class="nn">std</span><span class="p">::</span><span class="nn">os</span><span class="p">::</span><span class="nn">raw</span><span class="p">::</span><span class="nb">c_char</span><span class="p">;</span>
+
+<span class="k">static</span> <span class="n">HELLO</span><span class="p">:</span> <span class="o">&amp;</span><span class="k">'static</span> <span class="nb">str</span> <span class="o">=</span> <span class="s">"hello from rust"</span><span class="p">;</span>
+
+<span class="nd">#[no_mangle]</span>
+<span class="k">pub</span> <span class="k">fn</span> <span class="nf">get_hello</span><span class="p">()</span> <span class="k">-&gt;</span> <span class="o">*</span><span class="k">mut</span> <span class="nb">c_char</span> <span class="p">{</span>
+    <span class="k">let</span> <span class="n">s</span> <span class="o">=</span> <span class="nn">CString</span><span class="p">::</span><span class="nf">new</span><span class="p">(</span><span class="n">HELLO</span><span class="p">)</span><span class="nf">.unwrap</span><span class="p">();</span>
+    <span class="n">s</span><span class="nf">.into_raw</span><span class="p">()</span>
+<span class="p">}</span>
+
+<span class="nd">#[no_mangle]</span>
+<span class="k">pub</span> <span class="k">fn</span> <span class="nf">get_hello_len</span><span class="p">()</span> <span class="k">-&gt;</span> <span class="nb">usize</span> <span class="p">{</span>
+    <span class="n">HELLO</span><span class="nf">.len</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">fetch</span><span class="p">(</span><span class="dl">'</span><span class="s1">hello.wasm</span><span class="dl">'</span><span class="p">).</span><span class="nf">then</span><span class="p">(</span><span class="nx">response</span> <span class="o">=&gt;</span> <span class="nx">response</span><span class="p">.</span><span class="nf">arrayBuffer</span><span class="p">())</span>
+    <span class="p">.</span><span class="nf">then</span><span class="p">(</span><span class="nx">bytes</span> <span class="o">=&gt;</span> <span class="nx">WebAssembly</span><span class="p">.</span><span class="nf">instantiate</span><span class="p">(</span><span class="nx">bytes</span><span class="p">,</span> <span class="p">{}))</span>
+    <span class="p">.</span><span class="nf">then</span><span class="p">(</span><span class="nx">results</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="kd">const</span> <span class="nx">offset</span> <span class="o">=</span> <span class="nx">results</span><span class="p">.</span><span class="nx">instance</span><span class="p">.</span><span class="nx">exports</span><span class="p">.</span><span class="nf">get_hello</span><span class="p">();</span>
+        <span class="kd">const</span> <span class="nx">len</span> <span class="o">=</span> <span class="nx">results</span><span class="p">.</span><span class="nx">instance</span><span class="p">.</span><span class="nx">exports</span><span class="p">.</span><span class="nf">get_hello_len</span><span class="p">();</span>
+        <span class="kd">const</span> <span class="nx">stringBuffer</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Uint8Array</span><span class="p">(</span><span class="nx">results</span><span class="p">.</span><span class="nx">instance</span><span class="p">.</span><span class="nx">exports</span><span class="p">.</span><span class="nx">memory</span><span class="p">.</span><span class="nx">buffer</span><span class="p">,</span> <span class="nx">offset</span><span class="p">,</span> <span class="nx">len</span><span class="p">);</span>
+        <span class="kd">let</span> <span class="nx">str</span> <span class="o">=</span> <span class="dl">''</span><span class="p">;</span>
+        <span class="k">for </span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">stringBuffer</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">str</span> <span class="o">+=</span> <span class="nb">String</span><span class="p">.</span><span class="nf">fromCharCode</span><span class="p">(</span><span class="nx">stringBuffer</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
+        <span class="p">}</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">str</span><span class="p">);</span>
+    <span class="p">});</span>
+</code></pre></div></div>
+
+<p>なお補足ですが、Rust 側で static 配列をミュータブルにすると unsafe になるのにご注意ください。</p>
+
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">static</span> <span class="k">mut</span> <span class="n">MEMORY</span><span class="p">:</span> <span class="o">&amp;</span><span class="k">'static</span> <span class="k">mut</span> <span class="p">[</span><span class="nb">i32</span><span class="p">]</span> <span class="o">=</span> <span class="o">&amp;</span><span class="k">mut</span> <span class="p">[</span><span class="mi">0</span><span class="p">;</span> <span class="mi">5</span><span class="p">];</span>
+
+<span class="k">fn</span> <span class="n">hoge</span> <span class="p">{</span>
+    <span class="k">unsafe</span> <span class="p">{</span>
+        <span class="n">MEMORY</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>今回の実装では、<code class="language-plaintext highlighter-rouge">CanvasRenderingContext2D#putImageData</code> を使って、Rust 側で用意したメモリをそっくりそのまま Canvas に挿入することで高速化をしています。TypedArray はそもそも WebGL の採用に従って導入されたもので、WebAssembly も絡めて正しく実装すると、従来の JavaScript に比べて極めて高速な描画が期待できるようになります。</p>
+
+<hr />
+
+<h2 id="rust-出力の性能">Rust 出力の性能</h2>
+
+<h3 id="速度">速度</h3>
+
+<p>せっかく JavaScript と WebAssembly の両方で同じコードを書いたので、いろいろとプロファイルを取ってみました。まずはなんと言ってもスピードです。両者の <code class="language-plaintext highlighter-rouge">clock</code> 関数を for ループで 1000 回呼んで計測してみました。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th style="text-align: right">経過秒数</th>
+      <th style="text-align: right">秒間実行回数</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>WebAssembly</td>
+      <td style="text-align: right">7391ms</td>
+      <td style="text-align: right">135.29回/s</td>
+    </tr>
+    <tr>
+      <td>JavaScript</td>
+      <td style="text-align: right">10801ms</td>
+      <td style="text-align: right">92.58回/s</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><span style="color:red">WebAssembly の方が 46% ほど性能が良い</span>ことがわかります。今回の JavaScript はブラウザの JIT 等の最適化が効きやすい形である上に、Canvas に出力する API の処理時間もそこそこあるという悪条件にも関わらず、これだけの差がでたのは驚きでした。<span style="font-weight:bold">やはり WebAssembly は速い</span>ですね。Rust の出力と、ガチガチに C で実装してコンパイラで最適化をかけた出力との速度差が気になります。</p>
+
+<h3 id="ファイルサイズ">ファイルサイズ</h3>
+
+<p>ファイルサイズを測る前にひとつ、Rust の WebAssembly 出力は、リリースビルドであっても一切呼ばれない無駄な関数がいくつか入ってしまっています。それを除去するために <code class="language-plaintext highlighter-rouge">wasm-gc</code> を使います。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ wasm-gc hoge.wasm -o hoge.min.wasm
+</code></pre></div></div>
+
+<p>普段はこれで一気に小さくなるのですが、今回は <code class="language-plaintext highlighter-rouge">wasm-gc</code> 前で 60KB、後で 40KB となり、なぜか全然効果がありませんでした。</p>
+
+<p>不思議に思って wat（WebAssembly のテキスト表現、wast とも呼ばれます）に変換して調べてみた所、例外発生時に呼ばれるであろう関数やメッセージが大量に入っていて、そこでほとんどの容量を使っていました。しかし、そもそもフロー的にそこには絶対に行かないことがわかっていたので、手動で wat の中から不要部分をまるっと削除して再度 wasm に変換してみた所、3KB まで小さくなりました。github 上に <a href="https://github.com/tkihira/Minecraft4kRust/blob/master/mine.min.wat"><code class="language-plaintext highlighter-rouge">mine.min.wat</code></a> という名前で用意したので、興味のある方は確認してみてください。</p>
+
+<p>まとめると、次のようになります。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>対象</th>
+      <th style="text-align: right">ファイル容量</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Rust（リリースビルド）</td>
+      <td style="text-align: right">59695 byte</td>
+    </tr>
+    <tr>
+      <td>Rust with wasm-gc</td>
+      <td style="text-align: right">39705 byte</td>
+    </tr>
+    <tr>
+      <td>Rust with 手作業で除去</td>
+      <td style="text-align: right">3174 byte</td>
+    </tr>
+    <tr>
+      <td>JavaScript (minified)</td>
+      <td style="text-align: right"><span style="color:red">2283</span> byte</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>…なんということでしょう。JavaScript の方が小さい、という極めて珍しい結果になってしまいました。なぜこうなったのか正確な検証はしていないのですが、</p>
+
+<ul>
+  <li>コード内から API 等を含む関数をほとんど呼んでいないので、JavaScript の文字数が少ない</li>
+  <li>型変換や分岐が多い上に四則演算が多いため、JavaScript の方が少ないバイト数で表現できる</li>
+  <li>元々デモとして作られているので、アルゴリズムレベルでコードが圧縮されている</li>
+</ul>
+
+<p>といったことが挙げられるかな、と思います。今回のように JavaScript の方が小さくなることは滅多にないことで、大抵の場合は WebAssembly の方が大幅に小さくなります。</p>
+
+<hr />
+
+<h2 id="終わりに">終わりに</h2>
+
+<p>これで、Rust から WebAssembly を使おうと思う時に必要な話は大体網羅出来たのではないかと思うのですが、いかがでしたでしょうか？</p>
+
+<p>今まで、WebAssembly といえば Emscripten しか選択肢がない時代が長く続いていました。Emscripten は当初、既存の OpenGL ゲーム等を低コストで JavaScript に移植することを目標にしていました。私も以前 <a href="http://nmi.jp/archives/763">Bonanza を Web に移植する時はとても簡単に出来ました</a>。一方で WebAssembly で何かを新しく作ろうという時に、どうしても問題を抱えやすい傾向がありました。</p>
+
+<p>しかし WebAssembly の登場から時間がたち、いろいろな新技術が登場してきました。ブラウザの対応も進み、一から新しく WebAssembly でプロダクトを作る時代にまさに突入しつつあると言ってよいでしょう。</p>
+
+<p>そんな中で、Rust は軽量・安全であり、かつ C 言語並に細いところまで手が届くので、基本的には低レベル技術である WebAssembly との相性は大変良いのではないかと感じています。この記事が、皆さんの Rust による WebAssembly 開発の助けになれば幸いです。</p>
+
+<p>重ねてになりますが、もし記事やソースコードにミスなどありましたら是非 <a href="https://twitter.com/tkihira">@tkihira</a> までご連絡ください。私は Rust ド素人なので、今回は特に問題がありそうです。皆さんのフィードバックお待ちしております。</p>
+
+
+        </article>
+        <hr>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/2018-03-19-WebAssembly-with-Rust&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="Rust で WebAssembly を出力する" data-url="http://nmi.jp/2018-03-19-WebAssembly-with-Rust">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/2018-03-19-WebAssembly-with-Rust" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="Rust で WebAssembly を出力する"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="Rust で WebAssembly を出力する" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+
+        
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+        
+
+        <div class="post-recent">
+    <div class="pre">
+
+    
+        <p><strong>前の投稿</strong> <a href="/2018-02-17-How-to-use-chrome_tracing">Chrome の隠し機能 chrome://tracing (about:tracing) の使い方</a></p>
+    
+    </div>
+    <div class="nex">
+
+        
+        <p><strong>次の投稿</strong> <a href="/2018-08-06-Flight_thru_Hawaii">実質無料でハワイを楽しむ！ハワイ経由でサンフランシスコに行く方法</a></p>
+        
+    </div>
+</div>
+
+
+    </div>
+    <button class="anchor"><i class="fa fa-anchor"></i></button>
+
+
+    <div class="right">
+        <div class="wrap">
+            <div class="side">
+                <div>
+                    <i class="fa fa-tags"></i>
+                    Top Popular Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2016-07-23-stock-strategy-for-early-startup-employee">スタートアップに転職する時に最低限知っておくべき株の話</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/582">生WebGL入門:初音ミクの美麗3Dモデルを表示する(前編)</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2017-10-06-Making_a-business_plan">事業計画書の作り方、新規ビジネスの考え方</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/902">Convertible Note / Convertible Equity とは？</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/488">JavaScript イディオム集</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/465">ExGameの製作で感じたこと</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                </ul>
+            </div>
+
+            <div class="side">
+                <div>
+                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                    Recent Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        <li><a href="/2024-08-28-Review-Binary-Hacks-Rebooted">書評 "Binary Hacks Rebooted"</a></li>
+                    
+                        <li><a href="/2024-06-10-Deep-Dive-into-ARM-JavaScript-Special-Instruction-FJCVTZS">ARM に存在する JavaScript 専用命令「FJCVTZS」を追う（ついでに V8 をビルドする）</a></li>
+                    
+                        <li><a href="/2024-06-03-Exploring-V8-JIT-Outputs">JavaScript 実行エンジン V8 の JIT 出力コードを読んでみよう</a></li>
+                    
+                </ul>
+            </div>
+
+            <!-- <div class="side">
+                <div>
+                    <i class="fa fa-external-link"></i>
+                    Links
+                </div>
+                <ul  class="content-ul">
+
+                </ul>
+            </div> -->
+        </div>
+    </div>
+
+
+
+</div>
+<script>
+/**
+ * target _blank
+ */
+(function() {
+    var aTags = document.querySelectorAll('article a:not([id])')
+    for (var i = 0; i < aTags.length; i++) {
+        aTags[i].setAttribute('target', '_blank')
+    }
+}());
+</script>
+<script src="/js/pageContent.js " charset="utf-8"></script>
+
+
+    <footer class="site-footer">
+
+
+    <div class="wrapper">
+
+        <p class="description">
+             Takuo Kihira 
+        </p>
+        <p class="contact">
+            Contact me at: 
+            <a href="https://github.com/tkihira" title="GitHub"><i class="fa fa-github" aria-hidden="true"></i></a>     
+            <a href="https://twitter.com/tkihira" title="Twitter"><i class="fa fa-twitter" aria-hidden="true"></i></a>  
+            <a href="https://www.facebook.com/takuo.kihira" title="Facebook"><i class="fa fa-facebook-official" aria-hidden="true"></i></a>    
+        </p>
+        <p class="power">
+            <span>
+                Site powered by <a href="https://jekyllrb.com/">Jekyll</a>.
+            </span>
+            <span>
+                Theme designed by <a href="https://github.com/Gaohaoyang">HyG</a>.
+            </span>
+        </p>
+    </div>
+</footer>
+
+    <div class="back-to-top">
+    <a href="#top" class="scroll">
+        <i class="fa fa-arrow-up" aria-hidden="true"></i>
+    </a>
+</div>
+
+    <script src=" /js/main.js " charset="utf-8"></script>
+    <script src=" /js/scroll.min.js " charset="utf-8"></script>
+  </body>
+
+</html>

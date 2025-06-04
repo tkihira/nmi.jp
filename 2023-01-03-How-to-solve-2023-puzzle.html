@@ -1,0 +1,1794 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>2023 パズルの逆ポーランド記法(RPN)による解法の解説</title>
+    <meta name="description" content="2023 年、あけましておめでとうございます！私は元旦に次のようなオリジナル・パズルを出しました。上の例のように、数字の合間に四則演算（＋−×÷）や括弧を入れることで、2023 を作ってください。  数字の間に必ず演算子を 1 つ入れてください  ただし 9 と 8 の間には既に ÷ が入っています  括弧は複数...">
+
+    <link rel="stylesheet" href=" /css/fontawesome/css/font-awesome.min.css ">
+    <link rel="stylesheet" href=" /css/main.css ">
+    <link rel="canonical" href="http://nmi.jp/2023-01-03-How-to-solve-2023-puzzle">
+    <link rel="alternate" type="application/rss+xml" title="nmi.jp" href="http://nmi.jp/feed.xml">
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=3.0'></script>
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=1.1'></script>
+    <script>
+        if(location.href.match(/\.html$/)) {
+            location.href = location.href.match(/(.+)\.html/)[1];
+        }
+    </script>
+
+
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-229769-8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-229769-8');
+</script>
+</head>
+
+
+  <body>
+
+    <header id="top">
+    <div class="wrapper">
+        <a href="/" class="brand">nmi.jp</a>
+        <small>Twitter → <a href="https://twitter.com/tkihira" target="_blank">@tkihira</a></small>
+        <button id="headerMenu" class="menu"><i class="fa fa-bars"></i></button>
+        <nav id="headerNav">
+            <ul>
+                <li>
+                    
+                    <a href="/">
+                    
+                        <i class="fa fa-home"></i>Home
+                    </a>
+                </li>
+
+                
+                    
+                    <li>
+                        
+                        <a href="/archive/">
+                        
+                            <i class="fa fa-archive"></i>Archives
+                        </a>
+                    </li>
+                    
+                
+                    
+                    <li>
+                        
+                        <a href="/category/">
+                        
+                            <i class="fa fa-th-list"></i>Categories
+                        </a>
+                    </li>
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            </ul>
+        </nav>
+    </div>
+</header>
+
+
+        <div class="page clearfix" post>
+    <div class="left">
+        <div class="post-recent">
+    <table style="width:100%;border:0;padding:0;"><tbody><tr style="padding:0">
+        <td class="toppre" style="padding:0">
+        
+        <a href="/2022-11-21-Understanding-setTimeout-completely">setTimeout を完璧に理解する</a>
+        
+        </td><td class="topnex" style="text-align:right;padding:0">
+        
+        <a href="/2023-01-11-Detecting-Intel-Arch-in-JavaScript">JavaScript で CPU が Intel かどうかを判定する（ついでに JIT を検知する）</a>
+        
+        </td>
+    </tr></tbody></table>
+</div>
+
+        <hr style="margin:0"/>
+        <h1 style="margin-top:10px">2023 パズルの逆ポーランド記法(RPN)による解法の解説</h1>
+<hr />
+        <div class="label">
+
+            <div class="label-card">
+                <i class="fa fa-calendar"></i>2023-01-03
+            </div>
+
+            <div class="label-card">
+                <i class="fa fa-user"></i>Takuo Kihira
+                
+            </div>
+
+            <div class="label-card">
+                
+            </div>
+
+            <div class="label-card">
+            
+
+
+<!-- <span class="point">•</span> -->
+<span class="categories">
+  <i class="fa fa-th-list"></i>
+  
+    
+        <a href="/category/#JavaScript" title="Category: JavaScript" rel="category">JavaScript</a>
+    
+  
+
+  <!-- <span class="point">•</span> -->
+</span>
+
+
+            </div>
+
+            <div class="label-card">
+                <a href="https://github.com/tkihira/nmi.jp/blob/master/_posts/2023-01-03-How-to-solve-2023-puzzle.md" target="_blank"><i class="fa fa-github"></i></a>
+            </div>
+
+        </div>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/2023-01-03-How-to-solve-2023-puzzle&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="2023 パズルの逆ポーランド記法(RPN)による解法の解説" data-url="http://nmi.jp/2023-01-03-How-to-solve-2023-puzzle">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/2023-01-03-How-to-solve-2023-puzzle" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="2023 パズルの逆ポーランド記法(RPN)による解法の解説"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="2023 パズルの逆ポーランド記法(RPN)による解法の解説" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+        <article itemscope itemtype="http://schema.org/BlogPosting">
+        <p>2023 年、あけましておめでとうございます！私は元旦に次のようなオリジナル・パズルを出しました。</p>
+
+<p><img src="/img/2023puzzle.png" alt="2023 パズル" /></p>
+
+<p>上の例のように、数字の合間に四則演算（＋−×÷）や括弧を入れることで、2023 を作ってください。</p>
+
+<ul>
+  <li>数字の間に必ず演算子を 1 つ入れてください</li>
+  <li>ただし 9 と 8 の間には既に ÷ が入っています</li>
+  <li>括弧は複数重ねて使用できます</li>
+  <li>10×(-9 ÷ 8) のようなマイナス記号の使用は禁止です</li>
+</ul>
+
+<p><a href="https://twitter.com/tkihira/status/1609313732034965506">オリジナルツイートはこちら</a>です。この記事では、JavaScript によるこのクイズの解き方をご紹介します。</p>
+
+<h1 id="括弧の数式をプログラムで扱うには">括弧の数式をプログラムで扱うには</h1>
+
+<p>さて、この問題の一番厄介な点は、<span style="color:red">括弧の絡む数式をプログラムで処理する</span>という点ではないかと思います。この記事でもそこを重点的に解説したいと思います。</p>
+
+<h2 id="中置記法">中置記法</h2>
+
+<p>まず、我々が日常的に使っている数式は、いわゆる「<a href="https://ja.wikipedia.org/wiki/%E4%B8%AD%E7%BD%AE%E8%A8%98%E6%B3%95">中置記法</a>」と呼ばれる記法です。例えば</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(1 + 1 / 9) * 9
+</code></pre></div></div>
+
+<p>のように、数字と数字の間に演算子が入ります。また、演算子の優先順位付けが定義されており、たとえば掛け算は足し算よりも優先して計算されるため、恣意的に順位をつけるためには括弧を利用しなければいけません。</p>
+
+<p>なお、数式は二分木として表現することが出来ます。すべてのリーフノードは数字となり、内部ノードは演算子になります。上記の数式を二分木で表現した図が次の通りです</p>
+
+<p><img src="/img/binary_tree.png" alt="二分木で表現した数式" /></p>
+
+<h2 id="逆ポーランド記法">逆ポーランド記法</h2>
+
+<p>数式の二分木を、括弧を使わずに表現する際に広く使われているのが「<a href="https://ja.wikipedia.org/wiki/%E9%80%86%E3%83%9D%E3%83%BC%E3%83%A9%E3%83%B3%E3%83%89%E8%A8%98%E6%B3%95">逆ポーランド記法（Reverse Polish Notation）</a>」とよばれる記法です。頭文字をとって RPN と略されることが多いです。逆ポーランド記法では、あらかじめ演算する数字を書いておき、最後に演算子を記述する形になります。</p>
+
+<p>例えば、上記の <code class="language-plaintext highlighter-rouge">(1 + 1 / 9) * 9</code> を逆ポーランド記法で書くと、</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1 1 9 / + 9 *
+</code></pre></div></div>
+
+<p>となります。直訳すると、「1 に、1 を 9 で割った結果を足して、それに 9 を掛ける」という風に読めます。</p>
+
+<p>逆ポーランド記法だと、中置記法のように数字と数字の間に必ず演算子が入るわけではないので、数字の間に区切り（今回はスペース）が必要になります。一方で、括弧を必要とせずに数式を記述出来ます。逆ポーランド記法で記述された数式には、次の特徴があります。</p>
+
+<ul>
+  <li>数字の数は、演算子の数より必ず 1 つ多い</li>
+  <li>数式の途中において、数字の数は演算子の数より常に 1 つ以上多い</li>
+</ul>
+
+<p>余談ですが、慣れると記述しやすいと感じる人が多く、例えばヒューレット・パッカード社の関数電卓には RPN モードが搭載されており、一部の界隈では大変好評でした。私も逆ポーランド記法目的でヒューレット・パッカード社の関数電卓（<a href="https://ja.wikipedia.org/wiki/HP-28_%E3%82%B7%E3%83%AA%E3%83%BC%E3%82%BA">HP-28C</a>）を愛用していたクチです。</p>
+
+<h3 id="逆ポーランド記法のコンピュータによる処理">逆ポーランド記法のコンピュータによる処理</h3>
+
+<p>逆ポーランド記法は、コンピュータによる計算と非常に相性が良いので、数式を扱う必要のあるプログラムではよく使われます。コンピュータでは次のように処理されます。</p>
+
+<ul>
+  <li>空のスタックを用意し、数式を前から読み込む</li>
+  <li>数字が出てきたら、その数字をスタックに格納する</li>
+  <li>演算子が出てきたら、スタックから 2 つ値を取り出し、それらを演算した結果をスタックに格納する</li>
+  <li>数式が終わると必ずスタックに 1 つ数字が残っているはずなので、その数字が演算結果となる</li>
+</ul>
+
+<p>実は、これはいわゆる「<a href="https://ja.wikipedia.org/wiki/%E3%82%B9%E3%82%BF%E3%83%83%E3%82%AF%E3%83%9E%E3%82%B7%E3%83%B3">スタックマシン</a>」と同じ演算になります。例えば Java や WebAssembly などのスタックマシン言語においては、バイナリレベルでは大体同じ様な構造を持っています。</p>
+
+<h1 id="パズルを解く戦略">パズルを解く戦略</h1>
+
+<p>私は、今回のパズルを解く戦略を次のように定めました</p>
+
+<ul>
+  <li>まず逆ポーランド記法で数式を全通り生成する</li>
+  <li>その数式を演算して、解が 2023 になるかどうか確認する</li>
+  <li>逆ポーランド記法を中置記法で書き下す</li>
+</ul>
+
+<p>それぞれについて解説します。</p>
+
+<h2 id="全通りの数式の生成">全通りの数式の生成</h2>
+
+<p>今回の問題では 9 と 8 の間に割り算が入っているのですが、とりあえずそれを無視して全通りの数式を出すことを考えてみましょう。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">counter</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">traverse</span> <span class="o">=</span> <span class="p">(</span><span class="nx">expr</span><span class="p">,</span> <span class="nx">number</span><span class="p">,</span> <span class="nx">opes</span><span class="p">,</span> <span class="nx">nums</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">opCharList</span> <span class="o">=</span> <span class="p">[...</span><span class="dl">"</span><span class="s2">n+-*/</span><span class="dl">"</span><span class="p">];</span>
+    <span class="k">if </span><span class="p">(</span><span class="nx">number</span> <span class="o">===</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nx">nums</span> <span class="o">-</span> <span class="nx">opes</span> <span class="o">===</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">counter</span><span class="o">++</span><span class="p">;</span>
+        <span class="c1">// solve(expr)</span>
+    <span class="p">}</span>
+    <span class="k">for </span><span class="p">(</span><span class="kd">const</span> <span class="nx">op</span> <span class="k">of</span> <span class="nx">opCharList</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if </span><span class="p">(</span><span class="nx">op</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">n</span><span class="dl">'</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if </span><span class="p">(</span><span class="nx">number</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">expr</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="nx">number</span><span class="p">);</span>
+                <span class="k">if </span><span class="p">(</span><span class="nf">traverse</span><span class="p">(</span><span class="nx">expr</span><span class="p">,</span> <span class="nx">number</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">opes</span><span class="p">,</span> <span class="nx">nums</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span> <span class="p">{</span>
+                    <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="nx">expr</span><span class="p">.</span><span class="nf">pop</span><span class="p">();</span>
+            <span class="p">}</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="k">if </span><span class="p">(</span><span class="nx">nums</span> <span class="o">-</span> <span class="nx">opes</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">expr</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="nx">op</span><span class="p">);</span>
+                <span class="k">if </span><span class="p">(</span><span class="nf">traverse</span><span class="p">(</span><span class="nx">expr</span><span class="p">,</span> <span class="nx">number</span><span class="p">,</span> <span class="nx">opes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">nums</span><span class="p">))</span> <span class="p">{</span>
+                    <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="nx">expr</span><span class="p">.</span><span class="nf">pop</span><span class="p">();</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+<span class="nf">traverse</span><span class="p">([],</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">({</span><span class="nx">counter</span><span class="p">});</span>
+</code></pre></div></div>
+
+<p>何も考えずに再帰で書いています。簡単に解説すると、</p>
+
+<ul>
+  <li>expr は生成途中の数式を配列で管理しています。number は次に登場する数字、opes は今までの演算子の数、nums は今までの数字の数です</li>
+  <li>再帰関数では、expr 配列の最後に「数字」もしくは「演算子」を 1 つ追加して、再度自分自身を呼びます</li>
+  <li>終了条件は、number がゼロ（もう数字が登場しない）、かつ今までの数字の数と演算子の数の差が 1 になった場合です</li>
+</ul>
+
+<p>なお、このプログラムを実行すると、手元のコンピュータでは 2 分 20 秒かかり、counter が 1,274,544,128 になりました。</p>
+
+<h2 id="割り算を考慮して生成">割り算を考慮して生成</h2>
+
+<p>ちょっと数が大きすぎるので、9 と 8 の間の割り算を考慮することにしましょう。割り算は 9 と 8 の間に入れたいのですが、<code class="language-plaintext highlighter-rouge">(9 / 8)</code> だけではなくて、例えば <code class="language-plaintext highlighter-rouge">9 / (8 - 7)</code> のような形も存在することに気をつけましょう。</p>
+
+<p>これを実現するには、逆ポーランド記法の特性を考えると、「8 の数字が出た後、数字と演算子の数が一致していた場合」の演算子を割り算に固定してしまえば良いことになります。</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">9 8 /</code>: この場合、8 の数字が出た後の数字と演算子の数は共にゼロになります。中置記法だと <code class="language-plaintext highlighter-rouge">9 / 8</code> になります</li>
+  <li><code class="language-plaintext highlighter-rouge">9 8 7 - /</code>: この場合、8 の数字が出た後の数字と演算子の数は共に 1 になります。中置記法だと <code class="language-plaintext highlighter-rouge">9 / (8 - 7)</code> になります</li>
+  <li><code class="language-plaintext highlighter-rouge">9 8 7 6 - 5 + * /</code>: この場合、8 の数字が出た後の数字と演算子の数は共に 3 になります。中置記法だと <code class="language-plaintext highlighter-rouge">9 / (8 * ((7 - 6) + 5))</code> になります</li>
+</ul>
+
+<p>それを考慮してコードを書くと、次のような感じになります。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">counter</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">traverse</span> <span class="o">=</span> <span class="p">(</span><span class="nx">expr</span><span class="p">,</span> <span class="nx">number</span><span class="p">,</span> <span class="nx">opes</span><span class="p">,</span> <span class="nx">nums</span><span class="p">,</span> <span class="nx">eightDepth</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">opCharList</span> <span class="o">=</span> <span class="p">[...</span><span class="dl">"</span><span class="s2">n+-*/</span><span class="dl">"</span><span class="p">];</span>
+    <span class="k">if </span><span class="p">(</span><span class="nx">number</span> <span class="o">===</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nx">nums</span> <span class="o">-</span> <span class="nx">opes</span> <span class="o">===</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">counter</span><span class="o">++</span><span class="p">;</span>
+        <span class="c1">// solve(expr)</span>
+    <span class="p">}</span>
+    <span class="k">for </span><span class="p">(</span><span class="kd">const</span> <span class="nx">op</span> <span class="k">of</span> <span class="nx">opCharList</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if </span><span class="p">(</span><span class="nx">op</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">n</span><span class="dl">'</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if </span><span class="p">(</span><span class="nx">number</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">expr</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="nx">number</span><span class="p">);</span>
+                <span class="k">if </span><span class="p">(</span><span class="nf">traverse</span><span class="p">(</span><span class="nx">expr</span><span class="p">,</span> <span class="nx">number</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">opes</span><span class="p">,</span> <span class="nx">nums</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">number</span> <span class="o">===</span> <span class="mi">8</span> <span class="p">?</span> <span class="mi">0</span> <span class="p">:</span> <span class="nx">eightDepth</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="p">?</span> <span class="nx">eightDepth</span> <span class="p">:</span> <span class="nx">eightDepth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span> <span class="p">{</span>
+                    <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="nx">expr</span><span class="p">.</span><span class="nf">pop</span><span class="p">();</span>
+            <span class="p">}</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="k">if </span><span class="p">(</span><span class="nx">nums</span> <span class="o">-</span> <span class="nx">opes</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">if </span><span class="p">(</span><span class="nx">eightDepth</span> <span class="o">===</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nx">op</span> <span class="o">!==</span> <span class="dl">'</span><span class="s1">/</span><span class="dl">'</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="k">continue</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="nx">expr</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="nx">op</span><span class="p">);</span>
+                <span class="k">if </span><span class="p">(</span><span class="nf">traverse</span><span class="p">(</span><span class="nx">expr</span><span class="p">,</span> <span class="nx">number</span><span class="p">,</span> <span class="nx">opes</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">nums</span><span class="p">,</span> <span class="nx">eightDepth</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="p">{</span>
+                    <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+                <span class="p">}</span>
+                <span class="nx">expr</span><span class="p">.</span><span class="nf">pop</span><span class="p">();</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+<span class="nf">traverse</span><span class="p">([],</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">({</span><span class="nx">counter</span><span class="p">});</span>
+</code></pre></div></div>
+
+<p>手元では 37 秒、counter は 318,636,032 でした。大体 1/4 程度まで探索量を減らせました。</p>
+
+<h2 id="逆ポーランド記法の数式の計算">逆ポーランド記法の数式の計算</h2>
+
+<p>さて、では上記でコメントアウトされていた <code class="language-plaintext highlighter-rouge">solve</code> 関数を作ってみましょう。実装は非常に簡単です。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">solve</span> <span class="o">=</span> <span class="p">(</span><span class="nx">expr</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">stack</span> <span class="o">=</span> <span class="p">[];</span>
+    <span class="k">for </span><span class="p">(</span><span class="kd">const</span> <span class="nx">c</span> <span class="k">of</span> <span class="nx">expr</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">switch </span><span class="p">(</span><span class="nx">c</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">case</span> <span class="dl">'</span><span class="s1">+</span><span class="dl">'</span><span class="p">:</span> <span class="nx">stack</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="nx">stack</span><span class="p">.</span><span class="nf">pop</span><span class="p">()</span> <span class="o">+</span> <span class="nx">stack</span><span class="p">.</span><span class="nf">pop</span><span class="p">());</span> <span class="k">break</span><span class="p">;</span>
+            <span class="k">case</span> <span class="dl">'</span><span class="s1">-</span><span class="dl">'</span><span class="p">:</span> <span class="nx">stack</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="o">-</span><span class="nx">stack</span><span class="p">.</span><span class="nf">pop</span><span class="p">()</span> <span class="o">+</span> <span class="nx">stack</span><span class="p">.</span><span class="nf">pop</span><span class="p">());</span> <span class="k">break</span><span class="p">;</span>
+            <span class="k">case</span> <span class="dl">'</span><span class="s1">*</span><span class="dl">'</span><span class="p">:</span> <span class="nx">stack</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="nx">stack</span><span class="p">.</span><span class="nf">pop</span><span class="p">()</span> <span class="o">*</span> <span class="nx">stack</span><span class="p">.</span><span class="nf">pop</span><span class="p">());</span> <span class="k">break</span><span class="p">;</span>
+            <span class="k">case</span> <span class="dl">'</span><span class="s1">/</span><span class="dl">'</span><span class="p">:</span> <span class="nx">stack</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="nx">stack</span><span class="p">.</span><span class="nf">pop</span><span class="p">()</span> <span class="o">*</span> <span class="nx">stack</span><span class="p">.</span><span class="nf">pop</span><span class="p">());</span> <span class="k">break</span><span class="p">;</span>
+            <span class="nl">default</span><span class="p">:</span> <span class="nx">stack</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="nc">Number</span><span class="p">(</span><span class="nx">c</span><span class="p">));</span> <span class="k">break</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="kd">const</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">stack</span><span class="p">.</span><span class="nf">pop</span><span class="p">();</span>
+    <span class="k">if </span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nf">abs</span><span class="p">(</span><span class="nx">result</span> <span class="o">-</span> <span class="mi">2023</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.001</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// prettyPrint(expr);</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">expr</span><span class="p">.</span><span class="nf">join</span><span class="p">());</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>数値が来たら stack に push して、演算子が来たら stack から取り出して計算し、演算結果を stack に push しています。最後は必ず stack に 1 つ答えが残っているので、それを 2023 と比較しています。stack には右辺値、左辺値の順番で積まれているので、引き算と割り算ではまず右辺値を扱う必要があることに気をつけましょう。</p>
+
+<p>また、result には浮動小数点演算による丸め誤差が含まれている可能性があるので、<a href="https://ja.wikipedia.org/wiki/%E8%A8%88%E7%AE%97%E6%A9%9F%E3%82%A4%E3%83%97%E3%82%B7%E3%83%AD%E3%83%B3">epsilon</a> を 0.001 として比較しています。数式的に桁落ちもないので私はこれで十分だと判断しましたが、正確に計算するためには仮想分数を自前で管理する必要があります。特に競プロ界隈ではこういった誤差を適当に処理することを許さない問題が多いので気をつけましょう。</p>
+
+<p>このプログラムを実行した結果、手元の計算では 530 行の出力を 3 分 33 秒で得られました。Twitter 等では、この結果と同じように<span style="color:red">全件を 530 件</span>として出していらっしゃる方が多いです。</p>
+
+<h2 id="逆ポーランド記法から中置記法への変換">逆ポーランド記法から中置記法への変換</h2>
+
+<p>最後に、この結果を中置記法に変換し、人間に読みやすくしてみましょう。何も考えずに変換すると、次のようなコードになるでしょう。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">prettyPrint</span> <span class="o">=</span> <span class="p">(</span><span class="nx">expr</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">stack</span> <span class="o">=</span> <span class="p">[];</span>
+    <span class="k">for </span><span class="p">(</span><span class="kd">const</span> <span class="nx">c</span> <span class="k">of</span> <span class="nx">expr</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">switch </span><span class="p">(</span><span class="nx">c</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">case</span> <span class="dl">'</span><span class="s1">+</span><span class="dl">'</span><span class="p">:</span> <span class="k">case</span> <span class="dl">'</span><span class="s1">-</span><span class="dl">'</span><span class="p">:</span> <span class="k">case</span> <span class="dl">'</span><span class="s1">*</span><span class="dl">'</span><span class="p">:</span> <span class="k">case</span> <span class="dl">'</span><span class="s1">/</span><span class="dl">'</span><span class="p">:</span>
+                <span class="kd">const</span> <span class="nx">r</span> <span class="o">=</span> <span class="nx">stack</span><span class="p">.</span><span class="nf">pop</span><span class="p">();</span>
+                <span class="kd">const</span> <span class="nx">l</span> <span class="o">=</span> <span class="nx">stack</span><span class="p">.</span><span class="nf">pop</span><span class="p">();</span>
+                <span class="nx">stack</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="s2">`(</span><span class="p">${</span><span class="nx">l</span><span class="p">}${</span><span class="nx">c</span><span class="p">}${</span><span class="nx">r</span><span class="p">}</span><span class="s2">)`</span><span class="p">)</span>
+                <span class="k">break</span><span class="p">;</span>
+            <span class="nl">default</span><span class="p">:</span> <span class="nx">stack</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="nc">Number</span><span class="p">(</span><span class="nx">c</span><span class="p">));</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">stack</span><span class="p">.</span><span class="nf">pop</span><span class="p">());</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>とにかく優先順位を考えなくてすむように、すべての項に括弧を付けた出力です。これでも良いのですが、例えば次の出力は中置記法においては同一視したいところですよね。</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">(((((10+(((9/8)+7)*(6*5)))*4)-3)*2)-1)</code></li>
+  <li><code class="language-plaintext highlighter-rouge">(((((10+((((9/8)+7)*6)*5))*4)-3)*2)-1)</code></li>
+</ul>
+
+<p>なので、不要な括弧を除去するようにしましょう。そして、重複する結果を出力しないようにします。コードは次のような形になります。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">prettyPrintLog</span> <span class="o">=</span> <span class="p">{};</span>
+<span class="kd">const</span> <span class="nx">prettyPrint</span> <span class="o">=</span> <span class="p">(</span><span class="nx">expr</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">stack</span> <span class="o">=</span> <span class="p">[];</span>
+    <span class="k">for </span><span class="p">(</span><span class="kd">const</span> <span class="nx">c</span> <span class="k">of</span> <span class="nx">expr</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">switch </span><span class="p">(</span><span class="nx">c</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">case</span> <span class="dl">'</span><span class="s1">+</span><span class="dl">'</span><span class="p">:</span> <span class="p">{</span>
+                <span class="kd">const</span> <span class="nx">r</span> <span class="o">=</span> <span class="nx">stack</span><span class="p">.</span><span class="nf">pop</span><span class="p">();</span>
+                <span class="kd">const</span> <span class="nx">l</span> <span class="o">=</span> <span class="nx">stack</span><span class="p">.</span><span class="nf">pop</span><span class="p">();</span>
+                <span class="nx">stack</span><span class="p">.</span><span class="nf">push</span><span class="p">({</span> <span class="na">str</span><span class="p">:</span> <span class="nx">l</span><span class="p">.</span><span class="nx">str</span> <span class="o">+</span> <span class="nx">c</span> <span class="o">+</span> <span class="nx">r</span><span class="p">.</span><span class="nx">str</span><span class="p">,</span> <span class="na">priority</span><span class="p">:</span> <span class="mi">3</span> <span class="p">});</span>
+                <span class="k">break</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">case</span> <span class="dl">'</span><span class="s1">-</span><span class="dl">'</span><span class="p">:</span> <span class="p">{</span>
+                <span class="kd">const</span> <span class="nx">r</span> <span class="o">=</span> <span class="nx">stack</span><span class="p">.</span><span class="nf">pop</span><span class="p">();</span>
+                <span class="kd">const</span> <span class="nx">l</span> <span class="o">=</span> <span class="nx">stack</span><span class="p">.</span><span class="nf">pop</span><span class="p">();</span>
+                <span class="k">if </span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">priority</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="nx">stack</span><span class="p">.</span><span class="nf">push</span><span class="p">({</span> <span class="na">str</span><span class="p">:</span> <span class="nx">l</span><span class="p">.</span><span class="nx">str</span> <span class="o">+</span> <span class="nx">c</span> <span class="o">+</span> <span class="nx">r</span><span class="p">.</span><span class="nx">str</span><span class="p">,</span> <span class="na">priority</span><span class="p">:</span> <span class="mi">3</span> <span class="p">});</span>
+                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                    <span class="nx">stack</span><span class="p">.</span><span class="nf">push</span><span class="p">({</span> <span class="na">str</span><span class="p">:</span> <span class="nx">l</span><span class="p">.</span><span class="nx">str</span> <span class="o">+</span> <span class="nx">c</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">(</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">r</span><span class="p">.</span><span class="nx">str</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">)</span><span class="dl">'</span><span class="p">,</span> <span class="na">priority</span><span class="p">:</span> <span class="mi">3</span> <span class="p">});</span>
+                <span class="p">}</span>
+                <span class="k">break</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">case</span> <span class="dl">'</span><span class="s1">*</span><span class="dl">'</span><span class="p">:</span> <span class="p">{</span>
+                <span class="kd">const</span> <span class="nx">r</span> <span class="o">=</span> <span class="nx">stack</span><span class="p">.</span><span class="nf">pop</span><span class="p">();</span>
+                <span class="kd">const</span> <span class="nx">l</span> <span class="o">=</span> <span class="nx">stack</span><span class="p">.</span><span class="nf">pop</span><span class="p">();</span>
+                <span class="kd">const</span> <span class="nx">rStr</span> <span class="o">=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">priority</span> <span class="o">===</span> <span class="mi">3</span> <span class="p">?</span> <span class="s2">`(</span><span class="p">${</span><span class="nx">r</span><span class="p">.</span><span class="nx">str</span><span class="p">}</span><span class="s2">)`</span> <span class="p">:</span> <span class="nx">r</span><span class="p">.</span><span class="nx">str</span><span class="p">;</span>
+                <span class="kd">const</span> <span class="nx">lStr</span> <span class="o">=</span> <span class="nx">l</span><span class="p">.</span><span class="nx">priority</span> <span class="o">===</span> <span class="mi">3</span> <span class="p">?</span> <span class="s2">`(</span><span class="p">${</span><span class="nx">l</span><span class="p">.</span><span class="nx">str</span><span class="p">}</span><span class="s2">)`</span> <span class="p">:</span> <span class="nx">l</span><span class="p">.</span><span class="nx">str</span><span class="p">;</span>
+                <span class="nx">stack</span><span class="p">.</span><span class="nf">push</span><span class="p">({</span> <span class="na">str</span><span class="p">:</span> <span class="nx">lStr</span> <span class="o">+</span> <span class="nx">c</span> <span class="o">+</span> <span class="nx">rStr</span><span class="p">,</span> <span class="na">priority</span><span class="p">:</span> <span class="mi">2</span> <span class="p">});</span>
+                <span class="k">break</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">case</span> <span class="dl">'</span><span class="s1">/</span><span class="dl">'</span><span class="p">:</span> <span class="p">{</span>
+                <span class="kd">const</span> <span class="nx">r</span> <span class="o">=</span> <span class="nx">stack</span><span class="p">.</span><span class="nf">pop</span><span class="p">();</span>
+                <span class="kd">const</span> <span class="nx">l</span> <span class="o">=</span> <span class="nx">stack</span><span class="p">.</span><span class="nf">pop</span><span class="p">();</span>
+                <span class="kd">const</span> <span class="nx">rStr</span> <span class="o">=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">priority</span> <span class="o">&gt;=</span> <span class="mi">2</span> <span class="p">?</span> <span class="s2">`(</span><span class="p">${</span><span class="nx">r</span><span class="p">.</span><span class="nx">str</span><span class="p">}</span><span class="s2">)`</span> <span class="p">:</span> <span class="nx">r</span><span class="p">.</span><span class="nx">str</span><span class="p">;</span>
+                <span class="kd">const</span> <span class="nx">lStr</span> <span class="o">=</span> <span class="nx">l</span><span class="p">.</span><span class="nx">priority</span> <span class="o">===</span> <span class="mi">3</span> <span class="p">?</span> <span class="s2">`(</span><span class="p">${</span><span class="nx">l</span><span class="p">.</span><span class="nx">str</span><span class="p">}</span><span class="s2">)`</span> <span class="p">:</span> <span class="nx">l</span><span class="p">.</span><span class="nx">str</span><span class="p">;</span>
+                <span class="nx">stack</span><span class="p">.</span><span class="nf">push</span><span class="p">({</span> <span class="na">str</span><span class="p">:</span> <span class="nx">lStr</span> <span class="o">+</span> <span class="nx">c</span> <span class="o">+</span> <span class="nx">rStr</span><span class="p">,</span> <span class="na">priority</span><span class="p">:</span> <span class="mi">2</span> <span class="p">});</span>
+                <span class="k">break</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="nl">default</span><span class="p">:</span>
+                <span class="nx">stack</span><span class="p">.</span><span class="nf">push</span><span class="p">({</span> <span class="na">str</span><span class="p">:</span> <span class="nx">c</span><span class="p">,</span> <span class="na">priority</span><span class="p">:</span> <span class="mi">1</span> <span class="p">});</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="kd">const</span> <span class="nx">output</span> <span class="o">=</span> <span class="nx">stack</span><span class="p">.</span><span class="nf">pop</span><span class="p">().</span><span class="nx">str</span><span class="p">;</span>
+    <span class="k">if </span><span class="p">(</span><span class="o">!</span><span class="nx">prettyPrintLog</span><span class="p">[</span><span class="nx">output</span><span class="p">])</span> <span class="p">{</span>
+        <span class="nx">prettyPrintLog</span><span class="p">[</span><span class="nx">output</span><span class="p">]</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">output</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p>優先度を、<code class="language-plaintext highlighter-rouge">数字: 1</code>、<code class="language-plaintext highlighter-rouge">掛け算・割り算: 2</code>、<code class="language-plaintext highlighter-rouge">足し算・引き算: 3</code> と規定し、それに従った出力をしています。このコードは、先程の結果を次のように同じ形で出力します。</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">((10+(9/8+7)*6*5)*4-3)*2-1</code></li>
+</ul>
+
+<p>このコードを手元のコンピュータで実行すると、3 分 37 秒で 81 行の出力になりました。<span style="color:red">中置記法ならば、全件で 81 件あると言えそうです</span>。</p>
+
+<p>ここまでのコードと出力結果を、gist に用意しました。参考にしてみてください。</p>
+
+<p><a href="https://gist.github.com/tkihira/e27ba639de5be545f79b8c3decead68d">https://gist.github.com/tkihira/e27ba639de5be545f79b8c3decead68d</a></p>
+
+<h2 id="余談-javascript-で手作業最適化">余談: JavaScript で手作業最適化</h2>
+
+<p>ところで、このコードを JavaScript で手作業で最適化を施したらどれくらい速くなるでしょうか。</p>
+
+<ul>
+  <li>Stack の push/pop は重いので、配列を直接扱う</li>
+  <li>配列の中に数字と文字列が両方入らないように、演算子をマイナスで表現する</li>
+  <li>その他細かい調整</li>
+</ul>
+
+<p>アルゴリズムは一切変えていませんが、手元で実行すると 27 秒でした。<span style="color:red;font-weight:bold">8 倍の高速化です</span>。</p>
+
+<p><a href="https://gist.github.com/tkihira/5d2add1e73019382bbcc63085c8cf527">https://gist.github.com/tkihira/5d2add1e73019382bbcc63085c8cf527</a></p>
+
+<p>10 年以上前はこのような高速化の効果が絶大だったのですが、最近はあまり必要ではありません。今回はあまりに無駄の多いコードだったので大きな効果が見えますが、普段のコーディングでこういった高速化が必要になることはあまりないでしょう。プロダクションでこのような探索コードを書く場合は、そもそも JavaScript を選ばないでしょうしね。</p>
+
+<h2 id="余談-宣伝">余談: 宣伝</h2>
+
+<p>私は大学生の時に共著で書いたアルゴリズム本で、逆ポーランド記法について<a href="https://ja.wikipedia.org/wiki/%E3%83%86%E3%83%B3%E3%83%91%E3%82%BA%E3%83%AB">テンパズル</a>を例に解説しています。かなり古い本で C や Java を前提に書かれているのですが、もし図書館などで出会いがあれば参考にしていただければ嬉しいです！</p>
+
+<iframe sandbox="allow-popups allow-scripts allow-modals allow-forms allow-same-origin" style="width:120px;height:240px;" marginwidth="0" marginheight="0" scrolling="no" frameborder="0" src="//rcm-fe.amazon-adsystem.com/e/cm?lt1=_blank&amp;bc1=000000&amp;IS2=1&amp;bg1=FFFFFF&amp;fc1=000000&amp;lc1=0000FF&amp;t=tkihira0e-22&amp;language=ja_JP&amp;o=9&amp;p=8&amp;l=as4&amp;m=amazon&amp;f=ifr&amp;ref=as_ss_li_til&amp;asins=4797363282&amp;linkId=b600f6ac270f51ea1162d5eb2ff971ad"></iframe>
+
+        </article>
+        <hr>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/2023-01-03-How-to-solve-2023-puzzle&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="2023 パズルの逆ポーランド記法(RPN)による解法の解説" data-url="http://nmi.jp/2023-01-03-How-to-solve-2023-puzzle">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/2023-01-03-How-to-solve-2023-puzzle" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="2023 パズルの逆ポーランド記法(RPN)による解法の解説"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="2023 パズルの逆ポーランド記法(RPN)による解法の解説" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+
+        
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+        
+
+        <div class="post-recent">
+    <div class="pre">
+
+    
+        <p><strong>前の投稿</strong> <a href="/2022-11-21-Understanding-setTimeout-completely">setTimeout を完璧に理解する</a></p>
+    
+    </div>
+    <div class="nex">
+
+        
+        <p><strong>次の投稿</strong> <a href="/2023-01-11-Detecting-Intel-Arch-in-JavaScript">JavaScript で CPU が Intel かどうかを判定する（ついでに JIT を検知する）</a></p>
+        
+    </div>
+</div>
+
+
+    </div>
+    <button class="anchor"><i class="fa fa-anchor"></i></button>
+
+
+    <div class="right">
+        <div class="wrap">
+            <div class="side">
+                <div>
+                    <i class="fa fa-tags"></i>
+                    Top Popular Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2016-07-23-stock-strategy-for-early-startup-employee">スタートアップに転職する時に最低限知っておくべき株の話</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/582">生WebGL入門:初音ミクの美麗3Dモデルを表示する(前編)</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2017-10-06-Making_a-business_plan">事業計画書の作り方、新規ビジネスの考え方</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/902">Convertible Note / Convertible Equity とは？</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/488">JavaScript イディオム集</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/465">ExGameの製作で感じたこと</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                </ul>
+            </div>
+
+            <div class="side">
+                <div>
+                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                    Recent Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        <li><a href="/2024-08-28-Review-Binary-Hacks-Rebooted">書評 "Binary Hacks Rebooted"</a></li>
+                    
+                        <li><a href="/2024-06-10-Deep-Dive-into-ARM-JavaScript-Special-Instruction-FJCVTZS">ARM に存在する JavaScript 専用命令「FJCVTZS」を追う（ついでに V8 をビルドする）</a></li>
+                    
+                        <li><a href="/2024-06-03-Exploring-V8-JIT-Outputs">JavaScript 実行エンジン V8 の JIT 出力コードを読んでみよう</a></li>
+                    
+                </ul>
+            </div>
+
+            <!-- <div class="side">
+                <div>
+                    <i class="fa fa-external-link"></i>
+                    Links
+                </div>
+                <ul  class="content-ul">
+
+                </ul>
+            </div> -->
+        </div>
+    </div>
+
+
+
+</div>
+<script>
+/**
+ * target _blank
+ */
+(function() {
+    var aTags = document.querySelectorAll('article a:not([id])')
+    for (var i = 0; i < aTags.length; i++) {
+        aTags[i].setAttribute('target', '_blank')
+    }
+}());
+</script>
+<script src="/js/pageContent.js " charset="utf-8"></script>
+
+
+    <footer class="site-footer">
+
+
+    <div class="wrapper">
+
+        <p class="description">
+             Takuo Kihira 
+        </p>
+        <p class="contact">
+            Contact me at: 
+            <a href="https://github.com/tkihira" title="GitHub"><i class="fa fa-github" aria-hidden="true"></i></a>     
+            <a href="https://twitter.com/tkihira" title="Twitter"><i class="fa fa-twitter" aria-hidden="true"></i></a>  
+            <a href="https://www.facebook.com/takuo.kihira" title="Facebook"><i class="fa fa-facebook-official" aria-hidden="true"></i></a>    
+        </p>
+        <p class="power">
+            <span>
+                Site powered by <a href="https://jekyllrb.com/">Jekyll</a>.
+            </span>
+            <span>
+                Theme designed by <a href="https://github.com/Gaohaoyang">HyG</a>.
+            </span>
+        </p>
+    </div>
+</footer>
+
+    <div class="back-to-top">
+    <a href="#top" class="scroll">
+        <i class="fa fa-arrow-up" aria-hidden="true"></i>
+    </a>
+</div>
+
+    <script src=" /js/main.js " charset="utf-8"></script>
+    <script src=" /js/scroll.min.js " charset="utf-8"></script>
+  </body>
+
+</html>

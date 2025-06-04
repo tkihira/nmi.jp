@@ -1,0 +1,2340 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>ARM に存在する JavaScript 専用命令「FJCVTZS」を追う（ついでに V8 をビルドする）</title>
+    <meta name="description" content="前回の記事では、JavaScript の実行エンジン V8 の JIT 出力コードを読んでみました。記事は M1 Mac 上で動かした結果でしたので、ARM アーキテクチャのアセンブラを読むことになりました。さてそんな ARM アーキテクチャですが、最近の ARM には FJCVTZS という JavaScrip...">
+
+    <link rel="stylesheet" href=" /css/fontawesome/css/font-awesome.min.css ">
+    <link rel="stylesheet" href=" /css/main.css ">
+    <link rel="canonical" href="http://nmi.jp/2024-06-10-Deep-Dive-into-ARM-JavaScript-Special-Instruction-FJCVTZS">
+    <link rel="alternate" type="application/rss+xml" title="nmi.jp" href="http://nmi.jp/feed.xml">
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=3.0'></script>
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=1.1'></script>
+    <script>
+        if(location.href.match(/\.html$/)) {
+            location.href = location.href.match(/(.+)\.html/)[1];
+        }
+    </script>
+
+
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-229769-8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-229769-8');
+</script>
+</head>
+
+
+  <body>
+
+    <header id="top">
+    <div class="wrapper">
+        <a href="/" class="brand">nmi.jp</a>
+        <small>Twitter → <a href="https://twitter.com/tkihira" target="_blank">@tkihira</a></small>
+        <button id="headerMenu" class="menu"><i class="fa fa-bars"></i></button>
+        <nav id="headerNav">
+            <ul>
+                <li>
+                    
+                    <a href="/">
+                    
+                        <i class="fa fa-home"></i>Home
+                    </a>
+                </li>
+
+                
+                    
+                    <li>
+                        
+                        <a href="/archive/">
+                        
+                            <i class="fa fa-archive"></i>Archives
+                        </a>
+                    </li>
+                    
+                
+                    
+                    <li>
+                        
+                        <a href="/category/">
+                        
+                            <i class="fa fa-th-list"></i>Categories
+                        </a>
+                    </li>
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            </ul>
+        </nav>
+    </div>
+</header>
+
+
+        <div class="page clearfix" post>
+    <div class="left">
+        <div class="post-recent">
+    <table style="width:100%;border:0;padding:0;"><tbody><tr style="padding:0">
+        <td class="toppre" style="padding:0">
+        
+        <a href="/2024-06-03-Exploring-V8-JIT-Outputs">JavaScript 実行エンジン V8 の JIT 出力コードを読んでみよう</a>
+        
+        </td><td class="topnex" style="text-align:right;padding:0">
+        
+        <a href="/2024-08-28-Review-Binary-Hacks-Rebooted">書評 "Binary Hacks Rebooted"</a>
+        
+        </td>
+    </tr></tbody></table>
+</div>
+
+        <hr style="margin:0"/>
+        <h1 style="margin-top:10px">ARM に存在する JavaScript 専用命令「FJCVTZS」を追う（ついでに V8 をビルドする）</h1>
+<hr />
+        <div class="label">
+
+            <div class="label-card">
+                <i class="fa fa-calendar"></i>2024-06-10
+            </div>
+
+            <div class="label-card">
+                <i class="fa fa-user"></i>Takuo Kihira
+                
+            </div>
+
+            <div class="label-card">
+                
+            </div>
+
+            <div class="label-card">
+            
+
+
+<!-- <span class="point">•</span> -->
+<span class="categories">
+  <i class="fa fa-th-list"></i>
+  
+    
+        <a href="/category/#JavaScript" title="Category: JavaScript" rel="category">JavaScript</a>
+    
+  
+
+  <!-- <span class="point">•</span> -->
+</span>
+
+
+            </div>
+
+            <div class="label-card">
+                <a href="https://github.com/tkihira/nmi.jp/blob/master/_posts/2024-06-10-Deep-Dive-into-ARM-JavaScript-Special-Instruction-FJCVTZS.md" target="_blank"><i class="fa fa-github"></i></a>
+            </div>
+
+        </div>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/2024-06-10-Deep-Dive-into-ARM-JavaScript-Special-Instruction-FJCVTZS&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="ARM に存在する JavaScript 専用命令「FJCVTZS」を追う（ついでに V8 をビルドする）" data-url="http://nmi.jp/2024-06-10-Deep-Dive-into-ARM-JavaScript-Special-Instruction-FJCVTZS">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/2024-06-10-Deep-Dive-into-ARM-JavaScript-Special-Instruction-FJCVTZS" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="ARM に存在する JavaScript 専用命令「FJCVTZS」を追う（ついでに V8 をビルドする）"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="ARM に存在する JavaScript 専用命令「FJCVTZS」を追う（ついでに V8 をビルドする）" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+        <article itemscope itemtype="http://schema.org/BlogPosting">
+        <p><a href="http://nmi.jp/2024-06-03-Exploring-V8-JIT-Outputs">前回の記事</a>では、JavaScript の実行エンジン V8 の JIT 出力コードを読んでみました。記事は M1 Mac 上で動かした結果でしたので、ARM アーキテクチャのアセンブラを読むことになりました。</p>
+
+<p>さてそんな ARM アーキテクチャですが、最近の ARM には <strong>FJCVTZS</strong> という JavaScript 専用の機械語命令があるのをご存知でしょうか？CPU に、特定の言語（それもコンパイラを持たない JavaScript）専用の命令があると知ったとき、私は大いに驚きました（過去にも <a href="https://en.wikipedia.org/wiki/Jazelle">Jazelle</a> みたいなものはありましたが）</p>
+
+<p>今回は、この <strong>FJCVTZS</strong> 命令について、実際にどれだけ効果があるのか、<span style="color:blue">V8 をビルドしながら調べてみましょう</span>。</p>
+
+<h1 id="fjcvtzs-命令とは">FJCVTZS 命令とは？</h1>
+
+<p>FJCVTZS 命令は、Arm v8.3 から導入された JSCVT 命令の一つで、JavaScript の言語特有の型変換（コンバージョン）を処理します。今のところ JSCVT 命令は FJCVTZS しかないようです。</p>
+
+<p>公式の資料はこちらです。</p>
+
+<p><a href="https://developer.arm.com/documentation/dui0801/g/A64-Floating-point-Instructions/FJCVTZS">https://developer.arm.com/documentation/dui0801/g/A64-Floating-point-Instructions/FJCVTZS</a></p>
+
+<p><code class="language-plaintext highlighter-rouge">Floating-point Javascript Convert to Signed fixed-point, rounding toward Zero.</code> と、公式の説明に思いっきり「Javascript」の文字がありますね。JavaScript（ECMAScript）の仕様にある <a href="https://tc39.es/ecma262/#sec-toint32">[[ToInt32]]</a> という内部関数の挙動を、そのままチップ上で行うのを目的に設計されています。</p>
+
+<p><strong>[[ToInt32]]</strong> は言語処理系内部の仮想関数であり JavaScript の関数として表に出てくることはないのですが、ビット演算系の数値処理をするとほぼ確実に呼ばれます。一言で説明すると、浮動小数点に対して小数点以下を切り捨てることで整数に変換する挙動です。</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">x</span> <span class="o">=</span> <span class="mf">1.23</span> <span class="o">&gt;&gt;</span> <span class="mi">0</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">y</span> <span class="o">=</span> <span class="o">-</span><span class="mf">45.6</span> <span class="o">|</span> <span class="mi">0</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">z</span> <span class="o">=</span> <span class="o">~~</span><span class="mf">78.9</span><span class="p">;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">({</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">,</span> <span class="nx">z</span><span class="p">});</span> <span class="c1">// x: 1, y: -45, z: 78</span>
+</code></pre></div></div>
+
+<p>これだけの挙動であれば ARM に既に存在する <a href="https://developer.arm.com/documentation/dui0801/h/A64-Floating-point-Instructions/FCVTZS--scalar--integer-">FCVTZS</a> 命令で問題なかったのですが、<strong>[[ToInt32]]</strong> は 2**31 (=== 2147483648) 以上の数値に対しての挙動が異なります。</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">x</span> <span class="o">=</span> <span class="mi">2147483648</span> <span class="o">|</span> <span class="mi">0</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">y</span> <span class="o">=</span> <span class="mi">4294967296</span> <span class="o">|</span> <span class="mi">0</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">z</span> <span class="o">=</span> <span class="mf">12345678901.234</span> <span class="o">|</span> <span class="mi">0</span><span class="p">;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">({</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span><span class="p">,</span> <span class="nx">z</span><span class="p">});</span> <span class="c1">// x: -2147483648, y: 0, z: -539222987</span>
+</code></pre></div></div>
+
+<p>平たくいうと、整数化した時に 32bit に収まらなかったビットは捨てられ、その上でビットパターンを符号付き整数にそのまま変換しているので、このような挙動になります。数が大きい時にしか発覚しない面倒なバグになることがあるので、速度がクリティカルではない JavaScript を書かれる際には <code class="language-plaintext highlighter-rouge">Math.trunc</code> で整数化するようにしましょう。（<a href="http://nmi.jp/2022-02-03-dont-use-parseInt">詳細は以前このブログで書きました</a>）。</p>
+
+<p>一方で、速度がクリティカルな場面では、この整数化は重要なテクニックになります。32bit int に変数を収めると前回の記事で見たようにブラウザの最適化がかかりやすくなるため、積極的に [[ToInt32]] の整数化を活用することになります。</p>
+
+<p>結果的に、[[ToInt32]] が活用されたコードではブラウザによる最適化がかかり、ネイティブコード（機械語）で上記の変換が行われます。機械語なので基本的に高速なのですが、上記の通り少し特殊な挙動であるため、FJCVTZS が存在しない CPU においては少し冗長な機械語が出力されていました。</p>
+
+<p>一方 FJCVTZS の存在する CPU においては、単純にこの 1 命令を呼べば、上記の複雑な変換を全てチップ側で処理してくれます。結果的に機械語が短くなり、さらに高速に動作することが期待されます。<span style="color:red">JavaScript が世の中で広く使われているために、CPU に専用命令を用意することで高速化を後押しし、広い人々により良い体験を届けよう</span>、という意図で設計された命令なのだろうと思います。</p>
+
+<p>しかしそうすると当然気になるのは、<span style="font-weight:bold"> <strong>FJCVTZS</strong> という JavaScript 専用命令が存在することで、具体的に JavaScript はどれほど速くなっているのでしょうか？</span>今回は、V8 をビルドすることで、<strong>FJCVTZS</strong> のある／なしそれぞれの状況における具体的な時間変化を計測してみようと思います。</p>
+
+<h1 id="fjcvtzs-命令の存在確認">FJCVTZS 命令の存在確認</h1>
+
+<p>実は<a href="http://nmi.jp/2024-06-03-Exploring-V8-JIT-Outputs">前回の記事</a>でも FJCVTZS 命令はちょっとだけ登場していたのですが、今回は改めてこの命令のための専用テストコードを用意します。</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">arr</span> <span class="o">=</span> <span class="p">[];</span>
+<span class="k">for </span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="nx">_000_000</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">arr</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nf">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">**</span> <span class="mi">31</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">const</span> <span class="nx">f</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">acc</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="kd">const</span> <span class="nx">len</span> <span class="o">=</span> <span class="nx">arr</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+    <span class="k">for </span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">len</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">acc</span> <span class="o">^=</span> <span class="nx">arr</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">|</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="k">for </span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="mi">5000</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nf">f</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>準備コードで 100 万個の小数を配列に準備し、その内容をひたすら [[ToInt32]] で整数化（ <code class="language-plaintext highlighter-rouge">arr[i] | 0</code> の部分がそれです）して、ついでに XOR するコードです。それを 5000 回呼ぶことで時間を測ります。ではこのコードを、まず手元の Node.js で最適化を確認してみましょう。Apple M1 Mac にて実行しました。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ node --print-opt-code test.js
+</code></pre></div></div>
+
+<p>出力の中に <strong>FJCVTZS</strong> 命令が存在することを確認します。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0x109c48450    90  1e7e0007       fjcvtzs w7, d0
+</code></pre></div></div>
+
+<p>M1 以降の Mac であれば確認できると思います。確かに <strong>FJCVTZS</strong> 命令が使われているようですね！</p>
+
+<p>というわけで、次の目的は、この <strong>FJCVTZS</strong> を使わない V8 を用意することです。</p>
+
+<h1 id="v8-をビルドする">V8 をビルドする</h1>
+
+<p>さて、では次に V8 をビルドしてみましょう。V8 のビルドはそんなに大変ではありません。ビルド方法は次のページに書いてあります。</p>
+
+<ul>
+  <li><a href="https://commondatastorage.googleapis.com/chrome-infra-docs/flat/depot_tools/docs/html/depot_tools_tutorial.html#_setting_up">https://commondatastorage.googleapis.com/chrome-infra-docs/flat/depot_tools/docs/html/depot_tools_tutorial.html#_setting_up</a></li>
+  <li><a href="https://v8.dev/docs/source-code">https://v8.dev/docs/source-code</a></li>
+  <li><a href="https://v8.dev/docs/build">https://v8.dev/docs/build</a></li>
+</ul>
+
+<p>今回は <strong>FJCVTZS</strong> 命令を対象にするため MacOS 向けに解説しますが、Windows でも基本は同じです。上記ページを参照してください。</p>
+
+<h2 id="v8-のビルドステップ">V8 のビルドステップ</h2>
+
+<p>V8 のソースは github に公式ミラーがありますが、<strong>一般の github のプロジェクトのように clone してビルドしようとしてはいけません</strong>（公式が「やるな！」と言っています）。その代わりに、専用のビルドシステムを利用してソースコードを取得しビルドします。</p>
+
+<h3 id="depot_tools-の準備"><code class="language-plaintext highlighter-rouge">depot_tools</code> の準備</h3>
+
+<p>V8 に限らず Chromium 関係のビルドをする際には、Google の用意した <code class="language-plaintext highlighter-rouge">depot_tools</code> と呼ばれるツールを利用します。まず、この <code class="language-plaintext highlighter-rouge">depot_tools</code> をチェックアウトします。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+</code></pre></div></div>
+
+<p>そして、そのフォルダにパスを通します</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ export PATH=/path/to/depot_tools:$PATH
+</code></pre></div></div>
+
+<p>Windows の場合はバイナリが配布されているので、それを展開してパスを通してください。</p>
+
+<h3 id="v8-のソースコード取得">v8 のソースコード取得</h3>
+
+<p>次に、<code class="language-plaintext highlighter-rouge">depot_tools</code> を利用して V8 のソースを取得します</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ mkdir ~/v8
+$ cd ~/v8
+$ fetch v8
+$ cd v8
+</code></pre></div></div>
+
+<p>上記の様に実行すると、 <code class="language-plaintext highlighter-rouge">~/v8/v8</code> ディレクトリの下に V8 のソースコード一式が展開されるはずです。なお <code class="language-plaintext highlighter-rouge">~/v8</code> ディレクトリにも同期用のファイルがいくつか展開されるので注意してください。</p>
+
+<p>なお、V8 ディレクトリ直下にある <code class="language-plaintext highlighter-rouge">BUILD.gn</code> ファイルを編集すると、V8 ビルドのフラグを色々と設定できます。今回はデフォルトの設定でビルドしますが、必要に応じて確認してみてください。</p>
+
+<h3 id="ビルド">ビルド</h3>
+
+<p>さて、これで準備が整いました。いざビルドしてみましょう。</p>
+
+<p>今回は Apple Silicon の M1 Mac の PC を前提にしているので、CPU ターゲットは <code class="language-plaintext highlighter-rouge">arm64</code> になります。Intel Mac や Windows の場合は <code class="language-plaintext highlighter-rouge">x64</code> になるでしょう。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ tools/dev/gm.py arm64.release
+</code></pre></div></div>
+
+<p>これでビルドが開始します。フルビルドでも 30 分ちょいくらいで終わるのではないかと思います。</p>
+
+<p>ビルドが正常に終わると、</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Done! - V8 compilation finished successfully.
+</code></pre></div></div>
+
+<p>という表示が出るはずです。これで準備が整いました！</p>
+
+<h3 id="ビルドの成果物を確認する">ビルドの成果物を確認する</h3>
+
+<p>ビルドの成果物として、 <code class="language-plaintext highlighter-rouge">d8</code> というコマンドが <code class="language-plaintext highlighter-rouge">out/arm64.release</code> ディレクトリの下に生成されます。これはデバッグやテストを目的とした V8 のコマンドラインインターフェイスです。起動してみましょう。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ ./out/arm64.release/d8
+V8 version 12.7.0 (candidate)
+d8&gt; print("hello")
+hello
+undefined
+d8&gt; 
+</code></pre></div></div>
+
+<p>まるで Node.js のような REPL 環境が起動します。</p>
+
+<p>今回の記事では利用しませんが、例えば <code class="language-plaintext highlighter-rouge">d8</code> では <code class="language-plaintext highlighter-rouge">--allow-natives-syntax</code> オプションをつけることで V8 の内部状況にアクセスできる<a href="https://source.chromium.org/chromium/v8/v8.git/+/315c974477e8100b024b3d2894594b48e5b33008:src/runtime/runtime.h;l=20">専用の特殊命令</a>を使えます。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>% ./out/arm64.release/d8 --allow-natives-syntax
+V8 version 12.7.0 (candidate)
+d8&gt; const a = [1, 2, 3, 4, 5]; %DebugPrint(a);
+DebugPrint: 0x399100047fb1: [JSArray]
+ - map: 0x39910018c7f1 &lt;Map[16](PACKED_SMI_ELEMENTS)&gt; [FastProperties]
+（...以下略...）
+</code></pre></div></div>
+
+<p>完全に余談ですが、私は以前、この <code class="language-plaintext highlighter-rouge">%DebugPrint</code> の出力を見ることで <code class="language-plaintext highlighter-rouge">PACKED</code> ならびに <code class="language-plaintext highlighter-rouge">SMI</code> という概念を知り、<a href="http://nmi.jp/2019-06-09-The-reason-you-should-avoid-new-array-100">それを調査した記事</a>」を書きました。<code class="language-plaintext highlighter-rouge">d8</code> をいじると V8 の内部知識に簡単に触れられるのでとても楽しいです。目的がなくても暇つぶしにビルドして遊びましょう。</p>
+
+<p>この記事では、後に別のビルドを用意するので、この d8 を別名で保存しておきます。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ cp ./out/arm64.release/d8 ./out/arm64.release/d8_with_fjcvtzs
+</code></pre></div></div>
+
+<h3 id="v8-で-fjcvtzs-を無効化するように書き換えてビルドする">V8 で FJCVTZS を無効化するように書き換えてビルドする</h3>
+
+<p>さて、次に本命の <strong>FJCVTZS</strong> を無効化した d8 をビルドしましょう。grep すればわかるのですが、FJCVTZS を扱っているソースコードはわずかしかないので、無効化する部分を特定するのは簡単です。手元で pull したソースでは 2 箇所見つかりました</p>
+
+<p><a href="https://github.com/v8/v8/blob/f0ada6d1dc6208472c1b736f82019e90edee29fb/src/codegen/arm64/macro-assembler-arm64.cc#L2932-L2935">src/codegen/arm64/macro-assembler-arm64.cc</a></p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="n">MacroAssembler</span><span class="o">::</span><span class="n">TruncateDoubleToI</span><span class="p">(</span><span class="n">Isolate</span><span class="o">*</span> <span class="n">isolate</span><span class="p">,</span> <span class="n">Zone</span><span class="o">*</span> <span class="n">zone</span><span class="p">,</span>
+                                       <span class="n">Register</span> <span class="n">result</span><span class="p">,</span>
+                                       <span class="n">DoubleRegister</span> <span class="n">double_input</span><span class="p">,</span>
+                                       <span class="n">StubCallMode</span> <span class="n">stub_mode</span><span class="p">,</span>
+                                       <span class="n">LinkRegisterStatus</span> <span class="n">lr_status</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">ASM_CODE_COMMENT</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">CpuFeatures</span><span class="o">::</span><span class="n">IsSupported</span><span class="p">(</span><span class="n">JSCVT</span><span class="p">))</span> <span class="p">{</span>
+    <span class="n">Fjcvtzs</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">W</span><span class="p">(),</span> <span class="n">double_input</span><span class="p">);</span>
+    <span class="k">return</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="n">Label</span> <span class="n">done</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p><a href="https://github.com/v8/v8/blob/f0ada6d1dc6208472c1b736f82019e90edee29fb/src/maglev/arm64/maglev-assembler-arm64.cc#L483-L485">src/maglev/arm64/maglev-assembler-arm64.cc</a></p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="n">MaglevAssembler</span><span class="o">::</span><span class="n">TruncateDoubleToInt32</span><span class="p">(</span><span class="n">Register</span> <span class="n">dst</span><span class="p">,</span> <span class="n">DoubleRegister</span> <span class="n">src</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">CpuFeatures</span><span class="o">::</span><span class="n">IsSupported</span><span class="p">(</span><span class="n">JSCVT</span><span class="p">))</span> <span class="p">{</span>
+    <span class="n">Fjcvtzs</span><span class="p">(</span><span class="n">dst</span><span class="p">.</span><span class="n">W</span><span class="p">(),</span> <span class="n">src</span><span class="p">);</span>
+    <span class="k">return</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="n">ZoneLabelRef</span> <span class="nf">done</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>このうち後者は <code class="language-plaintext highlighter-rouge">Maglev</code> という比較的最近導入された最適化エンジンなのですが、今回はその説明は端折ります。この両者をまるっとコメントアウトすれば <strong>FJCVTZS</strong> を完全に無効化した d8 をビルドすることが出来そうです。というわけでやってみましょう。</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="n">MacroAssembler</span><span class="o">::</span><span class="n">TruncateDoubleToI</span><span class="p">(</span><span class="n">Isolate</span><span class="o">*</span> <span class="n">isolate</span><span class="p">,</span> <span class="n">Zone</span><span class="o">*</span> <span class="n">zone</span><span class="p">,</span>
+                                       <span class="n">Register</span> <span class="n">result</span><span class="p">,</span>
+                                       <span class="n">DoubleRegister</span> <span class="n">double_input</span><span class="p">,</span>
+                                       <span class="n">StubCallMode</span> <span class="n">stub_mode</span><span class="p">,</span>
+                                       <span class="n">LinkRegisterStatus</span> <span class="n">lr_status</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">ASM_CODE_COMMENT</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+  <span class="c1">// if (CpuFeatures::IsSupported(JSCVT)) {</span>
+  <span class="c1">//   Fjcvtzs(result.W(), double_input);</span>
+  <span class="c1">//   return;</span>
+  <span class="c1">// }</span>
+
+  <span class="n">Label</span> <span class="n">done</span><span class="p">;</span>
+</code></pre></div></div>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="n">MaglevAssembler</span><span class="o">::</span><span class="n">TruncateDoubleToInt32</span><span class="p">(</span><span class="n">Register</span> <span class="n">dst</span><span class="p">,</span> <span class="n">DoubleRegister</span> <span class="n">src</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// if (CpuFeatures::IsSupported(JSCVT)) {</span>
+  <span class="c1">//   Fjcvtzs(dst.W(), src);</span>
+  <span class="c1">//   return;</span>
+  <span class="c1">// }</span>
+
+  <span class="n">ZoneLabelRef</span> <span class="n">done</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>これらの変更を保存した上で、再度 V8 をビルドします。差分ビルドになるので一瞬で終わるはずです。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ tools/dev/gm.py arm64.release
+# autoninja -C out/arm64.release d8
+ninja: Entering directory `out/arm64.release'
+[12/12] LINK ./d8
+# out/arm64.release/mkgrokdump &gt; tools/v8heapconst.py
+/bin/sh: out/arm64.release/mkgrokdump: No such file or directory
+Done! - V8 compilation finished successfully.
+$
+</code></pre></div></div>
+
+<p>これで <strong>FJCVTZS</strong> を利用しない <code class="language-plaintext highlighter-rouge">d8</code> が出来ました！これも後で使うので、別名で保存しておきます。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ cp ./out/arm64.release/d8 ./out/arm64.release/d8_without_fjcvtzs
+</code></pre></div></div>
+
+<h3 id="fjcvtzs-を出力しないことを確認する"><strong>FJCVTZS</strong> を出力しないことを確認する</h3>
+
+<p><code class="language-plaintext highlighter-rouge">d8</code> でも Node.js と同じように最適化された逆アセンブルコードを確認出来ます。ちょっとディレクトリを移動して、コードを確認してみましょう</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ ../../v8/out/arm64.release/d8_without_fjcvtzs --print-opt-code test.js &gt; test_without_fjcvtzs.code
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">test_without_fjcvtzs.code</code> を grep すると、<strong>FJCVTZS</strong> が一切存在しないことが確認できます。なお <code class="language-plaintext highlighter-rouge">d8_with_fjcvtzs</code> でも確認しておきましょう。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ ../../v8/out/arm64.release/d8_with_fjcvtzs --print-opt-code test.js &gt; test_with_fjcvtzs.code
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">test_with_fjcvtzs.code</code> を grep すると、<strong>FJCVTZS</strong> がたくさん存在することがわかります。具体的なコードは最後の余談で紹介します。</p>
+
+<h3 id="テストコードで実行時間の差を測る">テストコードで実行時間の差を測る</h3>
+
+<p>では、実際に <strong>FJCVTZS</strong> のあるなしでどれだけ実行速度が変わるのか確認しましょう。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ time ../../v8/out/arm64.release/d8_with_fjcvtzs test.js 
+
+real	0m3.787s
+user	0m3.764s
+sys	0m0.021s
+$ time ../../v8/out/arm64.release/d8_without_fjcvtzs test.js 
+
+real	0m4.413s
+user	0m4.379s
+sys	0m0.035s
+</code></pre></div></div>
+
+<p><strong>FJCVTZS</strong> のある d8 だと 3.764 秒だったのが、<strong>FJCVTZS</strong> のない d8 だと 4.379 秒になっています。4.379/3.764 = 1.163、<span style="color:blue"><strong>16% もの高速化が達成されている</strong></span>と言えます！</p>
+
+<h1 id="現実のコードではどうなのか">現実のコードではどうなのか？</h1>
+
+<p>とはいえ、今回利用したテストコードは <strong>FJCVTZS</strong> を全面的に利用する <strong>FJCVTZS</strong> に有利なコードであり、実世界の JavaScript ではまず存在し得ないでしょう。<span style="color:red">私達が日々使っているような JavaScript のプログラムが、<strong>FJCVTZS</strong> の存在によってどれだけ速くなっているのだろうか</span>、というのが本来知りたい情報のはずです。</p>
+
+<p>実世界の JavaScript に近い環境は、実際のブラウザ開発者にとっても興味の強い内容です。そのおかげで、いくつかの優秀なベンチマークが用意されています。今回はその中でも JetStream2 を利用してみましょう。</p>
+
+<h2 id="jetstream2">JetStream2</h2>
+
+<p>JetStream2 は、ブラウザからでも実行できる JavaScript のベンチマークです。</p>
+
+<p><a href="https://browserbench.org/JetStream2.2/">https://browserbench.org/JetStream2.2/</a></p>
+
+<p>私達の環境でもよく使われる様々な小さなベンチマークが多数あり、ブラウザの特性を把握するためにも有用なベンチマークです。このベンチマークのオリジナルがどこにあるのか私は把握していないのですが、おそらく <a href="https://github.com/WebKit/WebKit/tree/main/Websites/browserbench.org/JetStream2.2">WebKit のリポジトリにあるもの</a>が正式版だろうと思うので、今回はこれを利用します。</p>
+
+<p>ダウンロードして適当なフォルダに展開し、<code class="language-plaintext highlighter-rouge">cli.js</code> を <code class="language-plaintext highlighter-rouge">d8</code> で実行します（<code class="language-plaintext highlighter-rouge">cli.js</code> は最初から <code class="language-plaintext highlighter-rouge">d8</code> で実行できるように調整されています）</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ ../../v8/out/arm64.release/d8_with_fjcvtzs cli.js
+Starting JetStream2
+Running WSL:
+    Stdlib: 2.485
+    Tests: 1.247
+    Score: 1.761
+    Wall time: 0:06.028
+Running UniPoker:
+（...中略...）
+Running 3d-cube-SP:
+    Startup: 357.143
+    Worst Case: 625
+    Average: 744.681
+    Score: 549.833
+    Wall time: 0:00.814
+
+
+Stdlib: 2.485
+MainRun: 1.247
+First: 255.953
+Worst: 391.972
+Average: 511.234
+Startup: 1293.205
+Runtime: 14.491
+
+Total Score:  314.450 
+
+$
+</code></pre></div></div>
+
+<p>実行すると、約 1 分ほどで全てのテストが完了します。スコアが表示されていますが、今回は純粋に時間を測りたいので、<code class="language-plaintext highlighter-rouge">Wall time</code> ならびに <code class="language-plaintext highlighter-rouge">Run time</code> を計測・比較することにします。</p>
+
+<h2 id="ベンチマーク結果">ベンチマーク結果</h2>
+
+<p>手元のマシンで実行して計測したのですが、JavaScript はガベージコレクションなどの影響もあり、ベンチマークの実行結果があまり安定しませんでした。なので、15 回ずつベンチマークを回し、それぞれのベンチマークに対して上位 5 個と下位 5 個のデータを捨て、残りの 5 つのデータを平均した結果で比較することにしました（正確な測り方ではないと思うのですが、ご容赦ください）。</p>
+
+<p>その結果がこちらになります。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">benchmark</th>
+      <th style="text-align: center">with_fjcvtzs</th>
+      <th style="text-align: center">without_fjcvtzs</th>
+      <th>diff</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">WSL</td>
+      <td style="text-align: center">5.927</td>
+      <td style="text-align: center">5.939</td>
+      <td>0.20%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">UniPoker</td>
+      <td style="text-align: center">0.812</td>
+      <td style="text-align: center">0.816</td>
+      <td>0.49%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">uglify-js-wtb</td>
+      <td style="text-align: center">0.55</td>
+      <td style="text-align: center">0.551</td>
+      <td>0.18%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">typescript</td>
+      <td style="text-align: center">1.745</td>
+      <td style="text-align: center">1.751</td>
+      <td>0.34%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">(*)tsf-wasm</td>
+      <td style="text-align: center">6.01</td>
+      <td style="text-align: center">6</td>
+      <td>-0.17%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">tagcloud-SP</td>
+      <td style="text-align: center">1.095</td>
+      <td style="text-align: center">1.095</td>
+      <td>0.00%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">string-unpack-code-SP</td>
+      <td style="text-align: center">0.473</td>
+      <td style="text-align: center">0.471</td>
+      <td>-0.42%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">stanford-crypto-sha256</td>
+      <td style="text-align: center">0.572</td>
+      <td style="text-align: center">0.583</td>
+      <td>1.92%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">stanford-crypto-pbkdf2</td>
+      <td style="text-align: center">0.528</td>
+      <td style="text-align: center">0.54</td>
+      <td>2.27%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">stanford-crypto-aes</td>
+      <td style="text-align: center">0.94</td>
+      <td style="text-align: center">1.047</td>
+      <td><span style="color:red"><strong>11.38%</strong></span></td>
+    </tr>
+    <tr>
+      <td style="text-align: center">splay</td>
+      <td style="text-align: center">0.783</td>
+      <td style="text-align: center">0.778</td>
+      <td>-0.64%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">(*)richards-wasm</td>
+      <td style="text-align: center">9.774</td>
+      <td style="text-align: center">9.755</td>
+      <td>-0.19%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">richards</td>
+      <td style="text-align: center">0.553</td>
+      <td style="text-align: center">0.553</td>
+      <td>0.00%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">regexp</td>
+      <td style="text-align: center">0.878</td>
+      <td style="text-align: center">0.877</td>
+      <td>-0.11%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">regex-dna-SP</td>
+      <td style="text-align: center">0.897</td>
+      <td style="text-align: center">0.896</td>
+      <td>-0.11%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">raytrace</td>
+      <td style="text-align: center">0.402</td>
+      <td style="text-align: center">0.401</td>
+      <td>-0.25%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">(*)quicksort-wasm</td>
+      <td style="text-align: center">200</td>
+      <td style="text-align: center">210.29</td>
+      <td><span style="color:red"><strong>5.15%</strong></span></td>
+    </tr>
+    <tr>
+      <td style="text-align: center">prepack-wtb</td>
+      <td style="text-align: center">0.458</td>
+      <td style="text-align: center">0.459</td>
+      <td>0.22%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">pdfjs</td>
+      <td style="text-align: center">1.321</td>
+      <td style="text-align: center">1.327</td>
+      <td>0.45%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">OfflineAssembler</td>
+      <td style="text-align: center">1.37</td>
+      <td style="text-align: center">1.366</td>
+      <td>-0.29%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">octane-zlib</td>
+      <td style="text-align: center">1.802</td>
+      <td style="text-align: center">1.802</td>
+      <td>0.00%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">octane-code-load</td>
+      <td style="text-align: center">0.331</td>
+      <td style="text-align: center">0.333</td>
+      <td>0.60%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">navier-stokes</td>
+      <td style="text-align: center">0.454</td>
+      <td style="text-align: center">0.458</td>
+      <td>0.88%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">n-body-SP</td>
+      <td style="text-align: center">0.304</td>
+      <td style="text-align: center">0.304</td>
+      <td>0.00%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">multi-inspector-code-load</td>
+      <td style="text-align: center">0.366</td>
+      <td style="text-align: center">0.366</td>
+      <td>0.00%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">ML</td>
+      <td style="text-align: center">2.145</td>
+      <td style="text-align: center">2.142</td>
+      <td>-0.14%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">mandreel</td>
+      <td style="text-align: center">1.851</td>
+      <td style="text-align: center">1.861</td>
+      <td>0.54%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">lebab-wtb</td>
+      <td style="text-align: center">0.299</td>
+      <td style="text-align: center">0.296</td>
+      <td>-1.00%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">json-stringify-inspector</td>
+      <td style="text-align: center">0.323</td>
+      <td style="text-align: center">0.323</td>
+      <td>0.00%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">json-parse-inspector</td>
+      <td style="text-align: center">0.387</td>
+      <td style="text-align: center">0.387</td>
+      <td>0.00%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">jshint-wtb</td>
+      <td style="text-align: center">0.295</td>
+      <td style="text-align: center">0.295</td>
+      <td>0.00%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">(*)HashSet-wasm</td>
+      <td style="text-align: center">20.781</td>
+      <td style="text-align: center">20.764</td>
+      <td>-0.08%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">hash-map</td>
+      <td style="text-align: center">0.417</td>
+      <td style="text-align: center">0.418</td>
+      <td>0.24%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">(*)gcc-loops-wasm</td>
+      <td style="text-align: center">2.722</td>
+      <td style="text-align: center">2.722</td>
+      <td>0.00%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">gbemu</td>
+      <td style="text-align: center">2.061</td>
+      <td style="text-align: center">2.056</td>
+      <td>-0.24%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">gaussian-blur</td>
+      <td style="text-align: center">0.996</td>
+      <td style="text-align: center">1.026</td>
+      <td><span style="color:red"><strong>3.01%</strong></span></td>
+    </tr>
+    <tr>
+      <td style="text-align: center">float-mm.c</td>
+      <td style="text-align: center">3.658</td>
+      <td style="text-align: center">3.657</td>
+      <td>-0.03%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">FlightPlanner</td>
+      <td style="text-align: center">0.505</td>
+      <td style="text-align: center">0.503</td>
+      <td>-0.40%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">first-inspector-code-load</td>
+      <td style="text-align: center">1.83</td>
+      <td style="text-align: center">1.829</td>
+      <td>-0.05%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">espree-wtb</td>
+      <td style="text-align: center">0.397</td>
+      <td style="text-align: center">0.398</td>
+      <td>0.25%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">earley-boyer</td>
+      <td style="text-align: center">0.411</td>
+      <td style="text-align: center">0.412</td>
+      <td>0.24%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">delta-blue</td>
+      <td style="text-align: center">0.154</td>
+      <td style="text-align: center">0.154</td>
+      <td>0.00%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">date-format-xparb-SP</td>
+      <td style="text-align: center">1.103</td>
+      <td style="text-align: center">1.104</td>
+      <td>0.09%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">date-format-tofte-SP</td>
+      <td style="text-align: center">1.331</td>
+      <td style="text-align: center">1.332</td>
+      <td>0.08%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">crypto-sha1-SP</td>
+      <td style="text-align: center">0.926</td>
+      <td style="text-align: center">0.976</td>
+      <td><span style="color:red"><strong>5.40%</strong></span></td>
+    </tr>
+    <tr>
+      <td style="text-align: center">crypto-md5-SP</td>
+      <td style="text-align: center">1.114</td>
+      <td style="text-align: center">1.159</td>
+      <td><span style="color:red"><strong>4.04%</strong></span></td>
+    </tr>
+    <tr>
+      <td style="text-align: center">crypto-aes-SP</td>
+      <td style="text-align: center">0.469</td>
+      <td style="text-align: center">0.469</td>
+      <td>0.00%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">crypto</td>
+      <td style="text-align: center">0.226</td>
+      <td style="text-align: center">0.226</td>
+      <td>0.00%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">coffeescript-wtb</td>
+      <td style="text-align: center">0.388</td>
+      <td style="text-align: center">0.388</td>
+      <td>0.00%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">chai-wtb</td>
+      <td style="text-align: center">0.231</td>
+      <td style="text-align: center">0.232</td>
+      <td>0.43%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">cdjs</td>
+      <td style="text-align: center">0.965</td>
+      <td style="text-align: center">0.964</td>
+      <td>-0.10%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Box2D</td>
+      <td style="text-align: center">0.457</td>
+      <td style="text-align: center">0.457</td>
+      <td>0.00%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Basic</td>
+      <td style="text-align: center">0.309</td>
+      <td style="text-align: center">0.309</td>
+      <td>0.00%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">base64-SP</td>
+      <td style="text-align: center">0.662</td>
+      <td style="text-align: center">0.663</td>
+      <td>0.15%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">babylon-wtb</td>
+      <td style="text-align: center">0.287</td>
+      <td style="text-align: center">0.29</td>
+      <td>1.05%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Babylon</td>
+      <td style="text-align: center">0.231</td>
+      <td style="text-align: center">0.231</td>
+      <td>0.00%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">async-fs</td>
+      <td style="text-align: center">1.013</td>
+      <td style="text-align: center">1.024</td>
+      <td>1.09%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Air</td>
+      <td style="text-align: center">0.349</td>
+      <td style="text-align: center">0.348</td>
+      <td>-0.29%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">ai-astar</td>
+      <td style="text-align: center">0.522</td>
+      <td style="text-align: center">0.521</td>
+      <td>-0.19%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">acorn-wtb</td>
+      <td style="text-align: center">0.319</td>
+      <td style="text-align: center">0.321</td>
+      <td>0.63%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">3d-raytrace-SP</td>
+      <td style="text-align: center">0.849</td>
+      <td style="text-align: center">0.846</td>
+      <td>-0.35%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">3d-cube-SP</td>
+      <td style="text-align: center">0.774</td>
+      <td style="text-align: center">0.773</td>
+      <td>-0.13%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">TOTAL</td>
+      <td style="text-align: center">51.054</td>
+      <td style="text-align: center">51.353</td>
+      <td>0.58%</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>各ベンチマークの詳細に関しては、<a href="https://www.browserbench.org/JetStream/in-depth.html">In-Depth Analysis</a> のページを参考にしてください。</p>
+
+<p>(*) のついているベンチマーク（全部 wasm）は単位がミリ秒で、他の単位は秒です。赤色は実行時間に 3% 以上の差分のあるベンチマークです。マイナスは <code class="language-plaintext highlighter-rouge">without_fjcvtzs</code> の方が結果が良かったベンチマークになります。後述する余談で紹介しますが、本来 <code class="language-plaintext highlighter-rouge">without_fjcvtzs</code> の方がスコアが良くなることはないはずなのですが、実行時の環境等によって安定しない結果になっていると思われます。</p>
+
+<p>実行時間が短すぎて、あまり有意なデータではないベンチマークも多いのですが、暗号周りのベンチマークで良い結果が出ている傾向があるように見えますね。この結果だけから考えると、Arm が <strong>FJCVTZS</strong> 専用命令を導入した効果はあったと言って良いのではないか、と思います。</p>
+
+<h1 id="まとめ">まとめ</h1>
+
+<p>ARM の JavaScript 専用命令のパフォーマンスを確認するために V8 のビルドまでして追ってみましたが、思ったよりも簡単に深いところまで潜れたのではないでしょうか？</p>
+
+<p>Chrome や V8 に限らず、Webkit や Firefox のブラウザのソースコードもほとんど全て公開されています。それらのプロジェクトは大多数の人が開発に参加するため、ビルドステップ等もしっかりと整備されており、ビルドしたりちょっと改造する程度であれば簡単に行えることが多いでしょう。</p>
+
+<p>ARM の JavaScript 専用命令、みたいなニッチで特殊な内容が、実際のソースコードにどのような形で落とし込まれているのか、ソースを読むことで理解も深まります。また出力結果とソースコードを比較することで、内部で JIT がどのように行われているのかを実際に改造しながら学ぶこともできます。普段目にしている JavaScript のコードからは大きく外れたソースコードになるでしょうけれど、普段目にしないからこそ、そういったコードから学べる内容はより深いものになるかもしれません。</p>
+
+<p>この記事が、皆さん好奇心に火を付けることが出来たならば何よりです。ぜひ皆さんもビルドして遊んでみてください。</p>
+
+<h1 id="余談-fjcvtzs-の有無によって出力されるコード比較">余談: <strong>FJCVTZS</strong> の有無によって出力されるコード比較</h1>
+
+<p>テストコードを実行した JIT の出力結果から、<strong>FJCVTZS</strong> を使わない場合のコードを読み解いてみましょう。</p>
+
+<p>まず <strong>FJCVTZS</strong> を使った場合の逆アセンブルの抜粋です。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0x16cc81978    f8  d37df12a       lsl x10, x9, #3
+0x16cc8197c    fc  91001d4a       add x10, x10, #0x7 (7)
+0x16cc81980   100  fc6a68a0       ldr d0, [x5, x10]
+0x16cc81984   104  1e7e000a       fjcvtzs w10, d0
+0x16cc81988   108  11000529       add w9, w9, #0x1 (1)
+0x16cc8198c   10c  4a0a0108       eor w8, w8, w10
+0x16cc81990   110  6b07013f       cmp w9, w7
+0x16cc81994   114  54000202       b.hs #+0x40 (addr 0x16cc819d4)
+</code></pre></div></div>
+
+<p>これと同じ部分で、<strong>FJCVTZS</strong> を使わなかった場合の逆アセンブルの抜粋です。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0x150001be8   148  d37df12a       lsl x10, x9, #3
+0x150001bec   14c  91001d4a       add x10, x10, #0x7 (7)
+0x150001bf0   150  fc6a68a0       ldr d0, [x5, x10]
+0x150001bf4   154  9e78000a       fcvtzs x10, d0
+0x150001bf8   158  f100055f       cmp x10, #0x1 (1)
+0x150001bfc   15c  ba417941       ccmn x10, #1, #nzcV, vc
+0x150001c00   160  540000e7       b.vc #+0x1c (addr 0x150001c1c)
+0x150001c04   164  fc1f0fe0       str d0, [sp, #-16]!
+0x150001c08   168  f90007ff       str xzr, [sp, #8]
+0x150001c0c   16c  58001370       ldr x16, pc+620 (addr 0x0000000150001e78)    ;; off heap target
+0x150001c10   170  d63f0200       blr x16
+0x150001c14   174  f94003ea       ldr x10, [sp]
+0x150001c18   178  910043ff       add sp, sp, #0x10 (16)
+0x150001c1c   17c  53007d4a       lsr w10, w10, #0
+0x150001c20   180  11000529       add w9, w9, #0x1 (1)
+0x150001c24   184  4a0a0108       eor w8, w8, w10
+0x150001c28   188  6b07013f       cmp w9, w7
+0x150001c2c   18c  54000482       b.hs #+0x90 (addr 0x150001cbc)
+</code></pre></div></div>
+
+<p>命令数的にはとても増えているように見えますが、条件分岐が入っているので実際には全て実行される訳ではありません。<strong>FJCVTZS</strong> と同等のコードだけ抜き出すとこうなります。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0x150001bf4   154  9e78000a       fcvtzs x10, d0
+0x150001bf8   158  f100055f       cmp x10, #0x1 (1)
+0x150001bfc   15c  ba417941       ccmn x10, #1, #nzcV, vc
+0x150001c00   160  540000e7       b.vc #+0x1c (addr 0x150001c1c)
+0x150001c04   164  fc1f0fe0       str d0, [sp, #-16]!
+0x150001c08   168  f90007ff       str xzr, [sp, #8]
+0x150001c0c   16c  58001370       ldr x16, pc+620 (addr 0x0000000150001e78)    ;; off heap target
+0x150001c10   170  d63f0200       blr x16
+0x150001c14   174  f94003ea       ldr x10, [sp]
+0x150001c18   178  910043ff       add sp, sp, #0x10 (16)
+0x150001c1c   17c  53007d4a       lsr w10, w10, #0
+</code></pre></div></div>
+
+<p>余談ですが、この <strong>FJCVTZS</strong> 命令の代替命令の配置のされ方は、<a href="https://github.com/v8/v8/blob/f0ada6d1dc6208472c1b736f82019e90edee29fb/src/codegen/arm64/macro-assembler-arm64.cc#L2926-L2975">ソースコードで記述されている構造ものそのもの</a>なのが、当たり前とはいえ面白いですね。</p>
+
+<p>2 行目 3 行目の<code class="language-plaintext highlighter-rouge">cmp</code> と　<code class="language-plaintext highlighter-rouge">ccmn</code> で 64bit のオーバーフローを判定し、64bit のオーバーフローが発生していなかったら一番最後の <code class="language-plaintext highlighter-rouge">lsr</code> まで飛びます。すなわち、オーバーフローしない場合は <code class="language-plaintext highlighter-rouge">fjcvtzs</code> の  1命令が <code class="language-plaintext highlighter-rouge">fcvtzs</code> + <code class="language-plaintext highlighter-rouge">cmp</code> + <code class="language-plaintext highlighter-rouge">ccmn</code> + <code class="language-plaintext highlighter-rouge">b.vc</code> + <code class="language-plaintext highlighter-rouge">lsr</code> の 5 命令に増えており、オーバーフローする場合は 11 命令に増えることになります。</p>
+
+<p>なお、<a href="https://ja.wikipedia.org/wiki/RISC#%E7%89%B9%E5%BE%B4">Wikipedia の RISC</a> の特徴の項に「全ての演算は 1 クロックで実行する」とありますが、RISC の思想を汲む ARM ですが実際のサイクル数（この場合はレイテンシ）は大きく異なります。こちらに <a href="https://github.com/ocxtal/insn_bench_aarch64/blob/master/results/apple_m1_firestorm.md">Apple M1 chip を対象にしたレイテンシ・スループットの野良ベンチマークがありますが</a>、fjcvtzs は 10.00 (clock cycles) と記載されています。スループット分の並列実行もあれば投機実行もあり、近年の CPU において命令数とサイクル数は必ずしも一致しないのは抑えておきましょう（とはいえ、大抵の場合は命令数と実効速度には相関関係が出ます）。この資料は <a href="https://x.com/teehah">@teehah</a> さんに教えて頂きました。ありがとうございます！</p>
+
+<p>さて、上で紹介したテストコードは決してオーバーフローを起こさないコードでした。実際に 64bit をオーバーフローさせるとさらに重くなることを確認してみましょう。</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">arr</span> <span class="o">=</span> <span class="p">[];</span>
+<span class="k">for </span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="nx">_000_000</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">arr</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="mi">64</span> <span class="o">+</span> <span class="nb">Math</span><span class="p">.</span><span class="nf">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">**</span> <span class="mi">31</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">const</span> <span class="nx">f</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">acc</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="kd">const</span> <span class="nx">len</span> <span class="o">=</span> <span class="nx">arr</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+    <span class="k">for </span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">len</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">acc</span> <span class="o">^=</span> <span class="nx">arr</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">|</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="k">for </span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="mi">5000</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nf">f</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>上のテストコードを <code class="language-plaintext highlighter-rouge">test_overflow.js</code> に保存して、<code class="language-plaintext highlighter-rouge">test.js</code> との差分を確認してみましょう。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ time ../../v8/out/arm64.release/d8_without_fjcvtzs test.js 
+
+real	0m4.554s
+user	0m4.490s
+sys	0m0.040s
+$ time ../../v8/out/arm64.release/d8_without_fjcvtzs test_overflow.js 
+
+real	0m11.920s
+user	0m11.838s
+sys	0m0.049s
+</code></pre></div></div>
+
+<p>オーバーフローなしだと 4.490s でしたが、オーバーフローありだと 11.838s と大幅に遅くなっているのが確認できます。 どちらのテストコードも <strong>FJCVTZS</strong> を使うと、当然ながら有意な差は出ません。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ time ../../v8/out/arm64.release/d8_with_fjcvtzs test.js 
+
+real	0m3.958s
+user	0m3.893s
+sys	0m0.040s
+$ time ../../v8/out/arm64.release/d8_with_fjcvtzs test_overflow.js 
+
+real	0m3.901s
+user	0m3.867s
+sys	0m0.035s
+</code></pre></div></div>
+
+<p>3.867s と 11.838s だと 3 倍超もの高速化が達成されていることになります。<strong>FJCVTZS</strong> は普段でも速いですが、オーバーフローが発生するタイミングだと断然速くなることがわかりました。<strong>FJCVTZS</strong> 命令は、JavaScript の JIT においてはデメリットなく高速化できるので、私は <strong>FJCVTZS</strong> は使えるのであれば絶対に使ったほうが良い命令であるという理解をしています。</p>
+
+<p>これらの検証は <a href="https://x.com/hotpepsi">@hotpepsi</a> さんにも手伝って頂きました。ありがとうございます！</p>
+
+<p>なお、<code class="language-plaintext highlighter-rouge">JetStream2.2</code> の <code class="language-plaintext highlighter-rouge">stanford-crypto-aes</code> のベンチマークにおける大幅な速度改善は、ベンチマークの中で大量の <strong>FJCVTZS</strong> が使われているためだと推測しております。最も影響があると思われるコードは、<code class="language-plaintext highlighter-rouge">sjcl.cipher.aes</code> 関数の中のこのコードです。</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nx">a</span><span class="p">){</span><span class="k">this</span><span class="p">.</span><span class="nx">s</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">||</span><span class="k">this</span><span class="p">.</span><span class="nc">O</span><span class="p">();</span><span class="kd">var</span> <span class="nx">b</span><span class="p">,</span><span class="nx">c</span><span class="p">,</span><span class="nx">d</span><span class="p">,</span><span class="nx">e</span><span class="p">,</span><span class="nx">f</span><span class="o">=</span><span class="k">this</span><span class="p">.</span><span class="nx">s</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">4</span><span class="p">],</span><span class="nx">g</span><span class="o">=</span><span class="k">this</span><span class="p">.</span><span class="nx">s</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span><span class="nx">b</span><span class="o">=</span><span class="nx">a</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span><span class="kd">var</span> <span class="nx">h</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span><span class="k">if</span><span class="p">(</span><span class="mi">4</span><span class="o">!==</span><span class="nx">b</span><span class="o">&amp;&amp;</span><span class="mi">6</span><span class="o">!==</span><span class="nx">b</span><span class="o">&amp;&amp;</span><span class="mi">8</span><span class="o">!==</span><span class="nx">b</span><span class="p">)</span><span class="k">throw</span> <span class="k">new</span> <span class="nx">sjcl</span><span class="p">.</span><span class="nx">exception</span><span class="p">.</span><span class="nf">invalid</span><span class="p">(</span><span class="dl">"</span><span class="s2">invalid aes key size</span><span class="dl">"</span><span class="p">);</span><span class="k">this</span><span class="p">.</span><span class="nx">b</span><span class="o">=</span><span class="p">[</span><span class="nx">d</span><span class="o">=</span><span class="nx">a</span><span class="p">.</span><span class="nf">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span><span class="nx">e</span><span class="o">=</span><span class="p">[]];</span><span class="k">for</span><span class="p">(</span><span class="nx">a</span><span class="o">=</span><span class="nx">b</span><span class="p">;</span><span class="nx">a</span><span class="o">&lt;</span><span class="mi">4</span><span class="o">*</span><span class="nx">b</span><span class="o">+</span><span class="mi">28</span><span class="p">;</span><span class="nx">a</span><span class="o">++</span><span class="p">){</span><span class="nx">c</span><span class="o">=</span><span class="nx">d</span><span class="p">[</span><span class="nx">a</span><span class="o">-</span><span class="mi">1</span><span class="p">];</span><span class="k">if</span><span class="p">(</span><span class="mi">0</span><span class="o">===</span><span class="nx">a</span><span class="o">%</span><span class="nx">b</span><span class="o">||</span><span class="mi">8</span><span class="o">===</span><span class="nx">b</span><span class="o">&amp;&amp;</span><span class="mi">4</span><span class="o">===</span><span class="nx">a</span><span class="o">%</span><span class="nx">b</span><span class="p">)</span><span class="nx">c</span><span class="o">=</span><span class="nx">f</span><span class="p">[</span><span class="nx">c</span><span class="o">&gt;&gt;&gt;</span><span class="mi">24</span><span class="p">]</span><span class="o">&lt;&lt;</span><span class="mi">24</span><span class="o">^</span><span class="nx">f</span><span class="p">[</span><span class="nx">c</span><span class="o">&gt;&gt;</span><span class="mi">16</span><span class="o">&amp;</span><span class="mi">255</span><span class="p">]</span><span class="o">&lt;&lt;</span><span class="mi">16</span><span class="o">^</span><span class="nx">f</span><span class="p">[</span><span class="nx">c</span><span class="o">&gt;&gt;</span><span class="mi">8</span><span class="o">&amp;</span><span class="mi">255</span><span class="p">]</span><span class="o">&lt;&lt;</span><span class="mi">8</span><span class="o">^</span><span class="nx">f</span><span class="p">[</span><span class="nx">c</span><span class="o">&amp;</span><span class="mi">255</span><span class="p">],</span><span class="mi">0</span><span class="o">===</span><span class="nx">a</span><span class="o">%</span><span class="nx">b</span><span class="o">&amp;&amp;</span><span class="p">(</span><span class="nx">c</span><span class="o">=</span><span class="nx">c</span><span class="o">&lt;&lt;</span><span class="mi">8</span><span class="o">^</span><span class="nx">c</span><span class="o">&gt;&gt;&gt;</span><span class="mi">24</span><span class="o">^</span><span class="nx">h</span><span class="o">&lt;&lt;</span><span class="mi">24</span><span class="p">,</span><span class="nx">h</span><span class="o">=</span><span class="nx">h</span><span class="o">&lt;&lt;</span><span class="mi">1</span><span class="o">^</span><span class="mi">283</span><span class="o">*</span><span class="p">(</span><span class="nx">h</span><span class="o">&gt;&gt;</span><span class="mi">7</span><span class="p">));</span><span class="nx">d</span><span class="p">[</span><span class="nx">a</span><span class="p">]</span><span class="o">=</span><span class="nx">d</span><span class="p">[</span><span class="nx">a</span><span class="o">-</span><span class="nx">b</span><span class="p">]</span><span class="o">^</span><span class="nx">c</span><span class="p">}</span><span class="k">for</span><span class="p">(</span><span class="nx">b</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="nx">a</span><span class="p">;</span><span class="nx">b</span><span class="o">++</span><span class="p">,</span><span class="nx">a</span><span class="o">--</span><span class="p">)</span><span class="nx">c</span><span class="o">=</span><span class="nx">d</span><span class="p">[</span><span class="nx">b</span><span class="o">&amp;</span><span class="mi">3</span><span class="p">?</span><span class="nx">a</span><span class="p">:</span><span class="nx">a</span><span class="o">-</span><span class="mi">4</span><span class="p">],</span><span class="nx">e</span><span class="p">[</span><span class="nx">b</span><span class="p">]</span><span class="o">=</span><span class="mi">4</span><span class="o">&gt;=</span><span class="nx">a</span><span class="o">||</span><span class="mi">4</span><span class="o">&gt;</span><span class="nx">b</span><span class="p">?</span><span class="nx">c</span><span class="p">:</span><span class="nx">g</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="nx">f</span><span class="p">[</span><span class="nx">c</span><span class="o">&gt;&gt;&gt;</span><span class="mi">24</span><span class="p">]]</span><span class="o">^</span><span class="nx">g</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="nx">f</span><span class="p">[</span><span class="nx">c</span><span class="o">&gt;&gt;</span><span class="mi">16</span><span class="o">&amp;</span><span class="mi">255</span><span class="p">]]</span><span class="o">^</span><span class="nx">g</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="nx">f</span><span class="p">[</span><span class="nx">c</span><span class="o">&gt;&gt;</span><span class="mi">8</span><span class="o">&amp;</span><span class="mi">255</span><span class="p">]]</span><span class="o">^</span><span class="nx">g</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="nx">f</span><span class="p">[</span><span class="nx">c</span><span class="o">&amp;</span><span class="mi">255</span><span class="p">]]};</span>
+</code></pre></div></div>
+
+<p>ここは for ループで大量に処理される部分ですが、JIT の出力を見ると相当に <strong>FJCVTZS</strong> が使われているので、結果として 11% を超える高速化が実現されたのではないかと推測しています。このコードにおいて <code class="language-plaintext highlighter-rouge">b.vc</code> 部分で分岐予測をミスって投機実行されている分の速度ロスも出ているのではないかと少し考えたのですが、色々と検討した結果、このベンチマークに限っては分岐予測は関係なさそうと考えております。</p>
+
+<p>なお、<a href="https://gist.github.com/tkihira/adbc8107ec3abb0be27ca0d55c09e1d1">上記のコードを手元の V8 で最適化させた場合の出力コードをこちらに用意しました</a>。実際の最適化コードがどのような形になっているかをご確認される場合の参考にしてみてください。</p>
+
+<p>ここの検証は <a href="https://x.com/kazuho">@kazuho</a> さんにも手伝って頂きました。kazuho さんには他にも助言をいくつか頂きました。ありがとうございます！</p>
+
+        </article>
+        <hr>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/2024-06-10-Deep-Dive-into-ARM-JavaScript-Special-Instruction-FJCVTZS&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="ARM に存在する JavaScript 専用命令「FJCVTZS」を追う（ついでに V8 をビルドする）" data-url="http://nmi.jp/2024-06-10-Deep-Dive-into-ARM-JavaScript-Special-Instruction-FJCVTZS">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/2024-06-10-Deep-Dive-into-ARM-JavaScript-Special-Instruction-FJCVTZS" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="ARM に存在する JavaScript 専用命令「FJCVTZS」を追う（ついでに V8 をビルドする）"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="ARM に存在する JavaScript 専用命令「FJCVTZS」を追う（ついでに V8 をビルドする）" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+
+        
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+        
+
+        <div class="post-recent">
+    <div class="pre">
+
+    
+        <p><strong>前の投稿</strong> <a href="/2024-06-03-Exploring-V8-JIT-Outputs">JavaScript 実行エンジン V8 の JIT 出力コードを読んでみよう</a></p>
+    
+    </div>
+    <div class="nex">
+
+        
+        <p><strong>次の投稿</strong> <a href="/2024-08-28-Review-Binary-Hacks-Rebooted">書評 "Binary Hacks Rebooted"</a></p>
+        
+    </div>
+</div>
+
+
+    </div>
+    <button class="anchor"><i class="fa fa-anchor"></i></button>
+
+
+    <div class="right">
+        <div class="wrap">
+            <div class="side">
+                <div>
+                    <i class="fa fa-tags"></i>
+                    Top Popular Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2016-07-23-stock-strategy-for-early-startup-employee">スタートアップに転職する時に最低限知っておくべき株の話</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/582">生WebGL入門:初音ミクの美麗3Dモデルを表示する(前編)</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2017-10-06-Making_a-business_plan">事業計画書の作り方、新規ビジネスの考え方</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/902">Convertible Note / Convertible Equity とは？</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/488">JavaScript イディオム集</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/465">ExGameの製作で感じたこと</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                </ul>
+            </div>
+
+            <div class="side">
+                <div>
+                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                    Recent Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        <li><a href="/2024-08-28-Review-Binary-Hacks-Rebooted">書評 "Binary Hacks Rebooted"</a></li>
+                    
+                        <li><a href="/2024-06-10-Deep-Dive-into-ARM-JavaScript-Special-Instruction-FJCVTZS">ARM に存在する JavaScript 専用命令「FJCVTZS」を追う（ついでに V8 をビルドする）</a></li>
+                    
+                        <li><a href="/2024-06-03-Exploring-V8-JIT-Outputs">JavaScript 実行エンジン V8 の JIT 出力コードを読んでみよう</a></li>
+                    
+                </ul>
+            </div>
+
+            <!-- <div class="side">
+                <div>
+                    <i class="fa fa-external-link"></i>
+                    Links
+                </div>
+                <ul  class="content-ul">
+
+                </ul>
+            </div> -->
+        </div>
+    </div>
+
+
+
+</div>
+<script>
+/**
+ * target _blank
+ */
+(function() {
+    var aTags = document.querySelectorAll('article a:not([id])')
+    for (var i = 0; i < aTags.length; i++) {
+        aTags[i].setAttribute('target', '_blank')
+    }
+}());
+</script>
+<script src="/js/pageContent.js " charset="utf-8"></script>
+
+
+    <footer class="site-footer">
+
+
+    <div class="wrapper">
+
+        <p class="description">
+             Takuo Kihira 
+        </p>
+        <p class="contact">
+            Contact me at: 
+            <a href="https://github.com/tkihira" title="GitHub"><i class="fa fa-github" aria-hidden="true"></i></a>     
+            <a href="https://twitter.com/tkihira" title="Twitter"><i class="fa fa-twitter" aria-hidden="true"></i></a>  
+            <a href="https://www.facebook.com/takuo.kihira" title="Facebook"><i class="fa fa-facebook-official" aria-hidden="true"></i></a>    
+        </p>
+        <p class="power">
+            <span>
+                Site powered by <a href="https://jekyllrb.com/">Jekyll</a>.
+            </span>
+            <span>
+                Theme designed by <a href="https://github.com/Gaohaoyang">HyG</a>.
+            </span>
+        </p>
+    </div>
+</footer>
+
+    <div class="back-to-top">
+    <a href="#top" class="scroll">
+        <i class="fa fa-arrow-up" aria-hidden="true"></i>
+    </a>
+</div>
+
+    <script src=" /js/main.js " charset="utf-8"></script>
+    <script src=" /js/scroll.min.js " charset="utf-8"></script>
+  </body>
+
+</html>

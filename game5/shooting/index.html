@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html><head><title>shooting</title>
+<meta name="viewport" content="width=320,user-scalable=no"></script>
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<script>
+(function() {
+var config = {
+	cols: 10,
+	rows: 15,
+	cellWidth: 32,
+	cellHeight: 32,
+	bulletWidth: 4,
+	bulletHeight: 4,
+	bulletSpeed: 20,
+	reloadCount: 3
+};
+var status = {};
+var imageName = ["my", "bullet", "rock1", "rock2", "rock3"];
+var images = {};
+
+var drawBackground = function() {
+	var bottom = config.height + config.cellHeight - status.currentTop;
+	if(bottom) {
+		status.ctx.drawImage(status.bgCtx.canvas, 0, status.currentTop, config.width, bottom, 0, 0, config.width, bottom);
+	}
+	if(config.height - bottom) {
+		status.ctx.drawImage(status.bgCtx.canvas, 0, bottom);
+	}
+};
+var draw = function() {
+	drawBackground();
+	if(status.state == "gaming") {
+		status.ctx.drawImage(images["my"], status.x - (config.cellWidth / 2) | 0, status.y - (config.cellHeight / 2) | 0);
+	} else if(status.state == "dying") {
+		status.ctx.drawImage(images["bomb" + status.dying], status.x - (config.cellWidth / 2) | 0, status.y - (config.cellHeight / 2) | 0);
+		if(++status.dying > 10) {
+			status.state = "gameover";
+		}
+	}
+};
+
+var drawSpace = function(x, y) {
+	status.bgCtx.drawImage(images["space" + Math.floor(Math.random() * 10 + 1)], x * config.cellWidth, y * config.cellHeight);
+};
+var createBullet = function(dx, dy) {
+	return {x: status.x, y: status.y, dx: config.bulletSpeed * dx, dy: config.bulletSpeed * dy};
+};
+var createRock = function() {
+	var level = (status.frameCount / 500) | 0;
+	var x = status.x + Math.random() * 100 - 50;
+	var fy = (level >= 4)? ((Math.random() * 2) | 0) * config.height: 0;
+	var y = status.y + Math.random() * 100 - 50;
+	var fx = Math.random() * config.width;
+	var r = Math.atan2(y - fy, x - fx);
+	var d = Math.random() * (5.5 + level) + 1.5;
+	d = (d < 10)? d: 10;
+	var hp = (Math.random() * Math.random() * ((5 + level / 4) | 0)) | 1;
+	return {x: fx, y: fy, dx: Math.cos(r) * d, dy: Math.sin(r) * d, hp: hp, score: hp * hp * 100, state: "rock" + ((Math.random() * 3 + 1) | 0)};
+};
+var tick = function() {
+	setTimeout(tick, 1000 / 30);
+	if(status.state == "loading") {
+		return;
+	}
+	status.frameCount++;
+	status.currentTop--;
+	status.currentTop = status.currentTop || (config.height + config.cellHeight);
+	if(status.currentTop % config.cellHeight == 0) {
+		var line = status.currentTop / config.cellHeight - 1;
+		for(var x = 0; x < config.cols; x++) {
+			drawSpace(x, line);
+		}
+	}
+	draw();
+	if(status.state == "gaming" && status.frameCount % config.reloadCount == 0) {
+		status.bullets[status.frameCount + "a"] = createBullet(-1, -1);
+		status.bullets[status.frameCount + "b"] = createBullet(0, -1);
+		status.bullets[status.frameCount + "c"] = createBullet(1, -1);
+		status.bullets[status.frameCount + "d"] = createBullet(-1, 1);
+		status.bullets[status.frameCount + "e"] = createBullet(1, 1);
+	}
+	if(status.rockCount < 5 + status.frameCount / 500) {
+		status.rocks[status.frameCount + "r"] = createRock();
+		status.rockCount++;
+	}
+	for(var key in status.bullets) {
+		var bullet = status.bullets[key];
+		bullet.x += bullet.dx;
+		bullet.y += bullet.dy;
+		if(bullet.x < 0 || bullet.x > config.width || bullet.y < 0 || bullet.y > config.height) {
+			delete status.bullets[key];
+		} else {
+			status.ctx.drawImage(images["bullet"], bullet.x - ((config.bulletWidth / 2) | 0), bullet.y - ((config.bulletHeight / 2) | 0));
+			for(var rkey in status.rocks) {
+				var rock = status.rocks[rkey];
+				if(Math.abs(bullet.x - rock.x) < config.cellWidth / 2 && Math.abs(bullet.y - rock.y) < config.cellHeight / 2) {
+					if(rock.hp) {
+						delete status.bullets[key];
+						if(--rock.hp == 0) {
+							status.score += rock.score;
+							status.score = (status.score > 999999999)? 999999999: status.score;
+							status.scoreElement.innerHTML = "000000000".substring(0, 9 - (status.score + "").length) + status.score;
+							rock.dx = rock.dy = 0;
+							rock.state = "bomb1";
+						} else {
+							rock.state = (rock.state + "w").substring(0, 6);
+						}
+					}
+				}
+			}
+		}
+	}
+	for(var key in status.rocks) {
+		var rock = status.rocks[key];
+		rock.x += rock.dx;
+		rock.y += rock.dy;
+		if(rock.x < 0 || rock.x > config.width || rock.y < 0 || rock.y > config.height) {
+			delete status.rocks[key];
+			status.rockCount--;
+		} else {
+			status.ctx.drawImage(images[rock.state], rock.x - ((config.cellWidth / 2) | 0), rock.y - ((config.cellHeight / 2) | 0));
+			if(rock.hp == 0) {
+				var next = (+rock.state.substring(4, 6)) + 1;
+				if(next > 10) {
+					delete status.rocks[key];
+					status.rockCount--;
+				} else {
+					rock.state = "bomb" + next;
+				}
+			} else {
+				rock.state = rock.state.substring(0, 5);
+				if(status.state == "gaming" && Math.abs(status.x - rock.x) < config.cellWidth * 0.7 && Math.abs(status.y - rock.y) < config.cellHeight * 0.7) {
+					status.state = "dying";
+					status.dying = 1;
+				}
+			}
+		}
+	}
+};
+
+var initialize = function() {
+	for(var x = 0; x < config.cols; x++) {
+		for(var y = 0; y < config.rows + 1; y++) {
+			drawSpace(x, y);
+		}
+	}
+	for(var i = 0; i < 3; i++) {
+		var canvas = document.createElement("canvas");
+		canvas.width = config.cellWidth;
+		canvas.height = config.cellHeight;
+		var ctx = canvas.getContext("2d");
+		ctx.drawImage(images["rock" + (i + 1)], 0, 0);
+		ctx.globalCompositeOperation = "source-in";
+		ctx.fillStyle = "#fff";
+		ctx.fillRect(0, 0, canvas.width, canvas.height);
+		images["rock" + (i + 1) + "w"] = canvas;
+	}
+	status.currentTop = config.height + config.cellHeight;
+	status.x = (config.width / 2) | 0;
+	status.y = (config.height * 3 / 4) | 0;
+	status.frameCount = 0;
+	status.rockCount = 0;
+	status.score = 0;
+	status.bullets = {};
+	status.rocks = {};
+	status.scoreElement.innerHTML = "000000000";
+	status.state = "gaming";
+	setTimeout(function() { window.scrollTo(0, 0); }, 250);
+};
+
+window.onload = function() {
+	config.width = config.cols * config.cellWidth;
+	config.height = config.rows * config.cellHeight;
+	status.scoreElement = document.getElementsByTagName("div")[0];
+	status.scoreElement.style.width = config.width + "px";
+	var canvas = document.getElementById("canvas");
+	canvas.width = config.width;
+	canvas.height = config.height;
+	status.ctx = canvas.getContext("2d");
+	var bgCanvas = document.createElement("canvas");
+	bgCanvas.width = config.width;
+	bgCanvas.height = config.height + config.cellHeight;
+	status.bgCtx = bgCanvas.getContext("2d");
+	for(var i = 0; i < 10; i++) {
+		imageName.push("space" + (i + 1));
+		imageName.push("bomb" + (i + 1));
+	}
+	var checkLoad = function() {
+		status.loadedCount++;
+		if(status.loadedCount == imageName.length) {
+			initialize();
+		}
+	};
+	status.loadedCount = 0;
+	for(var i = 0; i < imageName.length; i++) {
+		var image = document.createElement("img");
+		image.onload = checkLoad;
+		images[imageName[i]] = image;
+		image.src = "img/" + imageName[i] + ".png";
+	}
+	status.state = "loading";
+	tick();
+	document.body.onmousedown = document.body.ontouchstart = function(e) {
+		e.preventDefault();
+		e = (e.touches && e.touches[0]) || e;
+		status.lastX = e.pageX;
+		status.lastY = e.pageY;
+		if(status.state == "gameover") {
+			initialize();
+		}
+	};
+	document.body.onmousemove = document.body.ontouchmove = function(e) {
+		e = (e.touches && e.touches[0]) || e;
+		if(status.state == "gaming" && status.lastX != null) {
+			status.x += (e.pageX - status.lastX) * 2.5;
+			status.y += (e.pageY - status.lastY) * 3;
+			status.x = ((status.x < 0)? 0: ((status.x > config.width)? config.width: status.x)) | 0;
+			status.y = ((status.y < 0)? 0: ((status.y > config.height)? config.height: status.y)) | 0;
+		}
+		status.lastX = e.pageX;
+		status.lastY = e.pageY;
+	};
+};
+})();
+</script>
+</head><body style="margin:0;position:relative"><canvas id="canvas"></canvas><div style="position:absolute;left:0;top:0;font-size:18px;color:#fff;text-align:right">000000000</div></body></html>

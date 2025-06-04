@@ -1,0 +1,1688 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>JavaScript で CPU が Intel かどうかを判定する（ついでに JIT を検知する）</title>
+    <meta name="description" content="先日、次のような Tweet を見かけましたTIL I discovered that TensorFlow.js uses an interesting trick to sniff your CPU architecture in WebAssembly. pic.twitter.com/LVyywIM48I...">
+
+    <link rel="stylesheet" href=" /css/fontawesome/css/font-awesome.min.css ">
+    <link rel="stylesheet" href=" /css/main.css ">
+    <link rel="canonical" href="http://nmi.jp/2023-01-11-Detecting-Intel-Arch-in-JavaScript">
+    <link rel="alternate" type="application/rss+xml" title="nmi.jp" href="http://nmi.jp/feed.xml">
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=3.0'></script>
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=1.1'></script>
+    <script>
+        if(location.href.match(/\.html$/)) {
+            location.href = location.href.match(/(.+)\.html/)[1];
+        }
+    </script>
+
+
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-229769-8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-229769-8');
+</script>
+</head>
+
+
+  <body>
+
+    <header id="top">
+    <div class="wrapper">
+        <a href="/" class="brand">nmi.jp</a>
+        <small>Twitter → <a href="https://twitter.com/tkihira" target="_blank">@tkihira</a></small>
+        <button id="headerMenu" class="menu"><i class="fa fa-bars"></i></button>
+        <nav id="headerNav">
+            <ul>
+                <li>
+                    
+                    <a href="/">
+                    
+                        <i class="fa fa-home"></i>Home
+                    </a>
+                </li>
+
+                
+                    
+                    <li>
+                        
+                        <a href="/archive/">
+                        
+                            <i class="fa fa-archive"></i>Archives
+                        </a>
+                    </li>
+                    
+                
+                    
+                    <li>
+                        
+                        <a href="/category/">
+                        
+                            <i class="fa fa-th-list"></i>Categories
+                        </a>
+                    </li>
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            </ul>
+        </nav>
+    </div>
+</header>
+
+
+        <div class="page clearfix" post>
+    <div class="left">
+        <div class="post-recent">
+    <table style="width:100%;border:0;padding:0;"><tbody><tr style="padding:0">
+        <td class="toppre" style="padding:0">
+        
+        <a href="/2023-01-03-How-to-solve-2023-puzzle">2023 パズルの逆ポーランド記法(RPN)による解法の解説</a>
+        
+        </td><td class="topnex" style="text-align:right;padding:0">
+        
+        <a href="/2023-12-04-Maximm-Call-Stack-Size-Exceeded">Maximum call stack size exceeded について解説</a>
+        
+        </td>
+    </tr></tbody></table>
+</div>
+
+        <hr style="margin:0"/>
+        <h1 style="margin-top:10px">JavaScript で CPU が Intel かどうかを判定する（ついでに JIT を検知する）</h1>
+<hr />
+        <div class="label">
+
+            <div class="label-card">
+                <i class="fa fa-calendar"></i>2023-01-11
+            </div>
+
+            <div class="label-card">
+                <i class="fa fa-user"></i>Takuo Kihira
+                
+            </div>
+
+            <div class="label-card">
+                
+            </div>
+
+            <div class="label-card">
+            
+
+
+<!-- <span class="point">•</span> -->
+<span class="categories">
+  <i class="fa fa-th-list"></i>
+  
+    
+        <a href="/category/#JavaScript" title="Category: JavaScript" rel="category">JavaScript</a>
+    
+  
+
+  <!-- <span class="point">•</span> -->
+</span>
+
+
+            </div>
+
+            <div class="label-card">
+                <a href="https://github.com/tkihira/nmi.jp/blob/master/_posts/2023-01-11-Detecting-Intel-Arch-in-JavaScript.md" target="_blank"><i class="fa fa-github"></i></a>
+            </div>
+
+        </div>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/2023-01-11-Detecting-Intel-Arch-in-JavaScript&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="JavaScript で CPU が Intel かどうかを判定する（ついでに JIT を検知する）" data-url="http://nmi.jp/2023-01-11-Detecting-Intel-Arch-in-JavaScript">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/2023-01-11-Detecting-Intel-Arch-in-JavaScript" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="JavaScript で CPU が Intel かどうかを判定する（ついでに JIT を検知する）"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="JavaScript で CPU が Intel かどうかを判定する（ついでに JIT を検知する）" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+        <article itemscope itemtype="http://schema.org/BlogPosting">
+        <p>先日、次のような Tweet を見かけました</p>
+
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">TIL I discovered that TensorFlow.js uses an interesting trick to sniff your CPU architecture in WebAssembly. <a href="https://t.co/LVyywIM48I">pic.twitter.com/LVyywIM48I</a></p>&mdash; Robert Knight (@robknight_) <a href="https://twitter.com/robknight_/status/1610638557118349317?ref_src=twsrc%5Etfw">January 4, 2023</a></blockquote>
+<script async="" src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<p>面白かったので、なぜこうなるのかの解説と、ついでにこのテクニックを使った JIT 検知方法などについて紹介します。</p>
+
+<h1 id="javascript-における低レイヤーの扱い">JavaScript における低レイヤーの扱い</h1>
+
+<p>JavaScript においては、挙動が比較的しっかりと仕様に定められているために、環境による振る舞いの違いはあまり発生しません。しかし、<span style="color:blue">低レイヤーに降りるほど振る舞いは実装依存になり、環境差が発生する余地が出てきます</span>。</p>
+
+<p>一番わかりやすいのは、リトルエンディアン・ビッグエンディアンです。例えば以下のようなコードを実行した場合、リトルエンディアンを採用しているアーキテクチャとビッグエンディアンを採用しているアーキテクチャでは結果が異なります。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">u32</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Uint32Array</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">u8</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Uint8Array</span><span class="p">(</span><span class="nx">u32</span><span class="p">.</span><span class="nx">buffer</span><span class="p">);</span>
+<span class="nx">u32</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mh">0x12345678</span><span class="p">;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">u8</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nf">toString</span><span class="p">(</span><span class="mi">16</span><span class="p">));</span> <span class="c1">// 78 or 12</span>
+</code></pre></div></div>
+
+<p>上記のコードは、リトルエンディアンの場合は 0x78 が、ビッグエンディアンの場合は 0x12 が返ります。このように少し低レイヤーに入ると環境やアーキテクチャの差によって結果が変わり得ます。現在 JavaScript が動いているほとんど全ての CPU アーキテクチャはリトルエンディアンを採用しているためにこれが問題になることは少ないとは思いますが、意識しておく価値はあるでしょう。</p>
+
+<p>なお、この記事はリトルエンディアンを前提にしております。</p>
+
+<h1 id="intel-architecture-の検知コード">Intel Architecture の検知コード</h1>
+
+<p>さて本題です。次のコードによって、Intel アーキテクチャかどうかを判定することが出来る、というのがツイートの主張でした。実際は WebAssembly (wasm) で書かれているようですが、以下の JavaScript コードでも判定出来ます。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">f</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Float32Array</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">u8</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Uint8Array</span><span class="p">(</span><span class="nx">f</span><span class="p">.</span><span class="nx">buffer</span><span class="p">);</span>
+<span class="nx">f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="kc">Infinity</span><span class="p">;</span>
+<span class="nx">f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nx">f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="nx">f</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">u8</span><span class="p">[</span><span class="mi">3</span><span class="p">]);</span> <span class="c1">// 255 if Intel, 127 otherwise</span>
+</code></pre></div></div>
+
+<p>Intel アーキテクチャの場合は 255 が表示され、それ以外の場合は 127 が表示されます。手元の Intel Mac と M1 Mac の各ブラウザで確認したところ、それぞれ 255 と 127 が表示されていました。</p>
+
+<h2 id="なぜ結果が変わるのか">なぜ結果が変わるのか</h2>
+
+<h3 id="nan-のビット表現">NaN のビット表現</h3>
+
+<p>この結果を理解するためには、まず NaN のビット表現についての理解が必要です。</p>
+
+<p>近代のコンピュータの浮動小数点演算は、<a href="https://ja.wikipedia.org/wiki/IEEE_754">IEEE754</a> と呼ばれる仕様に従います。IEEE754 において、浮動小数点数で表現可能なすべての数値において、NaN 以外の値においては数値とビット表現が 1 対 1 で対応しています。しかし NaN だけが複数のビット表現を持ちます。</p>
+
+<p>例えば今回利用している 32 bit の浮動小数点の場合、浮動小数点のビット表現は以下のようになります。</p>
+
+<p><img src="./img/floating-point-representation.png" alt="32bit 浮動小数点のビット表現" /></p>
+
+<p>詳細は省きますが、例えば符号が 1、指数部が 01111101、仮数部が 11010001011011110100010 だとすると、全体のビット表現は 0b11110110111010001011011110100010 となり、その表現の示す数値は -0.454526… となります。</p>
+
+<p>さて、この仕様において、</p>
+
+<ul>
+  <li>指数部が 全部 1</li>
+  <li>仮数部が 0 以外 （仮数部が 0 の時は ±Infinity）</li>
+</ul>
+
+<p>を満たす場合に、その表現は NaN を示します。NaN の仮数部にはデバッグ用等のデータを持たせることが出来る設計なのですが、実際にこの NaN 仮数部の情報を使用するコードはほとんどありません。</p>
+
+<p>32bit 浮動小数点の場合、一般的な NaN のビット表現は次のような形になります。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">f</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Float32Array</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">u32</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Uint32Array</span><span class="p">(</span><span class="nx">f</span><span class="p">.</span><span class="nx">buffer</span><span class="p">);</span>
+<span class="nx">f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="kc">NaN</span><span class="p">;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">u32</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nf">toString</span><span class="p">(</span><span class="mi">16</span><span class="p">));</span>
+<span class="c1">// =&gt; 0x7fc00000 === 0b0111_1111_1100_0000_0000_0000_0000_0000</span>
+</code></pre></div></div>
+
+<p><img src="./img/nan-representation.png" alt="32bit 浮動小数点における NaN のビット表現" /></p>
+
+<p>このように、符号は 0 で、指数部には全て 1 が入り、仮数部の最上位ビットのみが 1 になり、残りは 0、というのが一般的な NaN のビット表現です。</p>
+
+<p>NaN のビット表現やそれにまつわる処理は結構複雑で、例外を飛ばす signaling NaN、例外を飛ばさない quiet NaN、演算途中で NaN が発生した場合に立つ INVALID flag などなど、実際の演算で NaN が絡む場合の仕様が細かく定められています。興味があれば、<a href="https://ja.wikipedia.org/wiki/NaN">wikipedia の NaN の項</a>を参考にしてみてください。ただ、JavaScript においてはこれらの NaN の bit 表現の違いが挙動に変化を与えることはなく、NaN は区別なく同一の NaN という概念として扱われます。</p>
+
+<p>今回重要なのは、<span style="font-weight: bold; color:red">NaN にはビット表現において正負の値を持てる</span>、ということです。NaN 表現に符号ビットは関係ありません。なのでプラスの NaN とマイナスの NaN が存在し得ます。プラスの NaN の場合、上位 8 bit は 0x7F === 127 に、マイナスの NaN の場合は上位 8 bit は 0xFF === 255 となります。判別コードにおける 127 と 255 はこの違いを表しています。</p>
+
+<h3 id="intel-アーキテクチャの特殊挙動">Intel アーキテクチャの特殊挙動</h3>
+
+<p>さて、では具体的に上記コードでなぜ Intel アーキテクチャを判定出来るのかを解説します。この章の執筆には <a href="https://twitter.com/teehah">@teehah さん</a>の多大なご協力を得ております。ありがとうございます！</p>
+
+<p>Intel のサイトにある次の PDF シートを見てみてください。</p>
+
+<p><a href="https://www.intel.com/content/dam/develop/external/us/en/documents/floating-point-reference-sheet-v2-13.pdf">https://www.intel.com/content/dam/develop/external/us/en/documents/floating-point-reference-sheet-v2-13.pdf</a></p>
+
+<p>この中の R Ind こと「Real Indefinite」が今回のポイントです。このシートでは、Intel の演算ではいくつかのパターンにおいて Real Indefinite になることが定義されており、そのパターンになった場合は特殊な値（R Ind）を取ることが示されています。この R Ind のビット表現は次の通りです、</p>
+
+<p><img src="./img/nan-rind-representation.png" alt="32bit 浮動小数点における R Ind のビット表現" /></p>
+
+<p><span style="color:red">この R Ind の表現は、負の NaN の値になっており、上位 8 ビットが全て 1 になっております</span>。上記のコードではその上位 8 bit を判定して、それがすべて立っている（255）場合に Intel アーキテクチャと判断しております。</p>
+
+<p>この Real Indefinite、すなわち実数不定値とは何ぞや、というのを調べると、次の資料がヒットしました。</p>
+
+<p><a href="https://www.academia.edu/13572645/inter_basic_arsitecture">https://www.academia.edu/13572645/inter_basic_arsitecture</a></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>7.2.4. Indefinite
+For each FPU data type, one unique encoding is reserved for representing the special value indefinite. For example, when operating on real values, the real indefinite value is a QNaN (see Section 7.4.1., “Real Numbers”). The FPU produces indefinite values as responses to masked floating-point exceptions.
+</code></pre></div></div>
+
+<p>Intel 独特の文化だと思うのですが、qNaN の表現のうちの 1 つを「Real Indefinite」という特別な表現として扱い、いくつかの演算（上記シートの他、上の資料の TABLE 7-20 にも同様の内容が記載されています）の返り値として、この R Ind という特殊な表現の qNaN を返す実装になっているようです。</p>
+
+<p>R Ind を返すいくつかの演算の 1 つが「無限大マイナス無限大」であり、Intel アーキテクチャを判断するコードはその演算の結果が R Ind であるかどうかをチェックするコードとなっております。<span style="color:blue">Intel 以外のアーキテクチャではこのような特殊な NaN の処理をしていないため、普通の NaN すなわち 上位 8 bit が 127(0x7F) になる NaN が返ってくるのですが、Intel アーキテクチャでは返り値が R Ind となり上位 8 bit が 255(0xFF) となるため、結果として 255 との比較で Intel アーキテクチャであるかどうかがわかる</span>、という流れです。</p>
+
+<p>（なお細かい話ですが、FP 例外をマスクしない設定においては R Ind を生成しない可能性が高いので、この判別方法は使えないかもしれません）</p>
+
+<h2 id="なぜわざわざ代入してから引き算しているのか">なぜわざわざ代入してから引き算しているのか</h2>
+
+<p>ひとつ気になるのが、チェックコードでは <code class="language-plaintext highlighter-rouge">f[0] = Infinity;</code> と代入してから <code class="language-plaintext highlighter-rouge">f[0] = f[0] - f[0]</code> を呼んでいます。実は、これにも意味があるのです。</p>
+
+<p><code class="language-plaintext highlighter-rouge">f[0]</code> に代入せず、普通に無限大同士の引き算をしてみましょう。次のようなコードになります。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">f</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Float32Array</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">u8</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Uint8Array</span><span class="p">(</span><span class="nx">f</span><span class="p">.</span><span class="nx">buffer</span><span class="p">);</span>
+<span class="nx">f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="kc">Infinity</span> <span class="o">-</span> <span class="kc">Infinity</span><span class="p">;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">u8</span><span class="p">[</span><span class="mi">3</span><span class="p">]);</span>
+</code></pre></div></div>
+
+<p>手元の Intel マシンの Chrome で上記のコードを実行したところ、予想通り 255 が返ってきました。問題なく動作しているように思えるじゃないですか。<span style="color:blue">ところがどっこい、罠があります</span>。次のコードを Chrome もしくは Node.js 等の V8 環境で実行してみてください。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">func</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">f</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Float32Array</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+    <span class="kd">const</span> <span class="nx">u8</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Uint8Array</span><span class="p">(</span><span class="nx">f</span><span class="p">.</span><span class="nx">buffer</span><span class="p">);</span>
+    <span class="nx">f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="kc">Infinity</span> <span class="o">-</span> <span class="kc">Infinity</span><span class="p">;</span>
+    <span class="k">return</span> <span class="nx">u8</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">===</span> <span class="mi">255</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">for </span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="mi">100000</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if </span><span class="p">(</span><span class="o">!</span><span class="nf">func</span><span class="p">())</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">i</span><span class="p">);</span>
+        <span class="k">break</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><span style="font-weight:bold">手元の Intel マシンの Chrome で実行したところ、3289 を表示してストップしました！</span>私の環境では、実行するたびに違う値を表示します。</p>
+
+<p>この挙動は次のように説明出来ます。JIT がかかる前は <code class="language-plaintext highlighter-rouge">f[0] = Infinity - Infinity</code> というコードを逐次実行しているために、演算結果として毎回 R Ind の値が f[0] に代入されているのですが、JIT によって <code class="language-plaintext highlighter-rouge">Infinity - Infinity</code> が定数として事前に演算され、その結果である NaN に最適化で置き換わり、結果として <code class="language-plaintext highlighter-rouge">f[0] = NaN</code> というコードに最適化されてしまったせいで <code class="language-plaintext highlighter-rouge">R Ind</code> が発生しなくなった、と考えることが出来ます。</p>
+
+<p>というわけで、<code class="language-plaintext highlighter-rouge">f[0] = Infinity; f[0] = f[0] - f[0];</code> という冗長なコードは、<span style="font-weight: bold">V8 の JIT による最適化を避ける意図によって書かれていた</span>と考えられます。</p>
+
+<p>なお、これを利用すると<span style="color:red">Intel アーキテクチャかつ V8 エンジンの場合限定ですが、次のコードによって自分自身が JIT 化されているかどうかを確認出来ます</span>。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nf">isInJIT</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">f</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Float32Array</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+    <span class="kd">const</span> <span class="nx">u8</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Uint8Array</span><span class="p">(</span><span class="nx">f</span><span class="p">.</span><span class="nx">buffer</span><span class="p">);</span>
+    <span class="nx">f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="kc">Infinity</span> <span class="o">-</span> <span class="kc">Infinity</span><span class="p">;</span>
+    <span class="k">return</span> <span class="nx">u8</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">===</span> <span class="mi">127</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>もし JIT がかからなかったら、毎回律儀に Infinity - Infinity の計算が行われて毎回 R Ind が返ってくるため、上位 8 ビットが 255 になります。JIT がかかり最適化されたら、Infinity - Infinity が最適化によって普通の NaN に置換され、結果として上位 8 ビットが 127 になります。</p>
+
+<p><code class="language-plaintext highlighter-rouge">f[0] = Infinity; f[0] = f[0] - f[0];</code> が JIT で最適化されていないのは、おそらくたまたまです。もし将来的にこれも JIT 等で最適化されるようになったら、もう少し複雑で最適化されにくいコードに変える必要があるのでしょう。</p>
+
+<h3 id="ブラウザごとの挙動の違い">ブラウザごとの挙動の違い</h3>
+
+<p>当然ながら、これらの挙動は JavaScript の実行エンジンによって左右される可能性があります。例えば、次のようなコードを見てみてください。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">f</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Float32Array</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">u8</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Uint8Array</span><span class="p">(</span><span class="nx">f</span><span class="p">.</span><span class="nx">buffer</span><span class="p">);</span>
+<span class="nx">f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="nx">f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nx">f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="nx">f</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">u8</span><span class="p">[</span><span class="mi">3</span><span class="p">]);</span> <span class="c1">// ※1</span>
+<span class="nx">f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> <span class="o">/</span> <span class="mi">0</span><span class="p">;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">u8</span><span class="p">[</span><span class="mi">3</span><span class="p">]);</span> <span class="c1">// ※2</span>
+</code></pre></div></div>
+
+<p>まず、このコードは Intel 以外の環境だと、全て 127 を返します。R Ind の文化がないので当然ですね。</p>
+
+<p>さて、では Intel だとどうなるでしょうか？本来であれば全部 255 が返ってくるはずなのですが、手元の Intel 環境で試したところ、</p>
+
+<ul>
+  <li>Chrome: ※1 === 255, ※2 === 127</li>
+  <li>Safari: ※1 === 255, ※2 === 255</li>
+  <li>Firefox: ※1 === 127, ※2 === 127</li>
+</ul>
+
+<p>となりました。</p>
+
+<p>本来、Intel アーキテクチャにおいて <code class="language-plaintext highlighter-rouge">0/0</code> は R Ind を返さないといけないので、255 になるはずです。しかし内部で演算前に NaN になることがわかっている場合（もしくは NaN が返ってきた後に何らかの処理が挟まっている場合）には、JavaScript エンジンによってその値が R Ind ではない普通の NaN に変えられることもあるでしょう。</p>
+
+<p>Safari は愚直に 255 を返してくれました。Firefox は 127 が返ってきました。Chrome は、変数同士を割り算したときは 255、リテラルで <code class="language-plaintext highlighter-rouge">0/0</code> を書いた場合には 127 を返すというトリッキーな結果になりました。おそらく Chrome では <code class="language-plaintext highlighter-rouge">0/0</code> を構文解析の段階で NaN に置換しているか、それに近い処理が入っているのでしょう。</p>
+
+<p>このように、<code class="language-plaintext highlighter-rouge">f[0] = 0; f[0] = f[0] / f[0]</code> だと Firefox において結果の NaN に対して何らかの置換が入ってしまい R Ind ではなくなるので、Intel アーキテクチャの判断に利用することが出来ません。オリジナルコードで <code class="language-plaintext highlighter-rouge">f[0] = Infinity; f[0] = f[0] - f[0];</code> を使っているのは、モダンブラウザ（の JavaScript エンジン）において、<span style="font-weight:bold">たまたま最適化されず</span>にきちんと R Ind を返してくれる演算のひとつが「無限大マイナス無限大」だった、という消極的な理由によるものだと思われます。</p>
+
+<h1 id="まとめ">まとめ</h1>
+
+<p>結論として、現在は大体の環境において、以下のコードで Intel アーキテクチャであるかどうかの判断が可能です。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nf">isX86</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">f</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Float32Array</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+    <span class="kd">const</span> <span class="nx">u8</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Uint8Array</span><span class="p">(</span><span class="nx">f</span><span class="p">.</span><span class="nx">buffer</span><span class="p">);</span>
+    <span class="nx">f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="kc">Infinity</span><span class="p">;</span>
+    <span class="nx">f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nx">f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="nx">f</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+    <span class="k">return</span> <span class="nx">u8</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">===</span> <span class="mi">255</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>このコードは、Intel の仕様に基づいたものであり、Intel アーキテクチャをほぼ確実に判定することが出来ます。ただし、ブラウザの JavaScript エンジンの最適化の変化などによって、将来機能しなくなる可能性が大いにある点には気をつけましょう。</p>
+
+<h2 id="余談-amd-はどうなの">余談: AMD はどうなの？</h2>
+
+<p>AMD の一次資料にあたることが出来なかったのですが、AMD は SSE3 までは Intel と同じ実装のはずで、SSE2 において R Ind はドキュメント化されていました。このドキュメントは <a href="https://twitter.com/hagat">@hagat さん</a>に教えてもらいました。ありがとうございます！</p>
+
+<p><a href="https://www.intel.co.jp/content/dam/www/public/ijkk/jp/ja/documents/developer/w_fp_precision_j.pdf">https://www.intel.co.jp/content/dam/www/public/ijkk/jp/ja/documents/developer/w_fp_precision_j.pdf</a></p>
+
+<p>P.38 の「QNaN 実数不定値」というのが QNaN Real Indefinite、すなわち本記事の R Ind です。というわけで、おそらく SSE2 をサポートする AMD も上記コードで同じように Intel アーキテクチャだと判定されると思います。なお、<a href="https://twitter.com/hotpepsi">@hotpepsi さん</a>の手元の AMD 環境では Intel と同じ挙動だと確認してもらいました。ありがとうございます！</p>
+
+        </article>
+        <hr>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/2023-01-11-Detecting-Intel-Arch-in-JavaScript&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="JavaScript で CPU が Intel かどうかを判定する（ついでに JIT を検知する）" data-url="http://nmi.jp/2023-01-11-Detecting-Intel-Arch-in-JavaScript">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/2023-01-11-Detecting-Intel-Arch-in-JavaScript" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="JavaScript で CPU が Intel かどうかを判定する（ついでに JIT を検知する）"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="JavaScript で CPU が Intel かどうかを判定する（ついでに JIT を検知する）" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+
+        
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+        
+
+        <div class="post-recent">
+    <div class="pre">
+
+    
+        <p><strong>前の投稿</strong> <a href="/2023-01-03-How-to-solve-2023-puzzle">2023 パズルの逆ポーランド記法(RPN)による解法の解説</a></p>
+    
+    </div>
+    <div class="nex">
+
+        
+        <p><strong>次の投稿</strong> <a href="/2023-12-04-Maximm-Call-Stack-Size-Exceeded">Maximum call stack size exceeded について解説</a></p>
+        
+    </div>
+</div>
+
+
+    </div>
+    <button class="anchor"><i class="fa fa-anchor"></i></button>
+
+
+    <div class="right">
+        <div class="wrap">
+            <div class="side">
+                <div>
+                    <i class="fa fa-tags"></i>
+                    Top Popular Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2016-07-23-stock-strategy-for-early-startup-employee">スタートアップに転職する時に最低限知っておくべき株の話</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/582">生WebGL入門:初音ミクの美麗3Dモデルを表示する(前編)</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2017-10-06-Making_a-business_plan">事業計画書の作り方、新規ビジネスの考え方</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/902">Convertible Note / Convertible Equity とは？</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/488">JavaScript イディオム集</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/465">ExGameの製作で感じたこと</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                </ul>
+            </div>
+
+            <div class="side">
+                <div>
+                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                    Recent Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        <li><a href="/2024-08-28-Review-Binary-Hacks-Rebooted">書評 "Binary Hacks Rebooted"</a></li>
+                    
+                        <li><a href="/2024-06-10-Deep-Dive-into-ARM-JavaScript-Special-Instruction-FJCVTZS">ARM に存在する JavaScript 専用命令「FJCVTZS」を追う（ついでに V8 をビルドする）</a></li>
+                    
+                        <li><a href="/2024-06-03-Exploring-V8-JIT-Outputs">JavaScript 実行エンジン V8 の JIT 出力コードを読んでみよう</a></li>
+                    
+                </ul>
+            </div>
+
+            <!-- <div class="side">
+                <div>
+                    <i class="fa fa-external-link"></i>
+                    Links
+                </div>
+                <ul  class="content-ul">
+
+                </ul>
+            </div> -->
+        </div>
+    </div>
+
+
+
+</div>
+<script>
+/**
+ * target _blank
+ */
+(function() {
+    var aTags = document.querySelectorAll('article a:not([id])')
+    for (var i = 0; i < aTags.length; i++) {
+        aTags[i].setAttribute('target', '_blank')
+    }
+}());
+</script>
+<script src="/js/pageContent.js " charset="utf-8"></script>
+
+
+    <footer class="site-footer">
+
+
+    <div class="wrapper">
+
+        <p class="description">
+             Takuo Kihira 
+        </p>
+        <p class="contact">
+            Contact me at: 
+            <a href="https://github.com/tkihira" title="GitHub"><i class="fa fa-github" aria-hidden="true"></i></a>     
+            <a href="https://twitter.com/tkihira" title="Twitter"><i class="fa fa-twitter" aria-hidden="true"></i></a>  
+            <a href="https://www.facebook.com/takuo.kihira" title="Facebook"><i class="fa fa-facebook-official" aria-hidden="true"></i></a>    
+        </p>
+        <p class="power">
+            <span>
+                Site powered by <a href="https://jekyllrb.com/">Jekyll</a>.
+            </span>
+            <span>
+                Theme designed by <a href="https://github.com/Gaohaoyang">HyG</a>.
+            </span>
+        </p>
+    </div>
+</footer>
+
+    <div class="back-to-top">
+    <a href="#top" class="scroll">
+        <i class="fa fa-arrow-up" aria-hidden="true"></i>
+    </a>
+</div>
+
+    <script src=" /js/main.js " charset="utf-8"></script>
+    <script src=" /js/scroll.min.js " charset="utf-8"></script>
+  </body>
+
+</html>

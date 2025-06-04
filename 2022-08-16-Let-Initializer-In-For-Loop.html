@@ -1,0 +1,1737 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>JavaScript のクロージャーと for 文の let 初期化の例外</title>
+    <meta name="description" content="先日、次のような JavaScript クイズを Twitter で出しました。// JavaScript quiz: 出力は？const a = [];{ for(let i = 0; i &lt; 10; i++) { a[i] = () =&gt; console.log(i); }}a[3]();{ le...">
+
+    <link rel="stylesheet" href=" /css/fontawesome/css/font-awesome.min.css ">
+    <link rel="stylesheet" href=" /css/main.css ">
+    <link rel="canonical" href="http://nmi.jp/2022-08-16-Let-Initializer-In-For-Loop">
+    <link rel="alternate" type="application/rss+xml" title="nmi.jp" href="http://nmi.jp/feed.xml">
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=3.0'></script>
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=1.1'></script>
+    <script>
+        if(location.href.match(/\.html$/)) {
+            location.href = location.href.match(/(.+)\.html/)[1];
+        }
+    </script>
+
+
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-229769-8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-229769-8');
+</script>
+</head>
+
+
+  <body>
+
+    <header id="top">
+    <div class="wrapper">
+        <a href="/" class="brand">nmi.jp</a>
+        <small>Twitter → <a href="https://twitter.com/tkihira" target="_blank">@tkihira</a></small>
+        <button id="headerMenu" class="menu"><i class="fa fa-bars"></i></button>
+        <nav id="headerNav">
+            <ul>
+                <li>
+                    
+                    <a href="/">
+                    
+                        <i class="fa fa-home"></i>Home
+                    </a>
+                </li>
+
+                
+                    
+                    <li>
+                        
+                        <a href="/archive/">
+                        
+                            <i class="fa fa-archive"></i>Archives
+                        </a>
+                    </li>
+                    
+                
+                    
+                    <li>
+                        
+                        <a href="/category/">
+                        
+                            <i class="fa fa-th-list"></i>Categories
+                        </a>
+                    </li>
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            </ul>
+        </nav>
+    </div>
+</header>
+
+
+        <div class="page clearfix" post>
+    <div class="left">
+        <div class="post-recent">
+    <table style="width:100%;border:0;padding:0;"><tbody><tr style="padding:0">
+        <td class="toppre" style="padding:0">
+        
+        <a href="/2022-08-01-Document-Dot-All">document.all の例外仕様を知っていますか</a>
+        
+        </td><td class="topnex" style="text-align:right;padding:0">
+        
+        <a href="/2022-10-03-How-To-Make-Wordle-Solver">Wordle のソルバー（Hard Mode 対応）を作りました</a>
+        
+        </td>
+    </tr></tbody></table>
+</div>
+
+        <hr style="margin:0"/>
+        <h1 style="margin-top:10px">JavaScript のクロージャーと for 文の let 初期化の例外</h1>
+<hr />
+        <div class="label">
+
+            <div class="label-card">
+                <i class="fa fa-calendar"></i>2022-08-16
+            </div>
+
+            <div class="label-card">
+                <i class="fa fa-user"></i>Takuo Kihira
+                
+            </div>
+
+            <div class="label-card">
+                
+            </div>
+
+            <div class="label-card">
+            
+
+
+<!-- <span class="point">•</span> -->
+<span class="categories">
+  <i class="fa fa-th-list"></i>
+  
+    
+        <a href="/category/#JavaScript" title="Category: JavaScript" rel="category">JavaScript</a>
+    
+  
+
+  <!-- <span class="point">•</span> -->
+</span>
+
+
+            </div>
+
+            <div class="label-card">
+                <a href="https://github.com/tkihira/nmi.jp/blob/master/_posts/2022-08-16-Let-Initializer-In-For-Loop.md" target="_blank"><i class="fa fa-github"></i></a>
+            </div>
+
+        </div>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/2022-08-16-Let-Initializer-In-For-Loop&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="JavaScript のクロージャーと for 文の let 初期化の例外" data-url="http://nmi.jp/2022-08-16-Let-Initializer-In-For-Loop">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/2022-08-16-Let-Initializer-In-For-Loop" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="JavaScript のクロージャーと for 文の let 初期化の例外"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="JavaScript のクロージャーと for 文の let 初期化の例外" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+        <article itemscope itemtype="http://schema.org/BlogPosting">
+        <p>先日、次のような JavaScript クイズを Twitter で出しました。</p>
+
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">// JavaScript quiz: 出力は？<br />const a = [];<br />{<br /> for(let i = 0; i &lt; 10; i++) {<br /> a[i] = () =&gt; console.log(i);<br /> }<br />}<br />a[3]();<br />{<br /> let i;<br /> for(i = 0; i &lt; 10; i++) {<br /> a[i] = () =&gt; console.log(i);<br /> }<br />}<br />a[3]();<br />{<br /> for(let i = 0; i &lt; 10;) {<br /> a[i] = () =&gt; console.log(i);<br /> i++;<br /> }<br />}<br />a[3]();</p>&mdash; Takuo Kihira (@tkihira) <a href="https://twitter.com/tkihira/status/1559013385148452864?ref_src=twsrc%5Etfw">August 15, 2022</a></blockquote>
+<script async="" src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<p>答えは <span style="color:red">3, 10, 4</span> なのですが、for 文の let 初期化専用の例外処理がない場合は 10, 10, 10 になるべき問題です。<span style="color:blue">クロージャーをしっかり理解していれば（そして例外処理を知らなければ）、答えは全部 10 になるはずなのです</span>。今回この記事では、なぜ 10 になるべきなのか、そしてなぜ 10 にならないのか、について解説します。</p>
+
+<p>解説はいらん、仕様を確認させろ！という方は、記事最後の余談まで飛ばしてください。なお、この問題は <a href="https://twitter.com/kazuho">@kazuho</a> さんの<a href="https://twitter.com/kazuho/status/1558030625629929472">このツイート</a>を参考にしております。ありがとうございます！</p>
+
+<h1 id="クロージャーとは">クロージャーとは</h1>
+
+<p>クロージャーの説明は <a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Closures">MDN のクロージャーの解説</a>にとてもよくまとまっています。ここでは、実例を元に解説をしてみましょう。</p>
+
+<h2 id="var-の時代の話">var の時代の話</h2>
+
+<p>let や const が登場する前は、JavaScript の変数 (var) のスコープは関数単位でしか存在しませんでした。次のような関数を考えてみましょう（時代に合わせて arrow function を使っていません）。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="p">[];</span>
+<span class="k">for</span><span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">a</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">i</span><span class="p">);</span>
+    <span class="p">};</span>
+<span class="p">};</span>
+<span class="nx">a</span><span class="p">[</span><span class="mi">3</span><span class="p">]();</span> <span class="c1">// =&gt; 10</span>
+</code></pre></div></div>
+
+<p>変数 a も i も、大外のスコープで定義されています。var i の存在するスコープ（大外のスコープ）は一つしか存在しないので、変数 i のインスタンスも 1 個しか存在しません。そして、当たり前ですが、関数は実行されるまで実行されません。<span style="color:blue">すなわち、<code class="language-plaintext highlighter-rouge">console.log(i);</code> が実行される時に変数 i の値が改めて参照されるのです</span>。よって、console.log が呼び出されるのはループが終わった後であり、その時の i の値は 10 になっているため、結果として <code class="language-plaintext highlighter-rouge">a[3]();</code> を呼び出すと 10 が表示されます。</p>
+
+<p>もし 3 を表示したければ、当時は次のようにコードを変える必要がありました。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="p">[];</span>
+<span class="k">for</span><span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">a</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="c1">// function 1</span>
+        <span class="kd">var</span> <span class="nx">_i</span> <span class="o">=</span> <span class="nx">i</span><span class="p">;</span>
+        <span class="k">return</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="c1">// function 2</span>
+            <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">_i</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">})();</span>
+<span class="p">};</span>
+<span class="nx">a</span><span class="p">[</span><span class="mi">3</span><span class="p">]();</span> <span class="c1">// =&gt; 3</span>
+</code></pre></div></div>
+
+<p>新しい変数 <code class="language-plaintext highlighter-rouge">_i</code> のスコープを新設するために、ループごとに新しい関数を作成しています（<code class="language-plaintext highlighter-rouge">function 1</code>） 。そしてその関数を即時実行し、<code class="language-plaintext highlighter-rouge">_i</code> に現在の <code class="language-plaintext highlighter-rouge">i</code> の値をコピーします。そして返り値としてまた別の新しい関数（<code class="language-plaintext highlighter-rouge">function 2</code>）を用意して返すのですが、その関数の console.log で参照している変数はループごとに新たに宣言された <code class="language-plaintext highlighter-rouge">_i</code> であり、この <code class="language-plaintext highlighter-rouge">_i</code> はループごとにその時点の <code class="language-plaintext highlighter-rouge">i</code> がコピーされて以降一切変更されないので、結果として <code class="language-plaintext highlighter-rouge">a[3]();</code> を呼び出した時には 3 が表示されます。</p>
+
+<p>このように、関数がそこから参照できる変数と結びついている関係をクロージャーと呼びます。仮にその関数の呼び出し時には既に参照している変数のスコープの外であったとしても、関数自体に変数にアクセスする環境（レキシカル環境と呼ばれます）が結びついているため、関数が存在する限りその内部からは変数にアクセス出来ます。</p>
+
+<h2 id="let-と-const-の登場">let と const の登場</h2>
+
+<p>その後登場した let と const は、var のように関数単位のスコープではなく、ブロック単位のスコープを持ちます。簡単に言うと、{} の括弧で囲まれた範囲でのみ生存します。</p>
+
+<p>まずは前と同じような結果になるように書いてみましょう。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">a</span> <span class="o">=</span> <span class="p">[];</span>
+<span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="k">while</span><span class="p">(</span><span class="nx">i</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">a</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">i</span><span class="p">);</span>
+    <span class="p">};</span>
+    <span class="nx">i</span><span class="o">++</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nx">a</span><span class="p">[</span><span class="mi">3</span><span class="p">]();</span> <span class="c1">// =&gt; 10</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">let i</code> は大外のスコープの中で一度だけ宣言されており、実体は 1 つだけです。そして console.log から参照されている i は while 文が終わった段階で 10 になっております。よって、先程の var の例と同じように <code class="language-plaintext highlighter-rouge">a[3]();</code> は 10 を表示します。</p>
+
+<p>3 を表示したければ、次のように変更します。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">a</span> <span class="o">=</span> <span class="p">[];</span>
+<span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="k">while</span><span class="p">(</span><span class="nx">i</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">_i</span> <span class="o">=</span> <span class="nx">i</span><span class="p">;</span>
+    <span class="nx">a</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">_i</span><span class="p">);</span>
+    <span class="p">};</span>
+    <span class="nx">i</span><span class="o">++</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nx">a</span><span class="p">[</span><span class="mi">3</span><span class="p">]();</span> <span class="c1">// =&gt; 3</span>
+</code></pre></div></div>
+
+<p>新しく定義された変数 <code class="language-plaintext highlighter-rouge">_i</code> は、while の中のブロックでしか生存しません。そして console.log から参照している <code class="language-plaintext highlighter-rouge">_i</code> は <span style="color:blue">while ループで毎回新しく作られている変数 <code class="language-plaintext highlighter-rouge">_i</code> を参照</span>しており、そこには毎回実行時に <code class="language-plaintext highlighter-rouge">i</code> の値がコピーされています。そして console.log を含む関数がループごとに生成された <code class="language-plaintext highlighter-rouge">_i</code> 変数の環境と結びついているため、結果として <code class="language-plaintext highlighter-rouge">a[3]();</code> が 3 を表示します。</p>
+
+<p>このように let や const の登場によって、クロージャー（レキシカル環境）を作成するのに一時関数を作らなくて済むようになり、より軽量で読みやすいコードを書けるようになりました。</p>
+
+<h1 id="for-文の-let-初期化時の例外">for 文の let 初期化時の例外</h1>
+
+<p>さて本題の for ループについて考えてみましょう。文法的には、次の 3 つの for 文は本来同じ処理を行うはずです。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">a</span> <span class="o">=</span> <span class="p">[];</span>
+<span class="p">{</span>
+    <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">a</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+            <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">i</span><span class="p">);</span>
+        <span class="p">};</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="nx">a</span><span class="p">[</span><span class="mi">3</span><span class="p">]();</span> <span class="c1">// =&gt; 3</span>
+<span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">i</span><span class="p">;</span>
+    <span class="k">for</span><span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">a</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+            <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">i</span><span class="p">);</span>
+        <span class="p">};</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="nx">a</span><span class="p">[</span><span class="mi">3</span><span class="p">]();</span> <span class="c1">// =&gt; 10</span>
+<span class="p">{</span>
+    <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">;)</span> <span class="p">{</span>
+        <span class="nx">a</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+            <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">i</span><span class="p">);</span>
+        <span class="p">};</span>
+        <span class="nx">i</span><span class="o">++</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="nx">a</span><span class="p">[</span><span class="mi">3</span><span class="p">]();</span> <span class="c1">// =&gt; 4</span>
+</code></pre></div></div>
+
+<p>今までの説明に照らし合わせれば、console.log の参照する変数 <code class="language-plaintext highlighter-rouge">i</code> は一度しか宣言されていない変数であり、その変数はループが終わった後で 10 になっているため、その参照を握っている console.log はすべてのケースにおいて 10 を表示するのが正しい挙動になるはずです。しかし、実際にはこのようにバラバラの値を表示しております。なぜでしょうか？</p>
+
+<p><span style="color:red; font-weight:bold">これは、JavaScript(ECMAScript) がわざわざ for 文にのみ入れている例外的な挙動のためです</span>。この例外は、for 文の中で let で初期化した変数にしか発生しません。</p>
+
+<p>JavaScript では <strong><code class="language-plaintext highlighter-rouge">for(let ...;...;...)</code> の形で for 文を作った場合に限り</strong>、<span style="color:blue">例外的に for 文でループのたびに新しい変数のスコープ（正確には「レキシカル環境: lexical environment」）を生成し、そのレキシカル環境に for の中で <strong>let 宣言された変数に限って</strong>ループのたびに状態をコピーします</span>。具体的な仕様は後で余談として解説します。</p>
+
+<p>実際に追ってみましょう。まず一番上の例ですが、for 文の各ループにおいて新しいスコープが作成されています。<span style="color:blue">よって for 文のブロック内の i は別々の変数定義になります</span>。いわば、for 文のループごとに変数 i の名前が内部的に変わっているような状態です。よって、console.log の指す変数 i はそのループごとに独立した変数になり、よって <code class="language-plaintext highlighter-rouge">a[3]();</code> の出力は 3 になります。</p>
+
+<p>2 つ目の例は、for 文の中で i を宣言していないので、その特例が適用されません。スコープとしてはほぼ同じなのに、<span style="color:blue">for 文のなかで i が宣言されなかった</span>という理由により、console.log の指す変数 i はループ内において常に同一の変数を指し続けます。i はループが終わった後に 10 になるので、 <code class="language-plaintext highlighter-rouge">a[3]();</code> で出力される数字も 10 になります。</p>
+
+<p>最後の例も、for 文の中で i を宣言しているので、1 番目の例と同じように毎回同じように新しいスコープ（レキシカル環境）が新規生成され、そこに i の情報がコピーされます。ただし、<span style="color:red">console.log はそのループにおける i への参照を持つので、ループの内部で i が変更された場合は、そのループブロックにおける最終的な i の値を出力します</span>。今回はブロックの最後で <code class="language-plaintext highlighter-rouge">i++;</code> で i に 1 を足しているので、ブロックが終わった時の i の値が表示されることになり、結果として 4 が表示されます。</p>
+
+<p>内部的には、変数を書き戻す処理が発生しています。この例の場合、まずレキシカル環境が新規生成され、i = 0 の情報が追加されます。そしてブロックが実行され、その中で i++ があるので最初のレキシカル環境の i は 1 にアップデートされます。ブロックが終了した後、次のループのためにレキシカル環境が生成され、そのレキシカル環境に i を追加し、その i の値として直前のレキシカル環境の i の値をコピーします。その後、新しいレキシカル環境にてインクリメントの処理が行われるのですが、最後の例の場合はインクリメント処理がありませんので、前のブロック内部で変更された値がそのまま使われることになります。<span style="color:blue">ブロックの最後の変数の内容を、次のブロックで発生するレキシカル環境にコピーしているのです</span>。これによって、この for ループは無限ループにはなりません。</p>
+
+<h1 id="まとめ">まとめ</h1>
+
+<p>for 文中で let で初期化した場合、ループごとにレキシカル環境が別途構築され、let で初期化した変数に限って値がコピーされます。これによって、別途スコープを用意することなく、ループ変数を利用して、その時々のループ変数の値を用いたクロージャーを構築することが出来ます。そもそも for 文において、ループ変数をいじったり、ループ変数をそのままクロージャーで関連付ける必要性があることは滅多にないため、この特例の存在で不便を強いられることはまず無いと思います。</p>
+
+<p>この挙動は理解さえしてしまえば便利ではあるのですが、本来のクロージャーのあるべき挙動とは異なるために、例外挙動の存在を知らないとクロージャーを理解していればいるほど面食らうかと思います。またクロージャーに不慣れな人にとっては、この例外を知ってしまうことでクロージャーの原理を誤解しかねない挙動でもあると思います。言語の一貫性を犠牲にして便利さを優先した仕様、と言えるでしょうか。</p>
+
+<p>この挙動をカジュアルに利用したプログラムも多く存在するので、<strong>JavaScript において知っておくべき挙動だと思います</strong>。色々な意味で、ぜひ頭の片隅に置いておいてください。</p>
+
+<h1 id="余談-仕様で挙動を確認する">余談: 仕様で挙動を確認する</h1>
+
+<p>例によって長い余談です。</p>
+
+<p>さて、この例外的な挙動は仕様でどのように定義されているのか、ECMAScript の仕様を紐解いてみましょう。なお、仕様の中に出てくる ? は「ここでは例外とか起こるかも」、! は「絶対に例外とか起こらん」という意味だとざっくり思っておいてください。詳しくは <a href="https://262.ecma-international.org/13.0/#sec-algorithm-conventions">5.2 Algorithm Conventions</a> を読んでみてください。</p>
+
+<h2 id="14742-forloopevaluation">14.7.4.2 ForLoopEvaluation</h2>
+
+<p>まずは ForLoop の処理から追ってみましょう。仕様の以下の部分です。</p>
+
+<p><a href="https://262.ecma-international.org/13.0/#sec-runtime-semantics-forloopevaluation">https://262.ecma-international.org/13.0/#sec-runtime-semantics-forloopevaluation</a></p>
+
+<p>これの <code class="language-plaintext highlighter-rouge">for ( LexicalDeclaration Expression^opt ; Expression^opt ) Statement</code> の部分が、今回の処理に当たります。 <code class="language-plaintext highlighter-rouge">LexicalDeclaration</code> には let もしくは const で変数が宣言されます。では処理を見てみましょう。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1. Let oldEnv be the running execution context's LexicalEnvironment.
+2. Let loopEnv be NewDeclarativeEnvironment(oldEnv).
+3. Let isConst be IsConstantDeclaration of LexicalDeclaration.
+4. Let boundNames be the BoundNames of LexicalDeclaration.
+5. For each element dn of boundNames, do
+  a. If isConst is true, then
+    i. Perform ! loopEnv.CreateImmutableBinding(dn, true).
+  b. Else,
+    i. Perform ! loopEnv.CreateMutableBinding(dn, false).
+6. Set the running execution context's LexicalEnvironment to loopEnv.
+7. Let forDcl be the result of evaluating LexicalDeclaration.
+8. If forDcl is an abrupt completion, then
+  a. Set the running execution context's LexicalEnvironment to oldEnv.
+  b. Return ? forDcl.
+9. If isConst is false, let perIterationLets be boundNames; otherwise let perIterationLets be a new empty List.
+10. Let bodyResult be Completion(ForBodyEvaluation(the first Expression, the second Expression, Statement, perIterationLets, labelSet)).
+11. Set the running execution context's LexicalEnvironment to oldEnv.
+12. Return ? bodyResult.
+</code></pre></div></div>
+
+<p>まず (1) で <code class="language-plaintext highlighter-rouge">oldEnv</code> に現在のレキシカル環境を退避して、(2) で新しいレキシカル環境 <code class="language-plaintext highlighter-rouge">loopEnv</code> を <code class="language-plaintext highlighter-rouge">oldEnv</code> を元に作ります（レキシカル環境の作成時は外側のレキシカル環境を保持します）。そして (3) で <code class="language-plaintext highlighter-rouge">isConst</code> に <code class="language-plaintext highlighter-rouge">LexicalDeclaration</code> が const であるかどうか、すなわち <code class="language-plaintext highlighter-rouge">for(const ...;;)</code> であるか <code class="language-plaintext highlighter-rouge">for(let ...;;)</code> であるかのフラグをセットします。(4) で <code class="language-plaintext highlighter-rouge">boundNames</code> という変数に宣言された変数名のリストを保存しておきます。そして (5) で <code class="language-plaintext highlighter-rouge">loopEnv</code> にその変数名を追加します。(6) で現在のレキシカル環境を、その <code class="language-plaintext highlighter-rouge">loopEnv</code> にセットします。</p>
+
+<p>(7) で、let や const の初期化部分を評価します。そこでもし例外が発生したら (8) で例外用の処理をやって for 文から抜けます。</p>
+
+<p>さて、(9) で今回の例外処理の準備が始まります。もし <code class="language-plaintext highlighter-rouge">isConst</code> が false、すなわち let で初期化されていた場合は <code class="language-plaintext highlighter-rouge">perIterationLets</code> にその変数名一覧を保存します。const で初期化されていた場合は空リストにしておきます。</p>
+
+<p>そして (10) で <code class="language-plaintext highlighter-rouge">ForBodyEvaluation</code> という抽象関数を、 <code class="language-plaintext highlighter-rouge">the first Expression</code> (=&gt; i &lt; 10 の部分), <code class="language-plaintext highlighter-rouge">the second Expression</code> (=&gt; i++ の部分）, <code class="language-plaintext highlighter-rouge">statement</code>（ループコード）, <code class="language-plaintext highlighter-rouge">perIterationLets</code> (let で宣言された変数名一覧), <code class="language-plaintext highlighter-rouge">labelSet</code> (ラベル付き break とかでループを抜けるための情報一覧) を引数として呼びます。なお <code class="language-plaintext highlighter-rouge">Completion</code> は仕様を読みやすくするアサートみたいなものです。<span style="color:blue">ここで <code class="language-plaintext highlighter-rouge">perIterationLets</code>、すなわち let で宣言された変数名リストを <code class="language-plaintext highlighter-rouge">ForBodyEvaluation</code> に引き渡している点に注目です</span>。</p>
+
+<p>ループ本体の処理が終わったら、(11) で (1) で退避していたレキシカル環境に戻して、(10) の返り値をそのまま返して終了です。</p>
+
+<p>これが <code class="language-plaintext highlighter-rouge">ForLoopEvaluation</code> の処理です。実際のループ内部の処理は <code class="language-plaintext highlighter-rouge">ForBodyEvaluation</code> に引き継がれています。</p>
+
+<h2 id="14743-forbodyevaluation">14.7.4.3 ForBodyEvaluation</h2>
+
+<p>では次は ForBodyEvaluation の処理を追います。</p>
+
+<p><a href="https://262.ecma-international.org/13.0/#sec-forbodyevaluation">https://262.ecma-international.org/13.0/#sec-forbodyevaluation</a></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1. Let V be undefined.
+2. Perform ? CreatePerIterationEnvironment(perIterationBindings).
+3. Repeat,
+  a. If test is not [empty], then
+    i. Let testRef be the result of evaluating test.
+    ii. Let testValue be ? GetValue(testRef).
+    iii. If ToBoolean(testValue) is false, return V.
+  b. Let result be the result of evaluating stmt.
+  c. If LoopContinues(result, labelSet) is false, return ? UpdateEmpty(result, V).
+  d. If result.[[Value]] is not empty, set V to result.[[Value]].
+  e. Perform ? CreatePerIterationEnvironment(perIterationBindings).
+  f. If increment is not [empty], then
+    i. Let incRef be the result of evaluating increment.
+    ii. Perform ? GetValue(incRef).
+</code></pre></div></div>
+
+<p>(1) で作られている V は、ループの評価の返り値になります（今回は無視して良いです）。 (2) の <code class="language-plaintext highlighter-rouge">CreatePerIterationEnvironment(perIterationBindings)</code> の呼び出しが今回の本題になりますが、とりあえず先にループの処理を見てみましょう。</p>
+
+<p>ループ自体は (3) の Repeat で実行されます。まず (a) で <code class="language-plaintext highlighter-rouge">test</code> (=&gt; i &lt; 10 の部分) が空でなければ、実際に <code class="language-plaintext highlighter-rouge">test</code> を評価して、それが false になっていれば (iii) の return でループから抜けます。もし <code class="language-plaintext highlighter-rouge">test</code> が空であれば、ここではループからは抜けません（ <code class="language-plaintext highlighter-rouge">for(;;)</code> みたいな無限ループです）。</p>
+
+<p>(b) で <code class="language-plaintext highlighter-rouge">stmt</code> を評価し、実際のループの内容を実行します。ここで、もし stmt が括弧で包まれていた場合、すなわち仕様的に <a href="https://262.ecma-international.org/13.0/#prod-Block">Block</a> であれば、ここでさらに新たなレキシカル環境が作成されます。上の例で登場した <code class="language-plaintext highlighter-rouge">const _i</code> はここの Block の中で作られたレキシカル環境に紐付いた変数ということになります。詳しくは、<a href="https://262.ecma-international.org/13.0/#sec-block-runtime-semantics-evaluation">14.2.2 Runtime Semantics: Evaluation</a> を見てください。</p>
+
+<p>さて、(b) の評価をした結果を (c) の <code class="language-plaintext highlighter-rouge">LoopContinues</code> で評価します。break、return、もしくはラベル付き continue などが出てきた場合はループから抜けます。(d) では実行結果を V に保存しておきます。</p>
+
+<p>さて (e) で、再度 <code class="language-plaintext highlighter-rouge">CreatePerIterationEnvironment(perIterationBindings)</code> の評価をしています。後で解説しますが、この位置で呼び出しているのが重要です。</p>
+
+<p>最後に (f) で <code class="language-plaintext highlighter-rouge">increment</code> (=&gt; i++ の部分) の評価をします。そして (3) の先頭に戻ります。</p>
+
+<p>ここまで読んできて、ループ自体の仕様は極めて普通で、特殊なのは <code class="language-plaintext highlighter-rouge">CreatePerIterationEnvironment</code> という抽象関数を呼んでいるところのみです。次はこれを追いましょう。</p>
+
+<h2 id="14744-createperiterationenvironment">14.7.4.4 CreatePerIterationEnvironment</h2>
+
+<p>最後に <code class="language-plaintext highlighter-rouge">CreatePerIterationEnvironment</code> の処理を追っていきます。ここに例外処理のすべてが詰まっています。</p>
+
+<p><a href="https://262.ecma-international.org/13.0/#sec-createperiterationenvironment">https://262.ecma-international.org/13.0/#sec-createperiterationenvironment</a></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1. If perIterationBindings has any elements, then
+  a. Let lastIterationEnv be the running execution context's LexicalEnvironment.
+  b. Let outer be lastIterationEnv.[[OuterEnv]].
+  c. Assert: outer is not null.
+  d. Let thisIterationEnv be NewDeclarativeEnvironment(outer).
+  e. For each element bn of perIterationBindings, do
+    i. Perform ! thisIterationEnv.CreateMutableBinding(bn, false).
+    ii. Let lastValue be ? lastIterationEnv.GetBindingValue(bn, true).
+    iii. Perform ! thisIterationEnv.InitializeBinding(bn, lastValue).
+  f. Set the running execution context's LexicalEnvironment to thisIterationEnv.
+2. Return unused.
+</code></pre></div></div>
+
+<p>まず (1) で <code class="language-plaintext highlighter-rouge">perIterationBindings</code> の中身の確認をしています。ここは for 文で let 初期化された変数の一覧（もし <code class="language-plaintext highlighter-rouge">for(let i = 0;...;...)</code> ならば <code class="language-plaintext highlighter-rouge">i</code> ）が入っています。const で初期化されている場合は空になります。</p>
+
+<p>もし中身があれば、(a) で <code class="language-plaintext highlighter-rouge">lastIterationEnv</code> に現在のレキシカル環境を退避します。そして (b) で、その一つ外側のレキシカル環境（すなわち for 実行直前のレキシカル環境）を <code class="language-plaintext highlighter-rouge">outer</code> に保存します。(c) である通り、for でレキシカル環境を新たに作り出しているのでここでは null にはなりません。</p>
+
+<p>(d) で、新たに <code class="language-plaintext highlighter-rouge">thisIterationEnv</code> というレキシカル環境を <code class="language-plaintext highlighter-rouge">outer</code> を元にして生成します。ここで作られたレキシカル環境は for 文の実行直前のレキシカル環境と同じであるため、まだ中には let で初期化される変数（ <code class="language-plaintext highlighter-rouge">i</code> など）が登録されておりません。</p>
+
+<p>よって、(e) で <code class="language-plaintext highlighter-rouge">perIterationBindings</code> の中身一つずつ、すなわち let で初期化される変数名一つずつにおいて処理を開始します。まずその変数名を <code class="language-plaintext highlighter-rouge">bn</code> とします（例えば <code class="language-plaintext highlighter-rouge">i</code> のような名前が入っています）。そして、(i) で新しく作ったレキシカル環境 <code class="language-plaintext highlighter-rouge">thisIterationEnv</code> に <code class="language-plaintext highlighter-rouge">bn</code> 変数を追加し、(ii) で退避したレキシカル環境 <code class="language-plaintext highlighter-rouge">lastIterationEnv</code> から変数名 <code class="language-plaintext highlighter-rouge">bn</code> の値を <code class="language-plaintext highlighter-rouge">lastValue</code> に取り出し、それを新しく作ったレキシカル環境 <code class="language-plaintext highlighter-rouge">thisIterationEnv</code> の <code class="language-plaintext highlighter-rouge">bn</code> に保存しています。</p>
+
+<p><strong>すなわち、ここで古いレキシカル環境 <code class="language-plaintext highlighter-rouge">lastIterationEnv</code> の変数名 <code class="language-plaintext highlighter-rouge">bn</code> に入っている値を、新しいレキシカル環境 <code class="language-plaintext highlighter-rouge">thisIterationEnv</code> の変数名 <code class="language-plaintext highlighter-rouge">bn</code> の値としてコピーしているのです！</strong></p>
+
+<p>そして (f) で、現在のレキシカル環境を新しく作った <code class="language-plaintext highlighter-rouge">thisIterationEnv</code> に設定して終了します。これにて、次のループで参照されるレキシカル環境は以前のループとは別の環境に変わります。</p>
+
+<p>このように <code class="language-plaintext highlighter-rouge">CreatePerIterationEnvironment</code> 抽象関数では、レキシカル環境を新たに構築し、そこで for 文の let で宣言された変数名のみコピーしています。そして <code class="language-plaintext highlighter-rouge">ForBodyEvaluation</code> ではこの関数をループの先頭、ならびに <code class="language-plaintext highlighter-rouge">increment</code> (i++ などの部分) の直前に呼んでいるため、 <code class="language-plaintext highlighter-rouge">for(let i = 0; i &lt; 10; i++)</code> 構文によって新しく作られたレキシカル環境では i++ によって i に 1 が加算された状態でループブロックが開始するのです。</p>
+
+<p>今回の例のように、ループのブロックの最後で <code class="language-plaintext highlighter-rouge">i++;</code> を自分で呼ぶようにしていると、そのループで利用されているレキシカル環境の i が変更されるため、console.log が参照していた i も変更されてしまうことになります。よって <code class="language-plaintext highlighter-rouge">a[3]();</code> において 4 が出力されるという結果に繋がるわけです。</p>
+
+
+        </article>
+        <hr>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/2022-08-16-Let-Initializer-In-For-Loop&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="JavaScript のクロージャーと for 文の let 初期化の例外" data-url="http://nmi.jp/2022-08-16-Let-Initializer-In-For-Loop">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/2022-08-16-Let-Initializer-In-For-Loop" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="JavaScript のクロージャーと for 文の let 初期化の例外"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="JavaScript のクロージャーと for 文の let 初期化の例外" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+
+        
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+        
+
+        <div class="post-recent">
+    <div class="pre">
+
+    
+        <p><strong>前の投稿</strong> <a href="/2022-08-01-Document-Dot-All">document.all の例外仕様を知っていますか</a></p>
+    
+    </div>
+    <div class="nex">
+
+        
+        <p><strong>次の投稿</strong> <a href="/2022-10-03-How-To-Make-Wordle-Solver">Wordle のソルバー（Hard Mode 対応）を作りました</a></p>
+        
+    </div>
+</div>
+
+
+    </div>
+    <button class="anchor"><i class="fa fa-anchor"></i></button>
+
+
+    <div class="right">
+        <div class="wrap">
+            <div class="side">
+                <div>
+                    <i class="fa fa-tags"></i>
+                    Top Popular Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2016-07-23-stock-strategy-for-early-startup-employee">スタートアップに転職する時に最低限知っておくべき株の話</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/582">生WebGL入門:初音ミクの美麗3Dモデルを表示する(前編)</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2017-10-06-Making_a-business_plan">事業計画書の作り方、新規ビジネスの考え方</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/902">Convertible Note / Convertible Equity とは？</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/488">JavaScript イディオム集</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/465">ExGameの製作で感じたこと</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                </ul>
+            </div>
+
+            <div class="side">
+                <div>
+                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                    Recent Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        <li><a href="/2024-08-28-Review-Binary-Hacks-Rebooted">書評 "Binary Hacks Rebooted"</a></li>
+                    
+                        <li><a href="/2024-06-10-Deep-Dive-into-ARM-JavaScript-Special-Instruction-FJCVTZS">ARM に存在する JavaScript 専用命令「FJCVTZS」を追う（ついでに V8 をビルドする）</a></li>
+                    
+                        <li><a href="/2024-06-03-Exploring-V8-JIT-Outputs">JavaScript 実行エンジン V8 の JIT 出力コードを読んでみよう</a></li>
+                    
+                </ul>
+            </div>
+
+            <!-- <div class="side">
+                <div>
+                    <i class="fa fa-external-link"></i>
+                    Links
+                </div>
+                <ul  class="content-ul">
+
+                </ul>
+            </div> -->
+        </div>
+    </div>
+
+
+
+</div>
+<script>
+/**
+ * target _blank
+ */
+(function() {
+    var aTags = document.querySelectorAll('article a:not([id])')
+    for (var i = 0; i < aTags.length; i++) {
+        aTags[i].setAttribute('target', '_blank')
+    }
+}());
+</script>
+<script src="/js/pageContent.js " charset="utf-8"></script>
+
+
+    <footer class="site-footer">
+
+
+    <div class="wrapper">
+
+        <p class="description">
+             Takuo Kihira 
+        </p>
+        <p class="contact">
+            Contact me at: 
+            <a href="https://github.com/tkihira" title="GitHub"><i class="fa fa-github" aria-hidden="true"></i></a>     
+            <a href="https://twitter.com/tkihira" title="Twitter"><i class="fa fa-twitter" aria-hidden="true"></i></a>  
+            <a href="https://www.facebook.com/takuo.kihira" title="Facebook"><i class="fa fa-facebook-official" aria-hidden="true"></i></a>    
+        </p>
+        <p class="power">
+            <span>
+                Site powered by <a href="https://jekyllrb.com/">Jekyll</a>.
+            </span>
+            <span>
+                Theme designed by <a href="https://github.com/Gaohaoyang">HyG</a>.
+            </span>
+        </p>
+    </div>
+</footer>
+
+    <div class="back-to-top">
+    <a href="#top" class="scroll">
+        <i class="fa fa-arrow-up" aria-hidden="true"></i>
+    </a>
+</div>
+
+    <script src=" /js/main.js " charset="utf-8"></script>
+    <script src=" /js/scroll.min.js " charset="utf-8"></script>
+  </body>
+
+</html>

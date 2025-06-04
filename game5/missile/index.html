@@ -1,0 +1,222 @@
+<!DOCTYPE html5>
+<html><head><title>missile</title>
+<meta name="viewport" content="width=320,user-scalable=no">
+<script>
+(function() {
+	var config = {
+		width: 320,
+		height: 416,
+		backgroundColor: "#002",
+		groundHeight: 30,
+		groundColor: "#810",
+		baseRaidus: 50,
+		baseColor: "#9e0",
+		missileColor: "#0f0",
+		missileSpeed: 10,
+		explosionColor: "#f00",
+		explosionSpeed: 3,
+		explosionRadius: 40,
+		trackColor: "#fff",
+		rockColor: "#e00"
+	};
+	var status = {};
+	
+	var rect = function(color, x, y, w, h) {
+		status.ctx.fillStyle = color;
+		status.ctx.fillRect(x | 0, y | 0, w | 0, h | 0);
+	};
+	var circle = function(color, x, y, r) {
+		status.ctx.fillStyle = color;
+		status.ctx.beginPath();
+		status.ctx.arc(x | 0, y | 0, r | 0, 0, 2 * Math.PI, true);
+		status.ctx.fill();
+	};
+	var line = function(color, x1, y1, x2, y2, w) {
+		status.ctx.strokeStyle = color;
+		status.ctx.lineWidth = w;
+		status.ctx.beginPath();
+		status.ctx.moveTo(x1, y1);
+		status.ctx.lineTo(x2, y2);
+		status.ctx.stroke();
+	};
+	
+	var Explosion = function(x, y) {
+		var radius = config.explosionSpeed;
+		this.remove = function(over) {
+			radius += (over)? 1: config.explosionSpeed;
+			if(radius >= config.explosionRadius) {
+				circle(config.backgroundColor, x, y, radius);
+			}
+		};
+		this.move = function() {
+			if(radius >= config.explosionRadius) {
+				return false;
+			}
+			circle(config.explosionColor, x, y, radius);
+			return true;
+		};
+	};
+	
+	var Rock = function(fromX, toX, speed) {
+		var lastX = fromX;
+		var lastY = 0;
+		var toY = config.height - config.groundHeight;
+		var dx = fromX - toX;
+		var distance = Math.sqrt(dx * dx + toY * toY);
+		var current = 0;
+		this.remove = function() {
+		};
+		this.move = function() {
+			current += speed;
+			var ratio = current / distance;
+			var x = (toX - fromX) * ratio + fromX;
+			var y = toY * ratio;
+			var data = status.ctx.getImageData(x, y, 1, 1).data;
+			if(data[0] == 255 && data[1] == 0 && data[2] == 0) {
+				line(config.backgroundColor, fromX, 0, x, y, 3);
+				addObject(new Explosion(x, y));
+				status.score++;
+				return false;
+			}
+			line(config.trackColor, fromX, 0, x, y, 1);
+			lastX = x;
+			lastY = y;
+			if(ratio > 1) {
+				status.state = "losing";
+				status.explosion = new Explosion(x, toY)
+				return false;
+			}
+			return true;
+		};
+	};
+	
+	var Missile = function(toX, toY) {
+		var lastX = null;
+		var lastY = null;
+		
+		var fromX = config.width / 2;
+		var fromY = config.height - config.groundHeight;
+		var dx = fromX - toX;
+		var dy = fromY - toY;
+		var distance = Math.sqrt(dx * dx + dy * dy);
+		var current = 0;
+		
+		this.remove = function() {
+			if(lastX != null) {
+				circle(config.backgroundColor, lastX, lastY, 5);
+			}
+		};
+		this.move = function() {
+			current += config.missileSpeed;
+			if(distance > current) {
+				var ratio = current / distance;
+				lastX = (toX - fromX) * ratio + fromX;
+				lastY = (toY - fromY) * ratio + fromY;
+				circle(config.missileColor, lastX, lastY, 3);
+				return true;
+			} else {
+				addObject(new Explosion(toX, toY));
+				return false;
+			}
+		};
+	};
+	
+	var draw = function() {
+		if(status.state == "opening" || status.state == "gameover") {
+			rect("#000", 0, config.height / 2 - 16, config.width, 32);
+			status.ctx.textBaseline = "middle";
+			status.ctx.textAlign = "center";
+			status.ctx.fillStyle = "#fff";
+			if(status.state == "opening") {
+				status.ctx.font = "20px Futura";
+				status.ctx.fillText("touch to start", config.width / 2, config.height / 2);
+			} else {
+				status.ctx.font = "16px Futura";
+				status.ctx.fillText("your score:" + status.score, config.width / 2, config.height / 2 - 8);
+				status.ctx.fillText("touch to restart", config.width / 2, config.height / 2 + 8);
+			}
+		}
+		if(status.state != "gameover") {
+			circle(config.baseColor, config.width / 2, config.height, 50);
+			rect(config.groundColor, 0, config.height - config.groundHeight, config.width, config.groundHeight);
+		}
+	};
+	
+	var reset = function() {
+		var ctx = status.ctx;
+		rect(config.backgroundColor, 0, 0, config.width, config.height);
+		status.score = 0;
+		status.objectList = [];
+	};
+	
+	var addObject = function(obj) {
+		for(var i = 0; i < status.objectList.length + 1; i++) {
+			if(status.objectList[i] == null) {
+				status.objectList[i] = obj;
+				break;
+			}
+		}
+	};
+	
+	var ontouch = function(x, y) {
+		if(status.state == "playing" && y < config.height - config.groundHeight) {
+			var missile = new Missile(x, y);
+			addObject(missile);
+		} else if(status.state == "opening" || status.state == "gameover") {
+			reset();
+			rect(config.backgroundColor, 0, 0, config.width, config.height);
+			status.state = "playing";
+			draw();
+		}
+	};
+	
+	window.onload = function() {
+		var canvas = document.createElement("canvas");
+		canvas.width = config.width;
+		canvas.height = config.height;
+		document.body.appendChild(canvas);
+		status.ctx = canvas.getContext("2d");
+		setTimeout(function() { scrollTo(0, 0); }, 100);
+		reset();
+		status.state = "opening";
+		
+		(function mainLoop() {
+			setTimeout(mainLoop, 1000 / 30);
+			if(status.state == "playing") {
+				for(var i = 0; i < status.objectList.length; i++) {
+					var obj = status.objectList[i];
+					obj && obj.remove();
+				}
+				for(var i = 0; i < status.objectList.length; i++) {
+					var obj = status.objectList[i];
+					if(obj && !obj.move()) {
+						delete status.objectList[i];
+					}
+				}
+				if(Math.random() > 0.95) {
+					addObject(new Rock(Math.random() * config.width, Math.random() * config.width, Math.random() * (2 + status.score / 20) + 0.5));
+				}
+				draw();
+			} else if(status.state == "losing") {
+				status.explosion.remove(true);
+				if(!status.explosion.move()) {
+					delete status.explosion;
+					status.state = "gameover";
+				}
+			} else {
+				draw();
+			}
+		})();
+		canvas.onmousedown = function(e) {
+			ontouch(e.clientX, e.clientY);
+		};
+		canvas.ontouchstart = function(e) {
+			if(e.touches[0]) {
+				ontouch(e.touches[0].clientX, e.touches[0].clientY);
+			}
+			e.preventDefault();
+		};
+	};
+})();
+</script>
+<body style="margin:0;background-color:#000"></body></html>

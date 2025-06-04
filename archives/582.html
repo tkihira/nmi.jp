@@ -1,0 +1,1543 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>生WebGL入門:初音ミクの美麗3Dモデルを表示する(前編)</title>
+    <meta name="description" content="Special Thanks to @hagat and @teehah for reviewing my articles!近年、WebGLに流行の兆しが出てきました。WebGLとは、ブラウザに何らプラグインをインストールすることなく、JavaScriptよりGPUを使用した3Dの表示を可能とする技術です。プラ...">
+
+    <link rel="stylesheet" href=" /css/fontawesome/css/font-awesome.min.css ">
+    <link rel="stylesheet" href=" /css/main.css ">
+    <link rel="canonical" href="http://nmi.jp/archives/582">
+    <link rel="alternate" type="application/rss+xml" title="nmi.jp" href="http://nmi.jp/feed.xml">
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=3.0'></script>
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=1.1'></script>
+    <script>
+        if(location.href.match(/\.html$/)) {
+            location.href = location.href.match(/(.+)\.html/)[1];
+        }
+    </script>
+
+
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-229769-8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-229769-8');
+</script>
+</head>
+
+
+  <body>
+
+    <header id="top">
+    <div class="wrapper">
+        <a href="/" class="brand">nmi.jp</a>
+        <small>Twitter → <a href="https://twitter.com/tkihira" target="_blank">@tkihira</a></small>
+        <button id="headerMenu" class="menu"><i class="fa fa-bars"></i></button>
+        <nav id="headerNav">
+            <ul>
+                <li>
+                    
+                    <a href="/">
+                    
+                        <i class="fa fa-home"></i>Home
+                    </a>
+                </li>
+
+                
+                    
+                    <li>
+                        
+                        <a href="/archive/">
+                        
+                            <i class="fa fa-archive"></i>Archives
+                        </a>
+                    </li>
+                    
+                
+                    
+                    <li>
+                        
+                        <a href="/category/">
+                        
+                            <i class="fa fa-th-list"></i>Categories
+                        </a>
+                    </li>
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            </ul>
+        </nav>
+    </div>
+</header>
+
+
+        <div class="page clearfix" post>
+    <div class="left">
+        <div class="post-recent">
+    <table style="width:100%;border:0;padding:0;"><tbody><tr style="padding:0">
+        <td class="toppre" style="padding:0">
+        
+        <a href="/archives/573">DeNAを退職し、新しく会社を設立します</a>
+        
+        </td><td class="topnex" style="text-align:right;padding:0">
+        
+        <a href="/archives/642">生WebGL入門:初音ミクの美麗3Dモデルを表示する(中編)</a>
+        
+        </td>
+    </tr></tbody></table>
+</div>
+
+        <hr style="margin:0"/>
+        <h1 style="margin-top:10px">生WebGL入門:初音ミクの美麗3Dモデルを表示する(前編)</h1>
+<hr />
+        <div class="label">
+
+            <div class="label-card">
+                <i class="fa fa-calendar"></i>2014-12-03
+            </div>
+
+            <div class="label-card">
+                <i class="fa fa-user"></i>Takuo Kihira
+                
+            </div>
+
+            <div class="label-card">
+                
+            </div>
+
+            <div class="label-card">
+            
+
+
+<!-- <span class="point">•</span> -->
+<span class="categories">
+  <i class="fa fa-th-list"></i>
+  
+    
+        <a href="/category/#HTML5" title="Category: HTML5" rel="category">HTML5</a>&nbsp;
+    
+        <a href="/category/#Canvas" title="Category: Canvas" rel="category">Canvas</a>&nbsp;
+    
+        <a href="/category/#WebGL" title="Category: WebGL" rel="category">WebGL</a>
+    
+  
+
+  <!-- <span class="point">•</span> -->
+</span>
+
+
+            </div>
+
+            <div class="label-card">
+                <a href="https://github.com/tkihira/nmi.jp/blob/master/_posts/2014-12-04-582.md" target="_blank"><i class="fa fa-github"></i></a>
+            </div>
+
+        </div>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/archives/582&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="生WebGL入門:初音ミクの美麗3Dモデルを表示する(前編)" data-url="http://nmi.jp/archives/582">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/archives/582" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="生WebGL入門:初音ミクの美麗3Dモデルを表示する(前編)"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="生WebGL入門:初音ミクの美麗3Dモデルを表示する(前編)" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+        <article itemscope itemtype="http://schema.org/BlogPosting">
+        <p>Special Thanks to <a href="https://twitter.com/hagat/" target="_blank">@hagat</a> and <a href="https://twitter.com/teehah/" target="_blank">@teehah</a> for reviewing my articles!</p>
+<p><script>
+if(location.href.split("archives").length != 1 || location.href.split("preview").length != 1) {
+document.write('<iframe width="550" height="550" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" allowtransparency="true" src="http://nmi.jp/webgl/miku/append_miku/face.html"></iframe>');
+} else {
+document.write('<img src="http://nmi.jp/wp-content/uploads/2014/11/miku_face.png" alt="" title="miku_face" width="265" height="238" class="aligncenter size-full wp-image-651" />');
+}
+</script></p>
+<p>近年、WebGLに流行の兆しが出てきました。WebGLとは、ブラウザに何らプラグインをインストールすることなく、JavaScriptよりGPUを使用した3Dの表示を可能とする技術です。プラグインのインストールが必要ないとはいえ今までは対応ブラウザが少なくあまり実用的ではありませんでしたが、先日のiOS8で正式に対応されたことでモバイルブラウザにおいて対応率が跳ね上がり、スマートフォンにおいてブラウザベースで3Dのゲーム等を作れる可能性が急激に高まりました。</p>
+<p>今回<a href="http://qiita.com/advent-calendar/2014/webgl" target="_blank">WebGL Advent Calendar</a>の一環として、生WebGLで3Dのオブジェクトを表示するところまで挑戦してみます。WebGLには<a href="http://threejs.org/" target="_blank">three.js</a>を始めとして有用なライブラリがたくさんあり、大抵の場合は適したライブラリを使用するほうが良いでしょう。しかし、ライブラリの背景を知らずに機能だけを使っているよりは、ライブラリ内部でどのような処理が行われているのかを理解している方が良いのは言うまでもありません。今回は基礎を知るために、生のWebGLを触ってみることにしました。</p>
+<p>今回の記事の最終目的は、3DモデルをWebGLで表示することです。特に、プログラミング言語（JavaScript）はある程度得意だけれど3D技術はほとんどわからない、という方にとって有益な記事になれば幸いです。<br />
+<a id="more"></a><a id="more-582"></a></p>
+<h1>準備</h1>
+<p>まず3Dのデータを用意します。探せば色々とあるのでしょうが、綺麗なモデルのデータがたくさんある Miku Miku Dance（以下MMD）の3Dデータを利用してみたいと思います。今回、まず最初にMMDの標準モデルである「<a href="http://dic.nicovideo.jp/a/%E3%81%82%E3%81%AB%E3%81%BE%E3%81%95%E5%BC%8F%E3%83%9F%E3%82%AF" target="_blank">あにまさ式ミク</a>」と呼ばれるモデルを選びました。MMDのパッケージの中にある "初音ミク.pmd" です。</p>
+<p><img src="http://nmi.jp/wp-content/uploads/2014/11/miku.png" alt="" title="miku" width="344" height="485" class="aligncenter size-full wp-image-599" /></p>
+<p>MMDのデータはPMD、PMX形式で配布されているので、まずはこれを人が読める形式であるOBJ形式に変換したいと思います。今回はオープンソースの3D編集ツールであるBlenderを使いました。このBlenderって奴はとにかく初見殺しで、エンジニアの人向けには「3Dの世界のvim」といえば伝わるでしょうか。自分のWinノートパソコン環境だと、視点の移動一つ出来なくて大変でした。自分は未だにさっぱり慣れていませんが、とりあえず困ったらスペースを押してコマンドを入力する、という方法で切り抜けています（Move ViewとかRotate Viewとか）。</p>
+<p>Blenderの細かい使い方については割愛しますが、PMD形式は標準ではサポートされていないので、まずPMDのimportをサポートするプラグインをインストールし、それを使ってインポートします。確か自分が使ったのは<a href="http://saitottammas.wordpress.com/2013/05/14/blender-pmx/" target="_blank">これ</a>だったと思いますが、読み込みができればどれを使っても大丈夫です。そして、importしたオブジェクトを標準でついているOBJ exporterでexportして完了です。</p>
+<p>なお、MMDのモデルは当然ながらMMD専用なので、一部のモデルはMMDに特化しているためBlender等では崩れることがあります。例えば、有名な「Lat式ミク」をimportしたところ、（グロ画像・閲覧注意）<a href="http://nmi.jp/wp-content/uploads/2014/11/lat_miku.png" target="_target">大変なこと</a>になってしまいました。どうしてこうなるかの理由については<a href="http://d.hatena.ne.jp/edvakf/20111021/1319213629" target="_blank">このサイト</a>が詳しいです。</p>
+<p>さて、上記の工程を経て、<a href="http://nmi.jp/webgl/miku/miku.obj" target="_blank">miku.obj</a>、<a href="http://nmi.jp/webgl/miku/miku.mtl" target="_blank">miku.mtl</a> が生成されました。両方ともテキストファイルで、人間が中身を読むことが出来ます。それとmiku.mtlの中で定義されている <a href="http://nmi.jp/webgl/miku/eyeM2.bmp" target="_blank">eyeM2.bmp</a> を加え、この3つのファイルが「あにまさ式ミク」を形作っていることになります。</p>
+<p><img src="http://nmi.jp/wp-content/uploads/2014/11/miku_wireframe.png" alt="" title="miku_wireframe" width="399" height="588" class="aligncenter size-full wp-image-607" /></p>
+<h1>ポリゴンを1枚表示する</h1>
+<p>さて、準備が整ったところで早速WebGLの世界に入っていきましょう。3Dのモデルは大量のポリゴン（3次元の座標を持った三角形）により構成されております（あにまさ式ミクの場合は22961枚です）。WebGLはポリゴンを大量に高速に描画することが出来るのが特徴です。というわけで、まずは1枚ポリゴンを書くことを目標にしましょう。</p>
+<p>先にお伝えすると、ポリゴン1枚表示するために、かなりのコードが必要になります。しかし1枚ポリゴンさえ書いてしまえば、後はそれを何枚どのように書くかだけの話となるので、そこからの話はスイスイ進みます。ミクさんの表示目指して頑張りましょう！</p>
+<h3>初期化</h3>
+<p>まずは、とりあえず初期化するところだけでも書いたのがこちらです。</p>
+<p><a href="https://github.com/tkihira/webgl-miku-sample/tree/a1f307394fa5b3bbdfa05657c0affbbf4e1d9894" target="_blank">https://github.com/tkihira/webgl-miku-sample/tree/a1f307394fa5b3bbdfa05657c0affbbf4e1d9894</a></p>
+<p>WebGLはパイプラインで構成されております。まずVertex Shader（以下VS）と呼ばれるプログラムに頂点データが入力として流し込まれ、VSは頂点データを描画の座標系（クリップ座標系）とその座標が持つデータに変換して出力します。次に、WebGL内の処理として、頂点データ同士を適切につなぎ合わせ（たいていは三角形でつなぎます）、その三角形の内部のデータを補間します（VSの出力データが色データだった場合は、グラデーションする感じですね）。最後にFragment Shader（以下FS）と呼ばれるプログラムが各ピクセルごとに呼ばれます。FSは補間されたデータを受け取り、それを出力する色画像に変換して出力します。</p>
+<p>そして、VSとFSはユーザーがプログラムとして記述することが出来ます。GLSL（OpenGL Shading Language）と呼ばれるC言語風の言語で書きます。今回のコードではGLSLを適当に記述していますが、JavaScript側でindex.htmlに書いたGLSLを取得し、コンパイルし、ひとつのプログラムとしてリンクしているのが今回のコードです。リンクまでしかしていないのでエラーは出ませんが、このプログラムは初期化するだけで実際には何の出力もしません。</p>
+<h3>行列の効果</h3>
+<p>さて、行列は3Dプログラミングをする上で避けて通れません。具体的な行列の計算はただの足し算掛け算の羅列なのですが、その効果は大変便利なものです。というわけで、今回は「効果」だけを説明しちゃいます。行列について詳しく知っていることが望ましいのは言うまでもないですが、とりあえず効果さえ知っていればなんとかなります（断言）。</p>
+<p>行列は簡単にいうと「座標変換」のデータです。例えば、建物のモデルとミクさんのモデルの高さが同じだった場合、建物のモデルを3倍くらいに大きくしたいなーと思うわけですが（ミクさん縮めるでもいいです）、そういう時どうすればいいでしょうか。モデルの頂点データが(x, y, z)と格納されているなら、すべてのデータを(x * 3, y * 3, z * 3)と三倍にしてしまえば良さそうです。では別に、ミクさんの位置をちょっとx方向に10だけ動かしたいな…と思ったとしましょう。その場合は(x + 10, y, z)にすれば良さそうですよね。</p>
+<p>行列は、このような計算に最適なツールとなります。拡大縮小や平行移動だけでなく、回転などの表現も可能です。ある行列Mに対して、ベクトルvを掛ける（M * v）と、その掛け算の結果はベクトル（v'）となり、v'ベクトルは回転などの座標変換された情報になります。さらに、行列同士を掛け算すると行列になるのですが、掛け算された結果の行列はそれぞれの効果を掛けあわせた効果を持つ行列となります。例えば移動の行列をT、回転の行列をR、拡大の行列をSだとすると、T * R * S と掛けあわせて出来た新しい行列Mは、「拡大して回転して移動する」というのを一括してやってくれる便利行列となるのです。</p>
+<p>さて、前述したとおり、最終的にVSはクリップ座標系で出力する必要があるのですが、相当大雑把にいうとx, y, zを全部[-1, 1]の範囲の箱に入れる（その範囲外の場合は描画されなくなる）ということです。そして、その箱をZ軸沿いから眺めた絵が、出力される絵になるのです。かなりかいつまんで話していて、実際は違うのですが、イメージとしてはそういう感じです。</p>
+<p>しかし実際のプログラムでは、自分の定義した三次元空間（世界座標系）に自由自在にモノを置いて、それを適当に眺めたいわけです。そういう時に活躍するのが上記の行列の効果になります。三次元の時には、frustum（錐台）と呼ばれる変換をよく使います。世界座標系の、錐台の中に入ったやつをぐにゃりと曲げて、クリップ座標系の箱の中にぴったりに入れる変換効果だと思ってください。</p>
+<p><img src="http://nmi.jp/wp-content/uploads/2014/11/frustum.png" alt="" title="frustum" width="566" height="302" class="aligncenter size-full wp-image-595" /></p>
+<p>（正確には、クリップ座標系はWebGLの内部機構によりw要素で同次除算され、その結果が[-1,1]に正規化された正規化デバイス座標系になり、最終的に上記の変換が行われます。なので、frustum関数の生成する行列は、同次除算をおこなうと錐台が四角になるような良い感じの(x,y,z,w)を生成するような行列ということになります。詳しくは、座標系については<a href="http://oshiro.bpe.es.osaka-u.ac.jp/people/staff/imura/OpenGL/OpenGL/coordinates/disp_content" target="_blank">こちら</a>、frustumの変換に関しては<a href="http://d.hatena.ne.jp/ousttrue/20081111/1226368685" target="_blank">こちら</a>を参照してください）</p>
+<p>今回のプログラムでは、ポリゴンをそのfrustumの中に入るように平行移動する行列（translate）と、せっかくなのでポリゴンをクルクル回転させる行列（rotate）を使っています。こういった行列を生成するライブラリとして、今回は<a href="http://glmatrix.net/" target="_blank">glMatrix</a>を利用しました。WebGLを使う際にはこの行列ライブラリが多分いちばんいいのではないかと思っています。glMatrixはソースも綺麗なので、中身を読んでみると行列がどのように生成されているのかわかると思います。</p>
+<h3>WebGLへのデータの送信</h3>
+<p>WebGLへのデータの送信までを行うコードはこちらです。</p>
+<p><a href="https://github.com/tkihira/webgl-miku-sample/tree/ccc2addef05e407e145b98f55d270ace0e9c8c06" target="_blank">https://github.com/tkihira/webgl-miku-sample/tree/ccc2addef05e407e145b98f55d270ace0e9c8c06</a></p>
+<p>新しく、loadBuffer関数を用意しています。ここでは、唯一のポリゴンである三角形のデータと、その三角形の法線ベクトルを用意しました。三角形は、今回は3つの頂点をそのまま座標で指定しました。XYZ座標順に入っているので、(-0.5, -0.5)-(0.5, -0.5)-(0.5, 0.5)（Z座標はゼロ）というXY平面上の直角二等辺三角形です。そして法線ベクトルもついでに用意しました。法線というのは、ある面に垂直な方向ベクトルを示すデータです。その三角形が曲面の一部だった、という場合は3つの頂点でバラバラの法線を持つことになるのですが、今回は全部同じ方向(0, 0, 1)、Z軸方向を向いてもらいました。</p>
+<p><img src="http://nmi.jp/wp-content/uploads/2014/11/triangle.png" alt="" title="triangle" width="300" height="299" class="aligncenter size-full wp-image-639" /></p>
+<p>bindBufferで今から扱うバッファを指定し、そこにデータを流し込んでいます。WebGLで使うデータはTyped Arrayで行われます。JSの配列をFloat32Arrayに変換して、bufferDataで流し込めばOKです。</p>
+<p>さて、では描画のところを見ましょう。まず最初に、先ほどの錐台（frustum）の行列と、平行移動＆回転の行列を用意しています。そしてそれをuniformという形式でVSに渡しています。</p>
+<p>プログラムからVS・FS、VSからFSにデータを送る方法は、大きく3つあります。一つがuniformで、これはプログラムから定数値（頂点によって変わらない値）をVSもしくはFSに送る場合に使います。今回は、行列は頂点によって変わるものではないので、uniformで定数値として送ってしまいます。次に、プログラムから頂点ごとのデータを送る時に使われるのがattributeです。今回は、頂点ごとのデータvertexと、法線データnormalをattributeで送っています。最後に、VSからFSにデータを送るときに使われるのがvaryingです。これは上記でいったVSでの出力、FSでの入力の関係です。例えばvaryingで頂点ごとの色データを渡すと、WebGL機構の内部で補間（グラデーション）が行われ、FSではピクセル単位で色データを受け取ることになります。VSとFSのvaryingの変数名は一致しています。</p>
+<p>今回はプログラムから行列をuniformで送り、頂点データと法線データをattributeで送ります。その処理をしているのがdrawFrameのところです。まず錐台を適当に設定し、三角形がその中に入るように平行移動し、ついでに回転軸(0, 1, 0)で適当に回転する行列を作成しています。そしてそれらをuniformでVSに送る準備をしています。頂点データ・法線データもそれぞれattributeで送る準備をし（頂点データ数は3個ずつと設定しています）、最後にdrawArraysで3頂点分のデータをWebGLに流し込んで完了です。</p>
+<h3>Vertex ShaderとFragment Shader</h3>
+<p>では最後に、VSとFSで何をやっているのか見てみましょう。</p>
+<p>まずVSですが、受け取った錐台の行列と移動回転の行列を頂点データに掛けあわせ、(-1,-1,-1)-(1,1,1)の箱の中の座標に変換しています（前述の通り、正確にはw要素による同次除算の結果そのようになるクリッピング座標系に変換しています）。その座標をWebGLに対してgl_Positionという予約変数に入れることで伝えます。また、FSでは傾きに応じて明暗をつけたいので、e_normalというvaryingで頂点ごとの法線データを渡しています。法線データは世界座標系での値がほしいので、移動回転の行列のみと掛けあわせて渡します。</p>
+<p>これでWebGLの内部機構が、頂点の情報（三角形を構成する三つの頂点の座標変換の結果のウィンドウ座標）からどこのピクセルに描画されるのかを確認し、その対象全ピクセルに対してFSが呼ばれることになります。</p>
+<p>FSでは、まずそのピクセルでの法線データをvaryingで受け取り（補間される際に正規化が狂っている可能性があるので正規化しています）、光源のベクトルを適当に(0, 0, 1)と設定し、それと法線との内積(dot)を取ることでその点の明るさを（勝手に）求めています。ベクトルの内積は、2つのベクトルが同じ方向を向いていれば向いているほど大きな値になります。面（法線ベクトル）が光の方向を向いてるほど明るくするのに丁度良いので、それを利用して光の明るさを便宜的に求めています。</p>
+<p><img src="http://nmi.jp/wp-content/uploads/2014/11/dot_vector.png" alt="" title="dot_vector" width="475" height="233" class="aligncenter size-full wp-image-648" /></p>
+<p>光については、とりあえず今回はそれっぽく見えたら良し、という認識でやっています。そしてその内積した結果をgl_FragColorという予約変数に代入することで、そのピクセルがその色で描画されてCanvasに表示されることになります。</p>
+<h3>結果</h3>
+<iframe src="http://nmi.jp/webgl/miku/triangle/" width="550" height="550"></iframe>
+<p>想定したとおりに三角形が1枚舞っています。たかがポリゴン1枚を書くのがこんなに大変だなんて…！と思われた方が多いかもしれません。しかし、ミクさんもいわばただのポリゴンの集まりなので、実はこれでもうほぼミクさんが描けたも同然なんです。長くなったので次の記事に移りますが、この先あまりに簡単にミクさんの全体像が表示できるので、きっとびっくりされると思います。</p>
+<p>次の記事はこちら→ <span style="font-weight: bold"><a href="http://nmi.jp/archives/642">生WebGL入門:初音ミクの美麗3Dモデルを表示する(中編)</a></span></p>
+
+        </article>
+        <hr>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/archives/582&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="生WebGL入門:初音ミクの美麗3Dモデルを表示する(前編)" data-url="http://nmi.jp/archives/582">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/archives/582" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="生WebGL入門:初音ミクの美麗3Dモデルを表示する(前編)"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="生WebGL入門:初音ミクの美麗3Dモデルを表示する(前編)" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+
+        
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+        
+
+        <div class="post-recent">
+    <div class="pre">
+
+    
+        <p><strong>前の投稿</strong> <a href="/archives/573">DeNAを退職し、新しく会社を設立します</a></p>
+    
+    </div>
+    <div class="nex">
+
+        
+        <p><strong>次の投稿</strong> <a href="/archives/642">生WebGL入門:初音ミクの美麗3Dモデルを表示する(中編)</a></p>
+        
+    </div>
+</div>
+
+
+    </div>
+    <button class="anchor"><i class="fa fa-anchor"></i></button>
+
+
+    <div class="right">
+        <div class="wrap">
+            <div class="side">
+                <div>
+                    <i class="fa fa-tags"></i>
+                    Top Popular Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2016-07-23-stock-strategy-for-early-startup-employee">スタートアップに転職する時に最低限知っておくべき株の話</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/582">生WebGL入門:初音ミクの美麗3Dモデルを表示する(前編)</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2017-10-06-Making_a-business_plan">事業計画書の作り方、新規ビジネスの考え方</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/902">Convertible Note / Convertible Equity とは？</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/488">JavaScript イディオム集</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/465">ExGameの製作で感じたこと</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                </ul>
+            </div>
+
+            <div class="side">
+                <div>
+                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                    Recent Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        <li><a href="/2024-08-28-Review-Binary-Hacks-Rebooted">書評 "Binary Hacks Rebooted"</a></li>
+                    
+                        <li><a href="/2024-06-10-Deep-Dive-into-ARM-JavaScript-Special-Instruction-FJCVTZS">ARM に存在する JavaScript 専用命令「FJCVTZS」を追う（ついでに V8 をビルドする）</a></li>
+                    
+                        <li><a href="/2024-06-03-Exploring-V8-JIT-Outputs">JavaScript 実行エンジン V8 の JIT 出力コードを読んでみよう</a></li>
+                    
+                </ul>
+            </div>
+
+            <!-- <div class="side">
+                <div>
+                    <i class="fa fa-external-link"></i>
+                    Links
+                </div>
+                <ul  class="content-ul">
+
+                </ul>
+            </div> -->
+        </div>
+    </div>
+
+
+
+</div>
+<script>
+/**
+ * target _blank
+ */
+(function() {
+    var aTags = document.querySelectorAll('article a:not([id])')
+    for (var i = 0; i < aTags.length; i++) {
+        aTags[i].setAttribute('target', '_blank')
+    }
+}());
+</script>
+<script src="/js/pageContent.js " charset="utf-8"></script>
+
+
+    <footer class="site-footer">
+
+
+    <div class="wrapper">
+
+        <p class="description">
+             Takuo Kihira 
+        </p>
+        <p class="contact">
+            Contact me at: 
+            <a href="https://github.com/tkihira" title="GitHub"><i class="fa fa-github" aria-hidden="true"></i></a>     
+            <a href="https://twitter.com/tkihira" title="Twitter"><i class="fa fa-twitter" aria-hidden="true"></i></a>  
+            <a href="https://www.facebook.com/takuo.kihira" title="Facebook"><i class="fa fa-facebook-official" aria-hidden="true"></i></a>    
+        </p>
+        <p class="power">
+            <span>
+                Site powered by <a href="https://jekyllrb.com/">Jekyll</a>.
+            </span>
+            <span>
+                Theme designed by <a href="https://github.com/Gaohaoyang">HyG</a>.
+            </span>
+        </p>
+    </div>
+</footer>
+
+    <div class="back-to-top">
+    <a href="#top" class="scroll">
+        <i class="fa fa-arrow-up" aria-hidden="true"></i>
+    </a>
+</div>
+
+    <script src=" /js/main.js " charset="utf-8"></script>
+    <script src=" /js/scroll.min.js " charset="utf-8"></script>
+  </body>
+
+</html>

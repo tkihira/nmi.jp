@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html><head><title>HTML5でHSL色空間を使う - その２</title>
+<script>
+(function() {
+	var rgbToHSL = function(r, g, b) {
+		var h;
+		if(Math.max(r, g, b) == r) {
+			h = ((g - b) / (Math.max(r, g, b) - Math.min(r, g, b))) * 60;
+		} else if(Math.max(r, g, b) == g) {
+			h = ((b - r) / (Math.max(r, g, b) - Math.min(r, g, b))) * 60 + 120;
+		} else {
+			h = ((r - g) / (Math.max(r, g, b) - Math.min(r, g, b))) * 60 + 240;
+		}
+		var l = (Math.max(r, g, b) / 255 + Math.min(r, g, b) / 255) / 2;
+		var s;
+		if(l <= 0.5) {
+			s = (Math.max(r, g, b) - Math.min(r, g, b)) / (Math.max(r, g, b) + Math.min(r, g, b));
+		} else {
+			s = (Math.max(r, g, b) - Math.min(r, g, b)) / (2 * 255 - Math.max(r, g, b) - Math.min(r, g, b));
+		}
+		return "hsl(" + Math.floor(h) + "," + Math.floor(s * 100) + "%," + Math.floor(l * 100) + "%)";
+	};
+	
+	var hslToRGB = function(h, s, l) {
+		var max;
+		l /= 100; // 0～1に正規化
+		s /= 100; // 0～1に正規化
+		if(l <= 0.5) {
+			max = l * (1 + s);
+		} else {
+			max = l + s - l * s;
+		}
+		var min = 2 * l - max;
+		
+		var r = Math.floor(calc(max, min, h + 120) * 255);
+		var g = Math.floor(calc(max, min, h) * 255);
+		var b = Math.floor(calc(max, min, h - 120) * 255);
+		
+		return "rgb(" + r + "," + g + "," + b + ")";
+		
+		function calc(n1, n2, hue) {
+			hue = (hue + 180) % 360;
+			if(hue < 60) {
+				return n1 + (n2 - n1) * hue / 60;
+			} else if(hue < 180) {
+				return n2;
+			} else if(hue < 240) {
+				return n1 + (n2 - n1) * (240 - hue) / 60;
+			} else {
+				return n1;
+			}
+		}
+	};
+	
+    window.onload = function() {
+        var canvas = document.createElement("canvas");
+        canvas.width = 300;
+        canvas.height = 300;
+        document.body.appendChild(canvas);
+
+        var ctx = canvas.getContext("2d");
+        
+        var r = Math.min(canvas.width, canvas.height) / 2;
+        var cx = canvas.width / 2;
+        var cy = canvas.height / 2;
+        for(var x = 0; x < canvas.width; x++) {
+        	for(var y = 0; y < canvas.height; y++) {
+        		var d = (x - cx) * (x - cx) + (y - cy) * (y - cy);
+        		if(d < r * r) {
+        			var h = (Math.floor(Math.atan2(x - cx, y - cy) / Math.PI / 2 * 360) + 360 + 270) % 360;
+        			var s = 100;
+        			var l = Math.floor(50 + (r - Math.sqrt(d)) / r * 50);
+        			
+        			var color = hslToRGB(h, s, l);
+//        			var color = "hsl(" + h + "," + s + "%," + l + "%)";
+        			ctx.beginPath();
+        			ctx.fillStyle = color;
+        			ctx.fillRect(x, y, 1, 1);
+        		}
+        	}
+        }
+    };
+})();</script></head>
+<body></body></html>

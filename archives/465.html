@@ -1,0 +1,1510 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>ExGameの製作で感じたこと</title>
+    <meta name="description" content="久々のブログが自分語りになって大変恐縮ですが、将来の自分のためにメモしておきます。自分がExGameの製作を始めたのは2010年11月2日のことです。iPhone上でFlashが一切動かなかった当時、HTML5でFlash Playerを作れば大当たりする可能性は非常に高そうでした。当時のバイト君に技術検証を進め...">
+
+    <link rel="stylesheet" href=" /css/fontawesome/css/font-awesome.min.css ">
+    <link rel="stylesheet" href=" /css/main.css ">
+    <link rel="canonical" href="http://nmi.jp/archives/465">
+    <link rel="alternate" type="application/rss+xml" title="nmi.jp" href="http://nmi.jp/feed.xml">
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=3.0'></script>
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=1.1'></script>
+    <script>
+        if(location.href.match(/\.html$/)) {
+            location.href = location.href.match(/(.+)\.html/)[1];
+        }
+    </script>
+
+
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-229769-8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-229769-8');
+</script>
+</head>
+
+
+  <body>
+
+    <header id="top">
+    <div class="wrapper">
+        <a href="/" class="brand">nmi.jp</a>
+        <small>Twitter → <a href="https://twitter.com/tkihira" target="_blank">@tkihira</a></small>
+        <button id="headerMenu" class="menu"><i class="fa fa-bars"></i></button>
+        <nav id="headerNav">
+            <ul>
+                <li>
+                    
+                    <a href="/">
+                    
+                        <i class="fa fa-home"></i>Home
+                    </a>
+                </li>
+
+                
+                    
+                    <li>
+                        
+                        <a href="/archive/">
+                        
+                            <i class="fa fa-archive"></i>Archives
+                        </a>
+                    </li>
+                    
+                
+                    
+                    <li>
+                        
+                        <a href="/category/">
+                        
+                            <i class="fa fa-th-list"></i>Categories
+                        </a>
+                    </li>
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            </ul>
+        </nav>
+    </div>
+</header>
+
+
+        <div class="page clearfix" post>
+    <div class="left">
+        <div class="post-recent">
+    <table style="width:100%;border:0;padding:0;"><tbody><tr style="padding:0">
+        <td class="toppre" style="padding:0">
+        
+        <a href="/archives/444">Titaniumアプリの広告収入について</a>
+        
+        </td><td class="topnex" style="text-align:right;padding:0">
+        
+        <a href="/archives/476">JavaScriptの+演算子の謎挙動に迫る</a>
+        
+        </td>
+    </tr></tbody></table>
+</div>
+
+        <hr style="margin:0"/>
+        <h1 style="margin-top:10px">ExGameの製作で感じたこと</h1>
+<hr />
+        <div class="label">
+
+            <div class="label-card">
+                <i class="fa fa-calendar"></i>2013-05-10
+            </div>
+
+            <div class="label-card">
+                <i class="fa fa-user"></i>Takuo Kihira
+                
+            </div>
+
+            <div class="label-card">
+                
+            </div>
+
+            <div class="label-card">
+            
+
+
+<!-- <span class="point">•</span> -->
+<span class="categories">
+  <i class="fa fa-th-list"></i>
+  
+    
+        <a href="/category/#HTML5" title="Category: HTML5" rel="category">HTML5</a>&nbsp;
+    
+        <a href="/category/#JavaScript" title="Category: JavaScript" rel="category">JavaScript</a>&nbsp;
+    
+        <a href="/category/#Entrepreneurship" title="Category: Entrepreneurship" rel="category">Entrepreneurship</a>
+    
+  
+
+  <!-- <span class="point">•</span> -->
+</span>
+
+
+            </div>
+
+            <div class="label-card">
+                <a href="https://github.com/tkihira/nmi.jp/blob/master/_posts/2013-05-11-465.md" target="_blank"><i class="fa fa-github"></i></a>
+            </div>
+
+        </div>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/archives/465&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="ExGameの製作で感じたこと" data-url="http://nmi.jp/archives/465">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/archives/465" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="ExGameの製作で感じたこと"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="ExGameの製作で感じたこと" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+        <article itemscope itemtype="http://schema.org/BlogPosting">
+        <p>久々のブログが自分語りになって大変恐縮ですが、将来の自分のためにメモしておきます。</p>
+<p>自分がExGameの製作を始めたのは2010年11月2日のことです。iPhone上でFlashが一切動かなかった当時、HTML5でFlash Playerを作れば大当たりする可能性は非常に高そうでした。当時のバイト君に技術検証を進めてもらっていて、その結果2010年8月頃には「いけそうだ」という感覚はありました。</p>
+<p>しかし、そこから実際の開発に着手するまでに3ヶ月もかかってしまったのです。その期間の逡巡には色々と含蓄がある気がするので、まとめておこうと思います。<br />
+<a id="more"></a><a id="more-465"></a><br />
+まず、HTML5のFlash Playerはその時点で既に存在していました。具体的には「Gordon」というオープンソースと、「Smoke Screen」という個人ベースのソース非公開プロジェクト（後にオープンソースになったらしいです）の二つがありました。両方とも海外のプロジェクトで、特に当時のSmoke ScreenのデモはWebの広告バナーがそのままiPhoneで動くなど、とても良かったです。メディアも多く取り上げられていました。</p>
+<p><span style="color:red">「自分たちが海外の才能と戦って勝てるのか」</span>。私は、今も昔も少なくとも自分が世界トップクラスのエンジニアでないことには確信があります。日本人ですら（、と当時は思っていました）自分が敵わない素晴らしいエンジニアが各分野にたくさんいるのに、いわんや海外に思いを馳せるとどうなることでしょう。当時は全く自信がなかったです。</p>
+<p>そして、それら海外のFlash Playerですら性能的にはイマイチでした。<span style="color:red">「はたして、世界で誰も作れていない実用的なエンジンを、自分が作れるのか」</span>。自分は特別ではないし、世界的に需要がある（と当時は思っていました）Flash PlayerのHTML5版。もし作れるならAdobeさんあたりがさっさと作っていてもおかしくない。もしかしたら、そもそも完成しないプロジェクトなのではないか。当時はiPhone3Gが一般的であり、性能的にも大変不安でした。</p>
+<p>最後に、<span style="color:red">「失敗したら会社が潰れる。それでもやるのか」</span>。ただでさえ少ない人的リソースに加え、JavaScriptに明るいのは（当時は）ほぼ社長の自分だけ。その自分が全力投入したプロジェクトが成果を出さなければ、ベンチャー程度の規模であれば簡単に会社が潰れます（リビングデッドになる可能性も含めて）。会社が潰れるかもしれないリスクというのは、当時まがりなりにも経営者として、とても大きく感じてしまいました。</p>
+<p>結論からいえば、うまく行ったのはたまたまです。唯一誇れるのは、この状況で「それでもやる」と決めた決断だけだと思います。しかし、終わった後に振り返ると、当時の印象と今感じている実際の世界とのずれを少し感じました。</p>
+<p>まず、海外の才能と戦う件について。才能豊かなエンジニアは世界中におり、そして日本にも存在します。コンピュータのあらゆる分野に幅広い才能があるエンジニアですら、私の知る限り日本に数名おります。そんな彼らと比較しても、私の感じた限り、決してサンフランシスコのエンジニアスキルが全体的に日本よりもずば抜けて高い、ということはありませんでした。</p>
+<p>そして、ずば抜けた才能を持っているエンジニアは、みな彼らの一生を賭けて達成すべき何らかの目標を持っていました。それは本当に一途であり、そして彼らはその分野で非常に高い成果を挙げています。今にして思うと、JavaScriptのクロスブラウザという、大変辛い割にはコンピュータサイエンス的に面白みに欠ける分野に対して、必死にコミットするエンジニアはそうはいなかったのでしょう。少なくともExGameでは、自分程度の才能でも世界を相手に戦うことができました。</p>
+<p>最先端の技術にせよ、日ごろ自分たちが扱っているものにせよ、日本のエンジニアが世界に対して劣っているということは決してないということに、今は自信を持っています。アメリカ、特にシリコンバレーの方が環境として進んでいるのは間違いありませんが、しかし一人ひとりのエンジニアの質の差はそれほどない、と考えております。日本において自分の技術力に自信があるのであれば、世界でも自信を持ってよいと思います。</p>
+<p>そして次に、世界で誰も作っていないものを本当に自分が作れるのかどうか。それも、当時の自分としては世界的な需要があると思っていた、iPhoneで動くFlash Playerを、です。実際のところ、日本で必要とされていたのは「Flash Lite」というFlash4相当のプレイヤーであり、世界の需要とはわずかに違ったのですが、それでも完璧に動くものを作るには相当の苦労が予想されました。</p>
+<p>そもそも苦労だけであればたいした問題ではないのですが、どれだけ作ってもそもそも当時の環境では作り上げることが出来ないかもしれない不安がありました。当時は「そんなもの、絶対に出来るはずがない」という認識が当たり前でした。私も当時FlashにもJavaScriptにも相当詳しかったのですが、それでも着手するまでは（正直に言うと着手してからもしばらくは）そう思っていました。</p>
+<p>なぜそう思っていたか、というと、「世界で誰も作っていなかったから」です。まさに卵が先か鶏が先か、という話ではありますが、誰かが作っていれば「必ず達成できる」という証明になりますが、誰も作っていないということは「出来ない」証明に思えてしまうのです。エンジニアは星の数ほどいるのに、その誰も達成できていない。これは大変不安になります。</p>
+<p>これに対して当時も今も同じ考えで、少なくとも、自分たちの挑戦が社会の誰かを不幸にする話ではない以上、もうこればかりはやってみるしかないということです。ベンチャーですのでそこは冒険するしかないですね。そこにはブルーオーシャンが広がっているかもしれないし、断崖絶壁かもしれない。でも少なくともレッドオーシャンでないのは明らかでした。ベンチャーにとって、それは大変重要なことだと思っています。</p>
+<p>それと、実際にやってみて駄目であれば、少なくとも「自分には出来ない」証明にはなるので、それはそれで満足できる結果かなと思います。結果論から言えば、本当に本当にキツかったですが、やってみたら出来ました。出来るかどうか疑いながら作るのはなかなか辛いものがありましたが、出来てよかったと思います。</p>
+<p>最後に、失敗したら会社がつぶれる状況でチャレンジするのか。この時、会社は実に微妙な時期でした。大規模なプロジェクトを1つ依頼されており、そちらを受注すれば会社はしばらく安泰になるだけの売上が確定するが、しかし工数はかなりかかる。ExGameのプロジェクトがうまくいけば、会社はおそらくExit出来るが、失敗すれば会社がつぶれる。そのような状況でした。</p>
+<p>自分は、ベンチャーの社長にとって最も大切なことは、会社を絶対につぶさないこと（リビングデッドにしないこと）だと考えています。つぶれない限り、必ずチャンスはあると思っています。自分がDeNAの南場さんやスクエアの和田さんを尊敬しているのはその点で、DeNAにしろスクエアにしろ、なぜ潰れていないのか不思議なくらいな時期がありましたが、それを見事に経営者の指揮で乗り越え、復活を果たしています。ベンチャーに人が集まるというのはそれだけで奇跡であり、一度バラバラになると再集結は難しく、その一番の資産を生かすためにも会社をつぶしてはいけない、と考えていました。</p>
+<p>であれば受託開発をするか。ただ会社を存続させるためだけに仕事を請けるのは、それはリビングデッドへの道です。ならば新規事業か。そんな一か八かの賭けに出るリスクをここで犯すのか。しかしタイミングを逃すと他の誰かが同じものを作って価値がなくなるかもしれない。大変悩んだ結果、まあベンチャーにはありがちな決断ですが、両方やることにしました。この決断が多分ブロードテイルで一番きつい決断だったと思います。</p>
+<p>なにせエンジニアが3名、バイト入れても4名しかいない状況で、顧客のついているASPサービスも展開しつつ、数ヶ月で1000万円オーバーの仕事を受けながらExGameの開発をする、という決断です。これが達成できたのは、もう完全に社員のおかげです。色々な幸運もありましたが、まったく破綻しませんでした。プロジェクトでも高い評価を受け、その資金によって2011年はExGameに集中できたおかげで、買収の交渉も相当楽になりました。</p>
+<p>結果的にうまく行ったのは社員がそれぞれ奮闘してくれたおかげであり、そんな状況になった経営者こそが責められるべきなのかもしれませんが、しかし「どちらを選ぶのか」という状況で、「両方やる」という選択肢を考えることは、ベンチャーでは大切なことだと思っています。もちろん、もしどちらかが失敗していたら悲惨なことになっていたと思います。私がメインで関わっていない中で受託プロジェクトをまわしてくれた社員達には本当に感謝しています。</p>
+<p>以上、偉そうに色々と書きましたが、実際はそれでもやると決めるまでに相当悩みましたし、そしてうまく行ったのはたまたまでした。でも、当初想定していたよりも海外とのレベルの差は感じなかったし、世界ではじめての実用的エンジンが作れましたし、会社をつぶさないですみました。そして、もし私が「やらない」と決断していたら、そのときは絶対に後悔していました。そして大事なことですが、「やる」と決断して失敗していても、きっと後悔していない自信がありました。</p>
+<p>私は最初に起業した会社で、ひとつ似たような大切な判断を誤ったために大変後悔したことがありました。もし皆さんが私と同じような状況で悩まれたときに、私の今回の経験が役に立てばと思って（そして将来の自分が決断で悩むときのために）文章にしておきました。参考になれば幸いです。</p>
+
+        </article>
+        <hr>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/archives/465&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="ExGameの製作で感じたこと" data-url="http://nmi.jp/archives/465">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/archives/465" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="ExGameの製作で感じたこと"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="ExGameの製作で感じたこと" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+
+        
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+        
+
+        <div class="post-recent">
+    <div class="pre">
+
+    
+        <p><strong>前の投稿</strong> <a href="/archives/444">Titaniumアプリの広告収入について</a></p>
+    
+    </div>
+    <div class="nex">
+
+        
+        <p><strong>次の投稿</strong> <a href="/archives/476">JavaScriptの+演算子の謎挙動に迫る</a></p>
+        
+    </div>
+</div>
+
+
+    </div>
+    <button class="anchor"><i class="fa fa-anchor"></i></button>
+
+
+    <div class="right">
+        <div class="wrap">
+            <div class="side">
+                <div>
+                    <i class="fa fa-tags"></i>
+                    Top Popular Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2016-07-23-stock-strategy-for-early-startup-employee">スタートアップに転職する時に最低限知っておくべき株の話</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/582">生WebGL入門:初音ミクの美麗3Dモデルを表示する(前編)</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2017-10-06-Making_a-business_plan">事業計画書の作り方、新規ビジネスの考え方</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/902">Convertible Note / Convertible Equity とは？</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/488">JavaScript イディオム集</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/465">ExGameの製作で感じたこと</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                </ul>
+            </div>
+
+            <div class="side">
+                <div>
+                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                    Recent Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        <li><a href="/2024-08-28-Review-Binary-Hacks-Rebooted">書評 "Binary Hacks Rebooted"</a></li>
+                    
+                        <li><a href="/2024-06-10-Deep-Dive-into-ARM-JavaScript-Special-Instruction-FJCVTZS">ARM に存在する JavaScript 専用命令「FJCVTZS」を追う（ついでに V8 をビルドする）</a></li>
+                    
+                        <li><a href="/2024-06-03-Exploring-V8-JIT-Outputs">JavaScript 実行エンジン V8 の JIT 出力コードを読んでみよう</a></li>
+                    
+                </ul>
+            </div>
+
+            <!-- <div class="side">
+                <div>
+                    <i class="fa fa-external-link"></i>
+                    Links
+                </div>
+                <ul  class="content-ul">
+
+                </ul>
+            </div> -->
+        </div>
+    </div>
+
+
+
+</div>
+<script>
+/**
+ * target _blank
+ */
+(function() {
+    var aTags = document.querySelectorAll('article a:not([id])')
+    for (var i = 0; i < aTags.length; i++) {
+        aTags[i].setAttribute('target', '_blank')
+    }
+}());
+</script>
+<script src="/js/pageContent.js " charset="utf-8"></script>
+
+
+    <footer class="site-footer">
+
+
+    <div class="wrapper">
+
+        <p class="description">
+             Takuo Kihira 
+        </p>
+        <p class="contact">
+            Contact me at: 
+            <a href="https://github.com/tkihira" title="GitHub"><i class="fa fa-github" aria-hidden="true"></i></a>     
+            <a href="https://twitter.com/tkihira" title="Twitter"><i class="fa fa-twitter" aria-hidden="true"></i></a>  
+            <a href="https://www.facebook.com/takuo.kihira" title="Facebook"><i class="fa fa-facebook-official" aria-hidden="true"></i></a>    
+        </p>
+        <p class="power">
+            <span>
+                Site powered by <a href="https://jekyllrb.com/">Jekyll</a>.
+            </span>
+            <span>
+                Theme designed by <a href="https://github.com/Gaohaoyang">HyG</a>.
+            </span>
+        </p>
+    </div>
+</footer>
+
+    <div class="back-to-top">
+    <a href="#top" class="scroll">
+        <i class="fa fa-arrow-up" aria-hidden="true"></i>
+    </a>
+</div>
+
+    <script src=" /js/main.js " charset="utf-8"></script>
+    <script src=" /js/scroll.min.js " charset="utf-8"></script>
+  </body>
+
+</html>

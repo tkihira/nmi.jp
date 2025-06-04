@@ -1,0 +1,1845 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>JavaScript で then を使うのは避けよう（await / async の初級者まとめ）</title>
+    <meta name="description" content="JavaScript において、特に苦手とする人が多い印象のある Promise ですが、await と async の文法が導入されたことで、Promise の仕様を深く理解しなくても非同期処理を自然に書けるようになってきたのではないかと思います。極論ですが、JavaScript の非同期処理は  async ...">
+
+    <link rel="stylesheet" href=" /css/fontawesome/css/font-awesome.min.css ">
+    <link rel="stylesheet" href=" /css/main.css ">
+    <link rel="canonical" href="http://nmi.jp/2024-05-17-Avoid-then">
+    <link rel="alternate" type="application/rss+xml" title="nmi.jp" href="http://nmi.jp/feed.xml">
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=3.0'></script>
+<script type='text/javascript' src='http://platform.twitter.com/widgets.js?ver=1.1'></script>
+    <script>
+        if(location.href.match(/\.html$/)) {
+            location.href = location.href.match(/(.+)\.html/)[1];
+        }
+    </script>
+
+
+<!-- Global Site Tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-229769-8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-229769-8');
+</script>
+</head>
+
+
+  <body>
+
+    <header id="top">
+    <div class="wrapper">
+        <a href="/" class="brand">nmi.jp</a>
+        <small>Twitter → <a href="https://twitter.com/tkihira" target="_blank">@tkihira</a></small>
+        <button id="headerMenu" class="menu"><i class="fa fa-bars"></i></button>
+        <nav id="headerNav">
+            <ul>
+                <li>
+                    
+                    <a href="/">
+                    
+                        <i class="fa fa-home"></i>Home
+                    </a>
+                </li>
+
+                
+                    
+                    <li>
+                        
+                        <a href="/archive/">
+                        
+                            <i class="fa fa-archive"></i>Archives
+                        </a>
+                    </li>
+                    
+                
+                    
+                    <li>
+                        
+                        <a href="/category/">
+                        
+                            <i class="fa fa-th-list"></i>Categories
+                        </a>
+                    </li>
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+            </ul>
+        </nav>
+    </div>
+</header>
+
+
+        <div class="page clearfix" post>
+    <div class="left">
+        <div class="post-recent">
+    <table style="width:100%;border:0;padding:0;"><tbody><tr style="padding:0">
+        <td class="toppre" style="padding:0">
+        
+        <a href="/2023-12-04-Maximm-Call-Stack-Size-Exceeded">Maximum call stack size exceeded について解説</a>
+        
+        </td><td class="topnex" style="text-align:right;padding:0">
+        
+        <a href="/2024-05-27-Color-Painting-app-with-Stable-Diffusion-API">Stable Diffusion API を使って塗り絵 自動生成アプリを作る</a>
+        
+        </td>
+    </tr></tbody></table>
+</div>
+
+        <hr style="margin:0"/>
+        <h1 style="margin-top:10px">JavaScript で then を使うのは避けよう（await / async の初級者まとめ）</h1>
+<hr />
+        <div class="label">
+
+            <div class="label-card">
+                <i class="fa fa-calendar"></i>2024-05-17
+            </div>
+
+            <div class="label-card">
+                <i class="fa fa-user"></i>Takuo Kihira
+                
+            </div>
+
+            <div class="label-card">
+                
+            </div>
+
+            <div class="label-card">
+            
+
+
+<!-- <span class="point">•</span> -->
+<span class="categories">
+  <i class="fa fa-th-list"></i>
+  
+    
+        <a href="/category/#JavaScript" title="Category: JavaScript" rel="category">JavaScript</a>
+    
+  
+
+  <!-- <span class="point">•</span> -->
+</span>
+
+
+            </div>
+
+            <div class="label-card">
+                <a href="https://github.com/tkihira/nmi.jp/blob/master/_posts/2024-05-17-Avoid-then.md" target="_blank"><i class="fa fa-github"></i></a>
+            </div>
+
+        </div>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/2024-05-17-Avoid-then&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="JavaScript で then を使うのは避けよう（await / async の初級者まとめ）" data-url="http://nmi.jp/2024-05-17-Avoid-then">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/2024-05-17-Avoid-then" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="JavaScript で then を使うのは避けよう（await / async の初級者まとめ）"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="JavaScript で then を使うのは避けよう（await / async の初級者まとめ）" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+        <article itemscope itemtype="http://schema.org/BlogPosting">
+        <p>JavaScript において、特に苦手とする人が多い印象のある Promise ですが、<code class="language-plaintext highlighter-rouge">await</code> と <code class="language-plaintext highlighter-rouge">async</code> の文法が導入されたことで、Promise の仕様を深く理解しなくても非同期処理を自然に書けるようになってきたのではないかと思います。</p>
+
+<p>極論ですが、JavaScript の非同期処理は</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">async</code></li>
+  <li><code class="language-plaintext highlighter-rouge">await</code></li>
+  <li><code class="language-plaintext highlighter-rouge">new Promise</code></li>
+</ul>
+
+<p>のみで、（ほぼ）全て表現可能です。特別な理由がない限り <code class="language-plaintext highlighter-rouge">then</code> を使わないようにしましょう、ということを周知するのがこの記事の目的です。</p>
+
+<p>なお本記事では Promise の <code class="language-plaintext highlighter-rouge">rejected</code> の状態についてほとんど解説しておりません。基本を理解したら、別記事でぜひ学んでみてください。</p>
+
+<h1 id="promise-とは">Promise とは？</h1>
+
+<p>Promise は、少し乱暴に説明すると「実行が終わっていないかもしれない何らかの関数」を包んだオブジェクトです。</p>
+
+<p>普通の関数とは違って、Promise は</p>
+
+<ul>
+  <li>関数が正常に終了した（ <code class="language-plaintext highlighter-rouge">fulfilled</code> ）</li>
+  <li>例外などで異常終了した（ <code class="language-plaintext highlighter-rouge">rejected</code> ）</li>
+  <li>まだ実行が終わっていない（ <code class="language-plaintext highlighter-rouge">pending</code> ）</li>
+</ul>
+
+<p>の 3 つの状態を持ちます。そして、正常に終了した場合は、返り値を持っていることがあります。</p>
+
+<p>Promise は、即座に実行が終了しないような処理（非同期処理、と呼ばれます）の際に返されることが多いです。例えば、次のコードを見てください。</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">r</span> <span class="o">=</span> <span class="nf">fetch</span><span class="p">(</span><span class="dl">'</span><span class="s1">https://wttr.in/</span><span class="dl">'</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">fetch</code> はネットワークのアクセスが終了するまで実行が終わりません。なので、<code class="language-plaintext highlighter-rouge">fetch</code> はとりあえず Promise を返します。その Promise の中に、（イメージとしては）ネットワークにアクセスしてデータを取ってくる関数が収納されており、その関数の実行が終了すると、晴れて <code class="language-plaintext highlighter-rouge">fetch</code> の返り値を得ることが出来るようになります。</p>
+
+<p>なので、この変数 <code class="language-plaintext highlighter-rouge">r</code> には Promise のオブジェクトが入っています。</p>
+
+<p>さて普通に考えると、次は Promise がどのような状態なのかをチェックして、正常に終了しているなら（ <code class="language-plaintext highlighter-rouge">fulfilled</code> なら）データを取得したい、と考えると思います。<span style="color:red"> <strong>しかし Promise は、外部から状態を確認することが出来ません</strong> </span>（正確に言うと方法があるので、余談で紹介します）。</p>
+
+<p>基本的に、Promise オブジェクトの状態を外部から操作・参照することは出来ないと考えてください。</p>
+
+<h1 id="then-について簡単に説明"><code class="language-plaintext highlighter-rouge">then</code> について簡単に説明</h1>
+
+<p>ではどのようにして <code class="language-plaintext highlighter-rouge">fetch</code> の結果を利用するのでしょうか？そこで登場するのが <code class="language-plaintext highlighter-rouge">then</code> です。<code class="language-plaintext highlighter-rouge">then</code> は Promise と同時に ES2015 で仕様に登場しました。</p>
+
+<p>上記で <code class="language-plaintext highlighter-rouge">r</code> について考えてみましょう。この Promise の中の関数の終了が完了すると、ネットワークからデータが取得出来たということなので、そのデータを取りたくなります。ただ、前述の通り、Promise はその状態を確認出来ません。</p>
+
+<p>そこで <code class="language-plaintext highlighter-rouge">then</code> が使われていました。Promise に対して「正常に終了したら、次はこの関数を実行してください」と関数を登録するのが <code class="language-plaintext highlighter-rouge">then</code> 関数です。</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">r</span> <span class="o">=</span> <span class="nf">fetch</span><span class="p">(</span><span class="dl">'</span><span class="s1">https://wttr.in/</span><span class="dl">'</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">f</span> <span class="o">=</span> <span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">status</span><span class="p">);</span>
+<span class="nx">r</span><span class="p">.</span><span class="nf">then</span><span class="p">(</span><span class="nx">f</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">r</code> の Promise は、<code class="language-plaintext highlighter-rouge">fetch</code> の処理が無事に終了すると、次に <code class="language-plaintext highlighter-rouge">then</code> で登録された関数 <code class="language-plaintext highlighter-rouge">f</code> を呼び出します。このような形で、 <code class="language-plaintext highlighter-rouge">fetch</code> の返り値を参照して処理することが可能になるのです。</p>
+
+<p>なお、<code class="language-plaintext highlighter-rouge">then</code> は返り値として Promise を返します。関数 <code class="language-plaintext highlighter-rouge">f</code> の返り値を、 <code class="language-plaintext highlighter-rouge">then</code> で次々に先の関数に送ることも出来ます。</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">r</span> <span class="o">=</span> <span class="nf">fetch</span><span class="p">(</span><span class="dl">'</span><span class="s1">https://wttr.in/</span><span class="dl">'</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">f1</span> <span class="o">=</span> <span class="nx">a</span> <span class="o">=&gt;</span> <span class="nx">a</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">f2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">status</span><span class="p">);</span>
+<span class="nx">r</span><span class="p">.</span><span class="nf">then</span><span class="p">(</span><span class="nx">f1</span><span class="p">).</span><span class="nf">then</span><span class="p">(</span><span class="nx">f1</span><span class="p">).</span><span class="nf">then</span><span class="p">(</span><span class="nx">f1</span><span class="p">).</span><span class="nf">then</span><span class="p">(</span><span class="nx">f1</span><span class="p">).</span><span class="nf">then</span><span class="p">(</span><span class="nx">f1</span><span class="p">).</span><span class="nf">then</span><span class="p">(</span><span class="nx">f1</span><span class="p">).</span><span class="nf">then</span><span class="p">(</span><span class="nx">f1</span><span class="p">).</span><span class="nf">then</span><span class="p">(</span><span class="nx">f2</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>また、<code class="language-plaintext highlighter-rouge">f</code> の返り値が Promise の場合、 <code class="language-plaintext highlighter-rouge">then</code> はその Promise の関数が終わるまで待ってから次の関数を呼びます。</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">r</span> <span class="o">=</span> <span class="nf">fetch</span><span class="p">(</span><span class="dl">'</span><span class="s1">https://wttr.in/</span><span class="dl">'</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">f1</span> <span class="o">=</span> <span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">First fetch's status:</span><span class="dl">"</span><span class="p">,</span> <span class="nx">response</span><span class="p">.</span><span class="nx">status</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nf">fetch</span><span class="p">(</span><span class="dl">'</span><span class="s1">https://wttr.in/</span><span class="dl">'</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="kd">const</span> <span class="nx">f2</span> <span class="o">=</span> <span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">Second fetch's status</span><span class="dl">"</span><span class="p">,</span> <span class="nx">response</span><span class="p">.</span><span class="nx">status</span><span class="p">);</span>
+<span class="nx">r</span><span class="p">.</span><span class="nf">then</span><span class="p">(</span><span class="nx">f1</span><span class="p">).</span><span class="nf">then</span><span class="p">(</span><span class="nx">f2</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>なお、一般的に <code class="language-plaintext highlighter-rouge">then</code> には関数本体を放り込む書き方をされることが多いです。上のコードは大抵、次のように書かれます。</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">fetch</span><span class="p">(</span><span class="dl">'</span><span class="s1">https://wttr.in/</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nf">then</span><span class="p">((</span><span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">First fetch's status:</span><span class="dl">"</span><span class="p">,</span> <span class="nx">response</span><span class="p">.</span><span class="nx">status</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nf">fetch</span><span class="p">(</span><span class="dl">'</span><span class="s1">https://wttr.in/</span><span class="dl">'</span><span class="p">);</span>
+    <span class="p">})</span>
+    <span class="p">.</span><span class="nf">then</span><span class="p">(((</span><span class="nx">response</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">Second fetch's status</span><span class="dl">"</span><span class="p">,</span> <span class="nx">response</span><span class="p">.</span><span class="nx">status</span><span class="p">)));</span>
+</code></pre></div></div>
+
+<p>率直に行って、それ以前の callback hell と呼ばれる状態よりはマシとはいえ、 <code class="language-plaintext highlighter-rouge">then</code> は読みにくいです。</p>
+
+<p>今は <code class="language-plaintext highlighter-rouge">async</code> と <code class="language-plaintext highlighter-rouge">await</code> があります。こちらを <code class="language-plaintext highlighter-rouge">then</code> の代わりに使ってみましょう。</p>
+
+<h1 id="async-と-await-で書き直す"><code class="language-plaintext highlighter-rouge">async</code> と <code class="language-plaintext highlighter-rouge">await</code> で書き直す</h1>
+
+<p><code class="language-plaintext highlighter-rouge">async</code> と <code class="language-plaintext highlighter-rouge">await</code> は ES2017 で仕様に登場しました。まず、上記のコードを <code class="language-plaintext highlighter-rouge">async</code> / <code class="language-plaintext highlighter-rouge">await</code> で書きなおしてみます。</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">async</span><span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">response1</span> <span class="o">=</span> <span class="k">await</span> <span class="nf">fetch</span><span class="p">(</span><span class="dl">'</span><span class="s1">https://wttr.in/</span><span class="dl">'</span><span class="p">);</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">First fetch's status:</span><span class="dl">"</span><span class="p">,</span> <span class="nx">response1</span><span class="p">.</span><span class="nx">status</span><span class="p">);</span>
+    <span class="kd">const</span> <span class="nx">response2</span> <span class="o">=</span> <span class="k">await</span> <span class="nf">fetch</span><span class="p">(</span><span class="dl">'</span><span class="s1">https://wttr.in/</span><span class="dl">'</span><span class="p">);</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">Second fetch's status:</span><span class="dl">"</span><span class="p">,</span> <span class="nx">response2</span><span class="p">.</span><span class="nx">status</span><span class="p">);</span>
+<span class="p">})();</span>
+</code></pre></div></div>
+
+<p>すっきり読みやすくなりました。</p>
+
+<ul>
+  <li>まず <code class="language-plaintext highlighter-rouge">async</code> 関数を作って、即時実行しています</li>
+  <li>その関数内部で <code class="language-plaintext highlighter-rouge">fetch</code> を <code class="language-plaintext highlighter-rouge">await</code> 付きで呼んでいます</li>
+  <li>関数内部は上から下に逐次実行されています</li>
+</ul>
+
+<p>では、<code class="language-plaintext highlighter-rouge">async</code> と <code class="language-plaintext highlighter-rouge">await</code> について説明しましょう</p>
+
+<h1 id="async-とは"><code class="language-plaintext highlighter-rouge">async</code> とは？</h1>
+
+<p><code class="language-plaintext highlighter-rouge">async</code> は一般的に「エイシンク」と読まれます（英語ネイティブでも一部の人は「アシンク」と読むようです）。</p>
+
+<p><code class="language-plaintext highlighter-rouge">async</code> は関数宣言の時につける修飾子で、これがつくとその関数は <code class="language-plaintext highlighter-rouge">async</code> 関数になります。</p>
+
+<p><span style="color:blue"><code class="language-plaintext highlighter-rouge">async</code> 関数は、関数内部で何をやろうとも、必ず返り値として Promise を返します。</span></p>
+
+<p>上の方で Promise を <code class="language-plaintext highlighter-rouge">「実行が終わっていないかもしれない何らかの関数」を包んだオブジェクト</code> と説明しましたが、この <code class="language-plaintext highlighter-rouge">async</code> 関数がその包まれた「何らかの関数」となり、<code class="language-plaintext highlighter-rouge">async</code> 関数は「その関数を包んだ Promise」を返します。</p>
+
+<p><code class="language-plaintext highlighter-rouge">async</code> 関数の返り値は Promise なので <code class="language-plaintext highlighter-rouge">then</code> を使えば、その返り値の内容を参照することができます。こんな感じになります。</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">f</span> <span class="o">=</span> <span class="k">async </span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">x</span> <span class="o">*</span> <span class="mi">10</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">ret</span> <span class="o">=</span> <span class="nf">f</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
+<span class="nx">ret</span><span class="p">.</span><span class="nf">then</span><span class="p">(</span><span class="nx">result</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">result</span><span class="p">));</span>
+</code></pre></div></div>
+
+<p>（ただ、普通は <code class="language-plaintext highlighter-rouge">async</code> と <code class="language-plaintext highlighter-rouge">then</code> を一緒に使いません。これはあくまでサンプルです）</p>
+
+<p>さて、なんのために <code class="language-plaintext highlighter-rouge">async</code> 関数が存在するか、というと、次に紹介する <code class="language-plaintext highlighter-rouge">await</code> のためです。<code class="language-plaintext highlighter-rouge">await</code> は <code class="language-plaintext highlighter-rouge">async</code> 関数の中でしか使えないのです。</p>
+
+<h1 id="await-とは"><code class="language-plaintext highlighter-rouge">await</code> とは？</h1>
+
+<p><code class="language-plaintext highlighter-rouge">await</code> は「アウェイト」と読まれます。</p>
+
+<p><code class="language-plaintext highlighter-rouge">async</code> 関数の中でしか使えず、<code class="language-plaintext highlighter-rouge">async</code> 関数でない場所で使おうとすると Syntax Error が発生します。</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">()</span><span class="o">=&gt;</span><span class="p">{</span> <span class="k">await</span> <span class="mi">3</span><span class="p">;</span> <span class="p">}</span> <span class="c1">// Syntax Error</span>
+<span class="k">async </span><span class="p">()</span><span class="o">=&gt;</span><span class="p">{</span> <span class="k">await</span> <span class="mi">3</span><span class="p">;</span> <span class="p">}</span> <span class="c1">// OK</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">await</code> は演算子で、何らかの値を受け取ります。Promise でなくても受け取るので、上にあるような <code class="language-plaintext highlighter-rouge">await 3</code> のような式も問題ありません。</p>
+
+<p><code class="language-plaintext highlighter-rouge">await</code> の効果を説明すると、 <code class="language-plaintext highlighter-rouge">await</code> は、そこで一旦処理を打ち切って <code class="language-plaintext highlighter-rouge">async</code> 関数から脱出し、引数にある Promise 内にある関数が終了するまで待ちます。Promise 内の関数が終了したり、Promise 内の関数が既に終了していた場合は、その Promise オブジェクトから値を取り出し、それを返します（引数に Promise 以外の値が指定されていた場合、大抵はそれをそのまま返します）。そして先ほど中断した場所から処理を再開します。</p>
+
+<p>次のコードを考えてみましょう。</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">async</span><span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="k">await</span> <span class="nf">fetch</span><span class="p">(</span><span class="dl">'</span><span class="s1">https://wttr.in/</span><span class="dl">'</span><span class="p">);</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">status</span><span class="p">);</span>
+<span class="p">})();</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">fetch</code> が Promise を返し、それを <code class="language-plaintext highlighter-rouge">await</code> で受け取っています。よって処理は一旦ここで中断します。その後、 <code class="language-plaintext highlighter-rouge">fetch</code> の実行が完了した（ネットワークアクセスが終わった）タイミングで <code class="language-plaintext highlighter-rouge">fetch</code> は <code class="language-plaintext highlighter-rouge">response</code> を返しますが、 <code class="language-plaintext highlighter-rouge">await</code> はそのタイミングで Promise から返り値を取り出し、処理を再開します。</p>
+
+<p>そして次の行で、console.log が呼ばれて status コードが表示されます。</p>
+
+<p><code class="language-plaintext highlighter-rouge">await</code> の処理はこれだけです。しかし、 <code class="language-plaintext highlighter-rouge">await</code> と <code class="language-plaintext highlighter-rouge">async</code> のおかげで、ぐっとソースコードが読みやすくなりました。</p>
+
+<h1 id="new-promise-を書かざるを得ない状況とは"><code class="language-plaintext highlighter-rouge">new Promise</code> を書かざるを得ない状況とは</h1>
+
+<p><code class="language-plaintext highlighter-rouge">async</code> と <code class="language-plaintext highlighter-rouge">await</code> だけで全ての非同期処理を記述出来れば最高だったのですが、残念ながらどうしても <code class="language-plaintext highlighter-rouge">new Promise</code> を書かざるを得ない局面があります。</p>
+
+<p>例えば、3 秒たったら再開する関数を時前で書く場合、 <code class="language-plaintext highlighter-rouge">async</code> のみではどうしても書くことができません。次のようになります。</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">wait3sec</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nc">Promise</span><span class="p">((</span><span class="nx">resolve</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="nf">setTimeout</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="nf">resolve</span><span class="p">(</span><span class="dl">"</span><span class="s2">3 seconds</span><span class="dl">"</span><span class="p">),</span> <span class="mi">3000</span><span class="p">);</span>
+    <span class="p">});</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">wait3sec</code> 関数は、 <code class="language-plaintext highlighter-rouge">new Promise</code> で新しい Promise オブジェクトを作成し、それを返します。Promise は関数を引数に取りますが、そこで渡される関数が上で説明した <code class="language-plaintext highlighter-rouge">「実行が終わっていないかもしれない何らかの関数」</code> となります。今回は new Promise に <code class="language-plaintext highlighter-rouge">(resolve) =&gt; { setTimeout(() =&gt; resolve("3 seconds"), 3000); }</code> という関数を渡しました。</p>
+
+<p>さて、この <code class="language-plaintext highlighter-rouge">resolve</code> というのは、「関数が終わったよ」ということを Promise に伝えるためのインターフェース用の関数になります。この <code class="language-plaintext highlighter-rouge">resolve</code> 関数（名前は何でもよいのですが）を呼び出さないと、Promise はずっと「まだ実行が終わっていない（ <code class="language-plaintext highlighter-rouge">pending</code> ）」状態のままになってしまいます。</p>
+
+<p><code class="language-plaintext highlighter-rouge">wait3sec</code> 関数では、3 秒経ったら <code class="language-plaintext highlighter-rouge">resolve</code> を呼んで、Promise に「もう終わったよ！」と伝えてあげています。その <code class="language-plaintext highlighter-rouge">resolve</code> の引数に、この関数全体の返り値である <code class="language-plaintext highlighter-rouge">"3 seconds"</code> を指定しています。これが Promise の返り値になり、 <code class="language-plaintext highlighter-rouge">await</code> などで取得され参照されるものになります。例えば次のようになりますね。</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">wait3sec</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nc">Promise</span><span class="p">((</span><span class="nx">resolve</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="nf">setTimeout</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="nf">resolve</span><span class="p">(</span><span class="dl">"</span><span class="s2">3 seconds</span><span class="dl">"</span><span class="p">),</span> <span class="mi">3000</span><span class="p">);</span>
+    <span class="p">});</span>
+<span class="p">};</span>
+
+<span class="p">(</span><span class="k">async</span><span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">result</span> <span class="o">=</span> <span class="k">await</span> <span class="nf">wait3sec</span><span class="p">();</span> <span class="c1">// wait 3 seconds</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">result</span><span class="p">);</span> <span class="c1">// 3 seconds</span>
+<span class="p">})();</span>
+</code></pre></div></div>
+
+<p>なお <code class="language-plaintext highlighter-rouge">new Promise</code> の引数で渡した関数は、その場で即座に実行されます。</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">1</span><span class="dl">"</span><span class="p">);</span>
+<span class="k">new</span> <span class="nc">Promise</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">2</span><span class="dl">"</span><span class="p">);</span>
+<span class="p">});</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">3</span><span class="dl">"</span><span class="p">);</span>
+<span class="c1">// 1, 2, 3</span>
+</code></pre></div></div>
+
+<h1 id="まとめ">まとめ</h1>
+
+<p><code class="language-plaintext highlighter-rouge">await</code> <code class="language-plaintext highlighter-rouge">async</code> <code class="language-plaintext highlighter-rouge">new Promise</code> さえ完全に理解すれば、JavaScript で可能な非同期処理は全て表現出来ます。 <code class="language-plaintext highlighter-rouge">then</code> は可読性に劣る上に特に大きなメリットもないので、理由がない限り使わない方が良いでしょう。</p>
+
+<p>今回の記事では、わかりやすさを優先するために <code class="language-plaintext highlighter-rouge">rejected</code> の状態や <code class="language-plaintext highlighter-rouge">thenable</code> オブジェクトなどの話を意図的に省いています。 <code class="language-plaintext highlighter-rouge">thenable</code> はともかく <code class="language-plaintext highlighter-rouge">rejected</code> は Promise における必須の知識となりますので、もし自信のない方は別に調べてみてください。</p>
+
+<p>乱暴に言ってしまうと、<code class="language-plaintext highlighter-rouge">await</code> <code class="language-plaintext highlighter-rouge">async</code> は非同期処理の可読性を大きくあげるための記法で、 <code class="language-plaintext highlighter-rouge">then</code> は内部的にそれを支える仕様です。もちろん <code class="language-plaintext highlighter-rouge">then</code> をしっかり理解していることはとても大切ですが、あくまでも内部仕様としての知識に留め、実際のコードでは <code class="language-plaintext highlighter-rouge">then</code> をあまり書かず、 <code class="language-plaintext highlighter-rouge">await</code> と <code class="language-plaintext highlighter-rouge">async</code> で書くようにしましょう。</p>
+
+<p>ただ <code class="language-plaintext highlighter-rouge">then</code> を使った方が綺麗にかける状況もありますので、そういう場合は固執せずに <code class="language-plaintext highlighter-rouge">then</code> を書くほうが良いと思います。</p>
+
+<h2 id="余談-1-es2024-の新機能-promisewithresolvers">余談 1: ES2024 の新機能 <code class="language-plaintext highlighter-rouge">Promise.withResolvers</code></h2>
+
+<p>上で「残念ながらどうしても <code class="language-plaintext highlighter-rouge">new Promise</code> を書かざるを得ない局面があります」と書きましたが、実は書かなくてもよい記法が登場しております。</p>
+
+<p>ES2024 から登場した <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/withResolvers">Promise.withResolvers</a> という API を利用すると、今まで煩雑だった <code class="language-plaintext highlighter-rouge">new Promise</code> を書かずに、すっきりと新しい Promise が作れます。</p>
+
+<p>上の、 3 秒待つコードを再掲します。</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">wait3sec</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nc">Promise</span><span class="p">((</span><span class="nx">resolve</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="nf">setTimeout</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="nf">resolve</span><span class="p">(</span><span class="dl">"</span><span class="s2">3 seconds</span><span class="dl">"</span><span class="p">),</span> <span class="mi">3000</span><span class="p">);</span>
+    <span class="p">});</span>
+<span class="p">};</span>
+
+<span class="p">(</span><span class="k">async</span><span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">result</span> <span class="o">=</span> <span class="k">await</span> <span class="nf">wait3sec</span><span class="p">();</span> <span class="c1">// wait 3 seconds</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">result</span><span class="p">);</span> <span class="c1">// 3 seconds</span>
+<span class="p">})();</span>
+</code></pre></div></div>
+
+<p>これを <code class="language-plaintext highlighter-rouge">Promise.withResolvers</code> で書くと次のようになります。</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">wait3sec</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="p">{</span> <span class="nx">promise</span><span class="p">,</span> <span class="nx">resolve</span><span class="p">,</span> <span class="nx">reject</span> <span class="p">}</span> <span class="o">=</span> <span class="nb">Promise</span><span class="p">.</span><span class="nf">withResolvers</span><span class="p">();</span>
+    <span class="nf">setTimeout</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="nf">resolve</span><span class="p">(</span><span class="dl">"</span><span class="s2">3 seconds</span><span class="dl">"</span><span class="p">),</span> <span class="mi">3000</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">promise</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="p">(</span><span class="k">async</span><span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">result</span> <span class="o">=</span> <span class="k">await</span> <span class="nf">wait3sec</span><span class="p">();</span> <span class="c1">// wait 3 seconds</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">result</span><span class="p">);</span> <span class="c1">// 3 seconds</span>
+<span class="p">})();</span>
+</code></pre></div></div>
+
+<p>すっきりして素晴らしいですね。モダンブラウザや Node.js 22 では使用可能ですが、古い Android WebView や古い Node.js などでは使えないので、使用には注意をしてください。</p>
+
+<p>この情報は <a href="https://twitter.com/shibu_jp">渋川よしき</a> さんに教えていただきました。ありがとうございます！</p>
+
+<h1 id="余談-2-then-を使う状況">余談 2: <code class="language-plaintext highlighter-rouge">then</code> を使う状況</h1>
+
+<p>例えば次のように、配列に複数の Promise が入っている状況を考えてみてください。</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">a</span> <span class="o">=</span> <span class="p">[];</span>
+<span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">a</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="k">async</span><span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="k">await</span> <span class="k">new</span> <span class="nc">Promise</span><span class="p">(</span><span class="nx">r</span> <span class="o">=&gt;</span> <span class="nf">setTimeout</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span> <span class="mi">1000</span><span class="p">));</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">i</span><span class="p">);</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>for 文を使って順次実行する時は、以下のように書きます。10 秒で 0 〜 9 が表示されます。</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span><span class="p">(</span><span class="kd">const</span> <span class="nx">p</span> <span class="k">of</span> <span class="nx">a</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">await</span> <span class="nf">p</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>これを for 文を使わずに処理したい時、 <code class="language-plaintext highlighter-rouge">reduce</code> と <code class="language-plaintext highlighter-rouge">then</code> を使うと次のように書けます。</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">a</span><span class="p">.</span><span class="nf">reduce</span><span class="p">((</span><span class="nx">acc</span><span class="p">,</span> <span class="nx">cur</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">acc</span><span class="p">.</span><span class="nf">then</span><span class="p">(</span><span class="nx">cur</span><span class="p">),</span> <span class="nb">Promise</span><span class="p">.</span><span class="nf">resolve</span><span class="p">());</span>
+</code></pre></div></div>
+
+<p>正直読みやすさだと for 文かもしれませんが、メソッドチェーンを維持したい場合などに <code class="language-plaintext highlighter-rouge">then</code> が効果を発揮するでしょう。この用例は <a href="https://twitter.com/about_hiroppy">hiroppy</a> さんに教えて頂きました。ありがとうございました！</p>
+
+<h1 id="余談-3-意外と知られていない実行順">余談 3: 意外と知られていない実行順</h1>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="p">(</span><span class="k">async </span><span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+    <span class="k">await</span> <span class="k">new</span> <span class="nc">Promise</span><span class="p">(</span><span class="nx">r</span> <span class="o">=&gt;</span> <span class="p">{</span>
+        <span class="nf">setTimeout</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span> <span class="mi">1000</span><span class="p">);</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
+    <span class="p">});</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+<span class="p">})();</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>これの実行順を正確に答えられるでしょうか？私が以前 <a href="https://twitter.com/tkihira/status/1429061261895946240">Twitter でクイズとして出した</a>時の正答率はとても低かったです。</p>
+
+<p>解答を記します。自分で考えたい人は以下は読まないでください。</p>
+
+<p>まず、 <code class="language-plaintext highlighter-rouge">1</code> はまっさきに表示されますね。次に <code class="language-plaintext highlighter-rouge">async</code> で修飾された即時関数が実行されます。 <code class="language-plaintext highlighter-rouge">async</code> 関数が実行される時、それ自体は実は普通の関数と全く同じです。なので普通に関数が呼ばれ、 <code class="language-plaintext highlighter-rouge">2</code> が表示されます。</p>
+
+<p>そして次、<code class="language-plaintext highlighter-rouge">await new Promise(f)</code> において、まず <code class="language-plaintext highlighter-rouge">f</code> が評価されます。<code class="language-plaintext highlighter-rouge">f</code> の中身は <code class="language-plaintext highlighter-rouge">setTimeout</code> で resolve を呼び、そして <code class="language-plaintext highlighter-rouge">3</code> を表示しています。上記で「<code class="language-plaintext highlighter-rouge">new Promise</code> の引数で渡した関数は、その場で即座に実行されます」と書いた通り、これはここで即座に実行されます。なので <code class="language-plaintext highlighter-rouge">3</code> が表示されます。</p>
+
+<p>さて、ここで <code class="language-plaintext highlighter-rouge">await</code> が評価されました。上記に書いた通り <code class="language-plaintext highlighter-rouge">await</code> が登場すると、そこで <strong>必ず</strong> 処理が打ち切られます。なのでここで一旦 <code class="language-plaintext highlighter-rouge">async</code> 関数は止まり、関数の続きから実行されます。そうすると <code class="language-plaintext highlighter-rouge">5</code> が表示されることになりますね。</p>
+
+<p>そして 1 秒間経つと、ここで改めて resolve 関数が呼ばれ、 <code class="language-plaintext highlighter-rouge">await</code> の直後から処理が再開します。最後に <code class="language-plaintext highlighter-rouge">4</code> が表示されるわけです。</p>
+
+<p>すなわち答えは、1→2→3→5→4 となります！</p>
+
+<p><span style="color:red">特に <code class="language-plaintext highlighter-rouge">async</code> 関数が実行されたら即座に処理が打ち切られてコンテキストが変わる、と誤解している方が多い</span>のですが、 <code class="language-plaintext highlighter-rouge">await</code> が登場するまでは普通の関数と同じように実行されます。逆に <code class="language-plaintext highlighter-rouge">await</code> が登場したら、そこで必ず処理が止まります。例えば、</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">1</span><span class="dl">"</span><span class="p">);</span>
+<span class="p">(</span><span class="k">async </span><span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">2</span><span class="dl">"</span><span class="p">);</span>
+    <span class="k">await</span> <span class="mi">9</span><span class="p">;</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">3</span><span class="dl">"</span><span class="p">);</span>
+<span class="p">})();</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">4</span><span class="dl">"</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>これの実行結果は <code class="language-plaintext highlighter-rouge">1→2→4→3</code> となります。 <code class="language-plaintext highlighter-rouge">await 9</code> と意味のない <code class="language-plaintext highlighter-rouge">await</code> を呼んだとしても、 <code class="language-plaintext highlighter-rouge">async</code> 中に <code class="language-plaintext highlighter-rouge">await</code> が登場すると必ずそこで処理が一旦止まります。処理が止まるタイミングは <code class="language-plaintext highlighter-rouge">async</code> ではなくて <code class="language-plaintext highlighter-rouge">await</code> であるということを意識しておきましょう。</p>
+
+<h1 id="余談-4-promise-状態確認">余談 4: Promise 状態確認</h1>
+
+<p>本文中で「Promise は、外部から状態を確認することが出来ません」と書きましたが、少しトリックを使うことで可能です。<a href="https://stackoverflow.com/questions/30564053/how-can-i-synchronously-determine-a-javascript-promises-state">Stack Overflow</a> で貼られているコードを、await/async で書き直しました。</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">async</span> <span class="kd">function</span> <span class="nf">promiseState</span><span class="p">(</span><span class="nx">p</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">t</span> <span class="o">=</span> <span class="p">{};</span>
+    <span class="k">try</span> <span class="p">{</span>
+        <span class="kd">const</span> <span class="nx">r</span> <span class="o">=</span> <span class="k">await</span> <span class="nb">Promise</span><span class="p">.</span><span class="nf">race</span><span class="p">([</span><span class="nx">p</span><span class="p">,</span> <span class="nx">t</span><span class="p">]);</span>
+        <span class="k">return </span><span class="p">(</span><span class="nx">r</span> <span class="o">===</span> <span class="nx">t</span><span class="p">)?</span> <span class="dl">"</span><span class="s2">pending</span><span class="dl">"</span> <span class="p">:</span> <span class="dl">"</span><span class="s2">fulfilled</span><span class="dl">"</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">catch</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="dl">"</span><span class="s2">rejected</span><span class="dl">"</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+
+<span class="kd">const</span> <span class="nx">a</span> <span class="o">=</span> <span class="nb">Promise</span><span class="p">.</span><span class="nf">resolve</span><span class="p">();</span>
+<span class="kd">const</span> <span class="nx">b</span> <span class="o">=</span> <span class="nb">Promise</span><span class="p">.</span><span class="nf">reject</span><span class="p">();</span>
+<span class="kd">const</span> <span class="nx">c</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Promise</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="p">{});</span>
+
+<span class="p">(</span><span class="k">async</span><span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="k">await</span> <span class="nf">promiseState</span><span class="p">(</span><span class="nx">a</span><span class="p">));</span> <span class="c1">// fulfilled</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="k">await</span> <span class="nf">promiseState</span><span class="p">(</span><span class="nx">b</span><span class="p">));</span> <span class="c1">// rejected</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="k">await</span> <span class="nf">promiseState</span><span class="p">(</span><span class="nx">c</span><span class="p">));</span> <span class="c1">// pending</span>
+<span class="p">})();</span>
+</code></pre></div></div>
+
+<p>簡単に言うと、</p>
+
+<ul>
+  <li>Promise.race は両方とも <code class="language-plaintext highlighter-rouge">fulfilled</code> の場合は前の値を返すので、 t が返ってきたら <code class="language-plaintext highlighter-rouge">pending</code>、そうでなければ <code class="language-plaintext highlighter-rouge">fulfilled</code> を返す</li>
+  <li>p を評価したときに <code class="language-plaintext highlighter-rouge">rejected</code> だと例外を飛ばすので、それをキャッチして <code class="language-plaintext highlighter-rouge">rejected</code> を返す</li>
+</ul>
+
+<p>という動作になります。稀に必要な場合があるので、記憶の片隅に置いておくと良いかもしれません。</p>
+
+<p>なお、この <code class="language-plaintext highlighter-rouge">promiseState</code> は、 <code class="language-plaintext highlighter-rouge">then</code> を使った<a href="https://stackoverflow.com/questions/30564053/how-can-i-synchronously-determine-a-javascript-promises-state">オリジナルの書き方</a>の方がすっきりして見やすいかもしれません。そういう時は <code class="language-plaintext highlighter-rouge">then</code> を使ってよいと思います。</p>
+
+<h1 id="余談-5-then-を多用している中上級者の皆様へ">余談 5: then を多用している中上級者の皆様へ</h1>
+
+<p>特に歴史的経緯から、JavaScript に詳しい方ほど <code class="language-plaintext highlighter-rouge">await</code>/<code class="language-plaintext highlighter-rouge">async</code> と <code class="language-plaintext highlighter-rouge">then</code> をあまり意識することなく混在させる傾向があると観測しています。 <code class="language-plaintext highlighter-rouge">then</code> はメソッドチェーンの様に書けるので、むしろ好んで <code class="language-plaintext highlighter-rouge">then</code> を多用されている方も多いかもしれません。</p>
+
+<p>ただ、これらの記法の混在は、入門者や初級者にとって理解するのにかなり時間がかかってしまうため、大きなハードルとなっております。私が「可能な限り <code class="language-plaintext highlighter-rouge">then</code> を使わないのが良い」という立場をとるのは、これが理由です。</p>
+
+<p>もちろん両方をしっかり理解することがベストだとは思います。しかし例えば <code class="language-plaintext highlighter-rouge">class</code> と <code class="language-plaintext highlighter-rouge">prototype</code> の両方を考えた場合、まず <code class="language-plaintext highlighter-rouge">class</code> の読み書きがしっかり出来ることが大切だと思うのです。中上級者としても、現状 <code class="language-plaintext highlighter-rouge">class</code> で書けるものを、わざわざ <code class="language-plaintext highlighter-rouge">prototype</code> を書くことはあまりないでしょう。</p>
+
+<p><code class="language-plaintext highlighter-rouge">then</code> と <code class="language-plaintext highlighter-rouge">async</code>/<code class="language-plaintext highlighter-rouge">await</code> も、所詮はシンタックスシュガーではあるのですが、両者の記法の混在が初学者に与えるコストは無視できないものだと考えております。もはや JavaScript 非同期処理の過渡期という暗黒時代は終わった、と言えるでしょう。中上級者の皆さまも <code class="language-plaintext highlighter-rouge">async</code>/<code class="language-plaintext highlighter-rouge">await</code> に記法を寄せていくメリットに目を向ける価値は大きいと思います。ぜひご一考をお願いします。</p>
+
+        </article>
+        <hr>
+
+<div class="entry fix" style="overflow:hidden;">
+    <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
+				<iframe src="http://www.facebook.com/plugins/like.php?href=http://nmi.jp/2024-05-17-Avoid-then&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
+			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
+				<a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" 
+					data-text="JavaScript で then を使うのは避けよう（await / async の初級者まとめ）" data-url="http://nmi.jp/2024-05-17-Avoid-then">Tweet</a> 
+			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
+					<a href="http://b.hatena.ne.jp/entry/http://nmi.jp/2024-05-17-Avoid-then" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="JavaScript で then を使うのは避けよう（await / async の初級者まとめ）"
+					><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="JavaScript で then を使うのは避けよう（await / async の初級者まとめ）" width="20"
+					height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js"
+					charset="utf-8" async="async"></script>
+				</div>
+</div>
+</div>
+
+        
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+            
+            
+        
+        
+
+        <div class="post-recent">
+    <div class="pre">
+
+    
+        <p><strong>前の投稿</strong> <a href="/2023-12-04-Maximm-Call-Stack-Size-Exceeded">Maximum call stack size exceeded について解説</a></p>
+    
+    </div>
+    <div class="nex">
+
+        
+        <p><strong>次の投稿</strong> <a href="/2024-05-27-Color-Painting-app-with-Stable-Diffusion-API">Stable Diffusion API を使って塗り絵 自動生成アプリを作る</a></p>
+        
+    </div>
+</div>
+
+
+    </div>
+    <button class="anchor"><i class="fa fa-anchor"></i></button>
+
+
+    <div class="right">
+        <div class="wrap">
+            <div class="side">
+                <div>
+                    <i class="fa fa-tags"></i>
+                    Top Popular Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2016-07-23-stock-strategy-for-early-startup-employee">スタートアップに転職する時に最低限知っておくべき株の話</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/582">生WebGL入門:初音ミクの美麗3Dモデルを表示する(前編)</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/2017-10-06-Making_a-business_plan">事業計画書の作り方、新規ビジネスの考え方</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/902">Convertible Note / Convertible Equity とは？</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/488">JavaScript イディオム集</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                            <li><a href="/archives/465">ExGameの製作で感じたこと</a></li>
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                          
+                        
+                    
+                </ul>
+            </div>
+
+            <div class="side">
+                <div>
+                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                    Recent Posts
+                </div>
+                <ul class="content-ul" recent>
+                    
+                        <li><a href="/2024-08-28-Review-Binary-Hacks-Rebooted">書評 "Binary Hacks Rebooted"</a></li>
+                    
+                        <li><a href="/2024-06-10-Deep-Dive-into-ARM-JavaScript-Special-Instruction-FJCVTZS">ARM に存在する JavaScript 専用命令「FJCVTZS」を追う（ついでに V8 をビルドする）</a></li>
+                    
+                        <li><a href="/2024-06-03-Exploring-V8-JIT-Outputs">JavaScript 実行エンジン V8 の JIT 出力コードを読んでみよう</a></li>
+                    
+                </ul>
+            </div>
+
+            <!-- <div class="side">
+                <div>
+                    <i class="fa fa-external-link"></i>
+                    Links
+                </div>
+                <ul  class="content-ul">
+
+                </ul>
+            </div> -->
+        </div>
+    </div>
+
+
+
+</div>
+<script>
+/**
+ * target _blank
+ */
+(function() {
+    var aTags = document.querySelectorAll('article a:not([id])')
+    for (var i = 0; i < aTags.length; i++) {
+        aTags[i].setAttribute('target', '_blank')
+    }
+}());
+</script>
+<script src="/js/pageContent.js " charset="utf-8"></script>
+
+
+    <footer class="site-footer">
+
+
+    <div class="wrapper">
+
+        <p class="description">
+             Takuo Kihira 
+        </p>
+        <p class="contact">
+            Contact me at: 
+            <a href="https://github.com/tkihira" title="GitHub"><i class="fa fa-github" aria-hidden="true"></i></a>     
+            <a href="https://twitter.com/tkihira" title="Twitter"><i class="fa fa-twitter" aria-hidden="true"></i></a>  
+            <a href="https://www.facebook.com/takuo.kihira" title="Facebook"><i class="fa fa-facebook-official" aria-hidden="true"></i></a>    
+        </p>
+        <p class="power">
+            <span>
+                Site powered by <a href="https://jekyllrb.com/">Jekyll</a>.
+            </span>
+            <span>
+                Theme designed by <a href="https://github.com/Gaohaoyang">HyG</a>.
+            </span>
+        </p>
+    </div>
+</footer>
+
+    <div class="back-to-top">
+    <a href="#top" class="scroll">
+        <i class="fa fa-arrow-up" aria-hidden="true"></i>
+    </a>
+</div>
+
+    <script src=" /js/main.js " charset="utf-8"></script>
+    <script src=" /js/scroll.min.js " charset="utf-8"></script>
+  </body>
+
+</html>
