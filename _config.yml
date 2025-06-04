@@ -9,7 +9,7 @@
 title: nmi.jp
 brief-intro: 'Twitter → <a href="https://twitter.com/tkihira" target="_blank">@tkihira</a>'
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "http://nmi.jp" # the base hostname & protocol for your site
+url: "https://nmi.jp" # the base hostname & protocol for your site
 
 permalink: /:year-:month-:day-:title
 #show_drafts: true
