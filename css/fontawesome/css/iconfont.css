@@ -5,6 +5,7 @@
   url('iconfont.woff?t=1461601848') format('woff'), /* chrome, firefox */
   url('iconfont.ttf?t=1461601848') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+*/
   url('iconfont.svg?t=1461601848#iconfont') format('svg'); /* iOS 4.1- */
+  font-display: swap;
 }
 
 .iconfont {
