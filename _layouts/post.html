@@ -1,6 +1,14 @@
 ---
 layout: default
 ---
+{% assign threshold_date = '2025-06-01' | date: '%s' %}
+{% assign page_date = page.date | date: '%s' %}
+
+{% if page_date >= threshold_date %}
+  {% assign post_scheme_string = 'https' %}
+{% else %}
+  {% assign post_scheme_string = 'http' %}
+{% endif %}
 
 <div class="page clearfix" post>
     <div class="left">
@@ -41,7 +49,7 @@ layout: default
 				<a href="//twitter.com/share" class="twitter-share-button" data-count="horizontal" 
 					data-text="{{ page.title }}" data-url="{{ site.url }}{{ page.url | prepend: site.baseurl }}">Tweet</a> 
 			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
-					<a href="//b.hatena.ne.jp/entry/http://nmi.jp{{ page.url | prepend: site.baseurl }}" class="hatena-bookmark-button"
+					<a href="//b.hatena.ne.jp/entry/{{ post_scheme_string }}://nmi.jp{{ page.url | prepend: site.baseurl }}" class="hatena-bookmark-button"
 					data-hatena-bookmark-layout="standard" title="{{ page.title }}"
 					><img src="//b.st-hatena.com/images/entry-button/button-only.gif" alt="{{ page.title }}" width="20"
 					height="20" style="border: none;" /></a><script type="text/javascript" src="//b.st-hatena.com/js/bookmark_button.js"
@@ -62,7 +70,7 @@ layout: default
 				<a href="//twitter.com/share" class="twitter-share-button" data-count="horizontal" 
 					data-text="{{ page.title }}" data-url="{{ site.url }}{{ page.url | prepend: site.baseurl }}">Tweet</a> 
 			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
-					<a href="//b.hatena.ne.jp/entry/http://nmi.jp{{ page.url | prepend: site.baseurl }}" class="hatena-bookmark-button"
+					<a href="//b.hatena.ne.jp/entry/{{ post_scheme_string }}://nmi.jp{{ page.url | prepend: site.baseurl }}" class="hatena-bookmark-button"
 					data-hatena-bookmark-layout="standard" title="{{ page.title }}"
 					><img src="//b.st-hatena.com/images/entry-button/button-only.gif" alt="{{ page.title }}" width="20"
 					height="20" style="border: none;" /></a><script type="text/javascript" src="//b.st-hatena.com/js/bookmark_button.js"

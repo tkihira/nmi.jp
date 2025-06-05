@@ -52,6 +52,15 @@ layout: default
                 </div>
 
 
+{% assign threshold_date = '2025-06-01' | date: '%s' %}
+{% assign post_date = post.date | date: '%s' %}
+
+{% if post_date >= threshold_date %}
+  {% assign post_scheme_string = 'https' %}
+{% else %}
+  {% assign post_scheme_string = 'http' %}
+{% endif %}
+
 <div class="entry fix" style="overflow:hidden;">
     <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
 				<iframe src="//www.facebook.com/plugins/like.php?href={{ site.url }}{{ post.url | prepend: site.baseurl }}&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
@@ -60,7 +69,7 @@ layout: default
 				<a href="//twitter.com/share" class="twitter-share-button" data-count="horizontal" 
 					data-text="{{ post.title }}" data-url="{{ site.url }}{{ post.url | prepend: site.baseurl }}">Tweet</a> 
 			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
-					<a href="//b.hatena.ne.jp/entry/http://nmi.jp{{ post.url | prepend: site.baseurl }}" class="hatena-bookmark-button"
+					<a href="//b.hatena.ne.jp/entry/{{ post_scheme_string }}://nmi.jp{{ post.url | prepend: site.baseurl }}" class="hatena-bookmark-button"
 					data-hatena-bookmark-layout="standard" title="{{ post.title }}"
 					><img src="//b.st-hatena.com/images/entry-button/button-only.gif" alt="{{ post.title }}" width="20"
 					height="20" style="border: none;" /></a><script type="text/javascript" src="//b.st-hatena.com/js/bookmark_button.js"
