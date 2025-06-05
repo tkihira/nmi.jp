@@ -4,11 +4,15 @@ layout: default
 {% assign threshold_date = '2025-06-01' | date: '%s' %}
 {% assign page_date = page.date | date: '%s' %}
 
+
 {% if page_date >= threshold_date %}
-  {% assign post_scheme_string = 'https' %}
+  {% assign post_scheme_string = 'https://' %}
 {% else %}
-  {% assign post_scheme_string = 'http' %}
+  {% assign post_scheme_string = 'http://' %}
 {% endif %}
+
+{% assign host = site.url | split: "//" | last | split: "/" | first %}
+{% assign siteurl = post_scheme_string | append: host %}
 
 <div class="page clearfix" post>
     <div class="left">
@@ -43,13 +47,13 @@ layout: default
 
 <div class="entry fix" style="overflow:hidden;">
     <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
-				<iframe src="//www.facebook.com/plugins/like.php?href={{ site.url }}{{ page.url | prepend: site.baseurl }}&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+				<iframe src="//www.facebook.com/plugins/like.php?href={{ siteurl }}{{ page.url | prepend: site.baseurl }}&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
 					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
 			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
 				<a href="//twitter.com/share" class="twitter-share-button" data-count="horizontal" 
 					data-text="{{ page.title }}" data-url="{{ site.url }}{{ page.url | prepend: site.baseurl }}">Tweet</a> 
 			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
-					<a href="//b.hatena.ne.jp/entry/{{ post_scheme_string }}://nmi.jp{{ page.url | prepend: site.baseurl }}" class="hatena-bookmark-button"
+					<a href="//b.hatena.ne.jp/entry/{{ siteurl }}{{ page.url | prepend: site.baseurl }}" class="hatena-bookmark-button"
 					data-hatena-bookmark-layout="standard" title="{{ page.title }}"
 					><img src="//b.st-hatena.com/images/entry-button/button-only.gif" alt="{{ page.title }}" width="20"
 					height="20" style="border: none;" /></a><script type="text/javascript" src="//b.st-hatena.com/js/bookmark_button.js"
@@ -64,13 +68,13 @@ layout: default
 
 <div class="entry fix" style="overflow:hidden;">
     <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
-				<iframe src="//www.facebook.com/plugins/like.php?href={{ site.url }}{{ page.url | prepend: site.baseurl }}&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+				<iframe src="//www.facebook.com/plugins/like.php?href={{ siteurl }}{{ page.url | prepend: site.baseurl }}&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
 					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
 			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
 				<a href="//twitter.com/share" class="twitter-share-button" data-count="horizontal" 
 					data-text="{{ page.title }}" data-url="{{ site.url }}{{ page.url | prepend: site.baseurl }}">Tweet</a> 
 			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
-					<a href="//b.hatena.ne.jp/entry/{{ post_scheme_string }}://nmi.jp{{ page.url | prepend: site.baseurl }}" class="hatena-bookmark-button"
+					<a href="//b.hatena.ne.jp/entry/{{ siteurl }}{{ page.url | prepend: site.baseurl }}" class="hatena-bookmark-button"
 					data-hatena-bookmark-layout="standard" title="{{ page.title }}"
 					><img src="//b.st-hatena.com/images/entry-button/button-only.gif" alt="{{ page.title }}" width="20"
 					height="20" style="border: none;" /></a><script type="text/javascript" src="//b.st-hatena.com/js/bookmark_button.js"
