@@ -61,6 +61,9 @@ kramdown:
 # port
 # port: 1234
 
+# future
+future: true
+
 # url
 category_dir: category/
 tag_dir: tag/
