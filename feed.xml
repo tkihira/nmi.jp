@@ -5,9 +5,84 @@
     <description></description>
     <link>https://nmi.jp/</link>
     <atom:link href="https://nmi.jp/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 07 Aug 2025 21:37:06 +0000</pubDate>
-    <lastBuildDate>Thu, 07 Aug 2025 21:37:06 +0000</lastBuildDate>
+    <pubDate>Thu, 07 Aug 2025 21:48:16 +0000</pubDate>
+    <lastBuildDate>Thu, 07 Aug 2025 21:48:16 +0000</lastBuildDate>
     <generator>Jekyll v4.4.1</generator>
+    
+      <item>
+        <title>書籍『ぷよぷよプログラミング』を出版しました</title>
+        <description>&lt;p&gt;『ぷよぷよプログラミング』という書籍を出版しました。本日 2025 年 8 月 8 日が発売日となります！&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://amzn.to/41iHjgH&quot; target=&quot;_blank&quot;&gt;&lt;img src=&quot;./img/cover_image_9784297147600.png&quot; alt=&quot;cover image&quot; style=&quot;width:300px&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://amzn.to/41iHjgH&quot;&gt;すぐわかる！ ぷよぷよプログラミング SEGA公式ガイドブック&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;「ぷよぷよ」ゲームをゼロから完成させるまでの道のりを、一冊の本の中で解説しております。ぜひお手にとって頂けましたら幸いです。&lt;/p&gt;
+
+&lt;h3 id=&quot;発売記念イベントのお知らせ&quot;&gt;発売記念イベントのお知らせ&lt;/h3&gt;
+
+&lt;p&gt;六本木蔦屋さんにて 8 月 11 日(月・祝)に&lt;a href=&quot;https://store.tsite.jp/roppongi/event/business/48796-2018140724.html&quot;&gt;発売記念イベント&lt;/a&gt;を開催いたします。&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;第一部　10時開始（9時45分開場）&lt;/li&gt;
+  &lt;li&gt;第二部　11時30分開始（11時15分開場）&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;チケット料金は 2,420 円（書籍代）、書籍を買って頂く形となります。ぷよぷよeスポーツの&lt;a href=&quot;https://x.com/piponeer&quot;&gt;ぴぽにあプロ&lt;/a&gt;のプレイの後で、私のリアルタイムコーディングを披露する予定です。一発勝負のコーディングになりますので、お近くにお住まいの方は是非ご参加頂いて、 &lt;strong&gt;現地で私がバグを出してワタワタしている&lt;/strong&gt; ところを笑いに来ていただければ大変光栄です。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://store.tsite.jp/roppongi/event/business/48796-2018140724.html&quot;&gt;https://store.tsite.jp/roppongi/event/business/48796-2018140724.html&lt;/a&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;出版に至る前&quot;&gt;出版に至る前&lt;/h1&gt;
+
+&lt;p&gt;5 年ほど前に、セガさんより「JavaScript でぷよぷよを制作するという中高生向けの教育コンテンツを作りたいのだけれど、プログラムコードを書いてもらえないか？」という打診を頂きました。以前ニコニコ動画で公開していた「&lt;a href=&quot;https://www.nicovideo.jp/watch/sm8517855&quot;&gt;【プログラミング】テトリスを1時間強で作ってみた【実況解説】&lt;/a&gt;」という動画がきっかけになりお声がけを頂いたと聞いております。&lt;/p&gt;
+
+&lt;p&gt;その結果、「ぷよぷよプログラミング」というコンテンツが生まれました。セガさんの尽力もあり、コンテンツ自体をとても高く評価していただきました。青森の「ぷよりんご」など、このコンテンツをベースに改造されてバズったゲームも多く登場しました。ありがとうございました！&lt;/p&gt;
+
+&lt;p&gt;そしてその後、私が「&lt;a href=&quot;https://www.youtube.com/@nico_pro&quot;&gt;ニコニコプログラミング&lt;/a&gt;」という名前で YouTuber をやっていたら、技術評論社の編集の方から「書籍化しませんか？」という打診を頂きました。そこで私の方から「ぷよぷよプログラミング」の書籍化を提案した形で、今回の企画が進行しました。&lt;/p&gt;
+
+&lt;h1 id=&quot;本に込めた思い&quot;&gt;本に込めた思い&lt;/h1&gt;
+
+&lt;p&gt;&lt;span style=&quot;color:red&quot;&gt;この本は、 &lt;strong&gt;自分が中学生・高校生の時にほしかった書籍&lt;/strong&gt; 、というコンセプトで執筆しております&lt;/span&gt;。&lt;/p&gt;
+
+&lt;p&gt;自分が小学生・中学生の頃、「マイコン BASIC マガジン」（通称ベーマガ）という雑誌がありました。その雑誌には BASIC という言語で書かれた読者投稿のゲームプログラムが大量に掲載されており、まず私達はゲームを遊ぶためにそのプログラムコードを自分のコンピュータに打ち込みました。当時はインターネットもなく、フロッピーディスクは雑誌のおまけには少し不向きだった、そのような時代です。「写経」と呼ばれるのですが、ベーマガを楽しむために、ただひたすら雑誌のコードを打ち込んでいました。&lt;/p&gt;
+
+&lt;p&gt;そうしているうちに、自分でゲームを改造したくなります。無敵にしたい、デモ画面を作りたい、もっと難しくしたい、新しいルールを追加したい、そのようなモチベーションが次々と湧いてきて、既存の完成品のコードを編集するようになります。私達の世代は、そのような形でプログラムを学んだ人が大勢おります。&lt;/p&gt;
+
+&lt;p&gt;時代の流れでベーマガは休刊になりました。インターネットのおかげで今の若い人たちは優れたプログラミング・コンテンツに囲まれており、また世界の第一人者とも github などで交流するチャンスが近くにあります。プログラミングを学ぶ方々にとって、素晴らしい環境だと思います。最近の若い方々のレベルは、自分が若い頃に比べて間違いなく高いなと思うことが多いですね。&lt;/p&gt;
+
+&lt;p&gt;そんな中、&lt;span style=&quot;color:red&quot;&gt;本書はすべてのソースコードを本に載せております&lt;/span&gt;。それも必要に応じて何度も何度も掲載しております。各章の扉ページにはその章で編集するすべてのソースコードを掲載しており、また本文中でも編集箇所をすべて示しています。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;./img/book-image-9784297147600.png&quot; alt=&quot;book image&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;これは、懐古主義として「写経」を勧めているわけではありません。中学生、高校生にとって、自室にパソコンがなく、限られた時間しかパソコンを触れないというような状況は今でも普通にあり得ると思います。プログラミングに強い興味を持っていても、実際に触ることのできる時間は限られており、それ以外の時間は周辺情報でしか学べない、という環境にいる方に、可能な限り最大限の学習効率を提供したいという思いを持って、この本を構成しました。&lt;/p&gt;
+
+&lt;p&gt;正直に言うと、ぷよぷよはプログラミング難易度的にかなり難しいゲームです。リアルに動くぷよ、回転の制御、4 つ繋がったら消える処理などなど、ある程度ゲームを作るのに慣れた方でも実装が難しいでしょう。しかしだからこそ、紙面で可能な限りの解説を入れ、ソースコードを省略せず紙面ですべてのソースコードを確認できる状態を担保し、紙面を言ったり来たりしながらでも理解できるようにする、そういったデザインが生きるだろうと考えました。&lt;/p&gt;
+
+&lt;p&gt;プログラミングをしてみたいという方にとって、ゲームを作ってみたいというモチベーションは一般的だと思います。本書がその思いを後押しし、その方にプログラミングの可能性や楽しさをお伝えできれば、そしてこの本がきっかけでよりプログラミングを楽しんでもらうようになれば、著者としてこれ以上の喜びはありません。&lt;/p&gt;
+
+&lt;h1 id=&quot;プログラミング経験者の皆様にもオススメ&quot;&gt;プログラミング経験者の皆様にもオススメ&lt;/h1&gt;
+
+&lt;p&gt;もちろん、初心者ではないプログラマの皆様にも胸を張っておすすめします。普段ゲームプログラムを書いていらっしゃる方は少ないでしょうから、ゲーム独特のテクニックなどは参考になるのではないかと思います。また JavaScript ならではの、DOM を使ったゲーム画面の構築は面白いと思います（本書では Canvas は使っていません。迷ったのですが…）。&lt;/p&gt;
+
+&lt;p&gt;JavaScript 初学者のために、かなり独特なプログラムを書きました。例えばオブジェクト指向は難しかろうと思い、Class を完全に namespace と割り切って使っていて、一切インスタンス化していません。他にもいくつか割り切った設計をしているところが多いですが、もし気づかれたらその背景を考えていただければ面白いかと思います。&lt;/p&gt;
+
+&lt;p&gt;普段のコーディングとは大きく違う世界だと思うので、その別世界における設計やデザインを見て頂くだけでも色々と刺激になると思います。&lt;/p&gt;
+
+&lt;h1 id=&quot;最後に&quot;&gt;最後に&lt;/h1&gt;
+
+&lt;p&gt;本書はセガの関係者の皆様のご尽力の元に実現したプロジェクトです。セガの皆様のプログラミング教育にかける熱意には感服します。各地でイベントや授業を開催されるたびに細かく改良され、そのノウハウをご共有頂けたことに感謝しております。ありがとうございました。&lt;/p&gt;
+
+&lt;p&gt;また本書のレビューにご参加頂きました、&lt;a href=&quot;https://x.com/shibu_jp&quot;&gt;渋川よしき&lt;/a&gt;さん、&lt;a href=&quot;https://x.com/h_doxas&quot;&gt;杉本雅広&lt;/a&gt;さん、&lt;a href=&quot;https://x.com/daigo&quot;&gt;Daigo&lt;/a&gt;さん、&lt;a href=&quot;https://x.com/ringo&quot;&gt;中嶋謙互&lt;/a&gt;さん、&lt;a href=&quot;https://x.com/yosuke_furukawa&quot;&gt;古川陽介&lt;/a&gt;さん、ありがとうございました！&lt;/p&gt;
+
+</description>
+        <pubDate>Fri, 08 Aug 2025 00:00:00 +0000</pubDate>
+        <link>https://nmi.jp/2025-08-08-Publishing-Puyo-Puyo-Programming</link>
+        <guid isPermaLink="true">https://nmi.jp/2025-08-08-Publishing-Puyo-Puyo-Programming</guid>
+        
+        
+        <category>JavaScript</category>
+        
+      </item>
     
       <item>
         <title>書評 &quot;Binary Hacks Rebooted&quot;</title>
@@ -3256,188 +3331,6 @@ immediate
         <pubDate>Mon, 21 Nov 2022 00:00:00 +0000</pubDate>
         <link>https://nmi.jp/2022-11-21-Understanding-setTimeout-completely</link>
         <guid isPermaLink="true">https://nmi.jp/2022-11-21-Understanding-setTimeout-completely</guid>
-        
-        
-        <category>JavaScript</category>
-        
-      </item>
-    
-      <item>
-        <title>Chrome の console.log でハマらないために</title>
-        <description>&lt;p&gt;JavaScript を書いたことがある人ならば一度は使うであろう &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;console.log&lt;/code&gt; ですが、この関数は思ったよりも厄介な性質を持っています。その性質を知らずに &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;console.log&lt;/code&gt; を使うと、デバッグ時に大ハマリしてしまうことがあります。この記事では &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;console.log&lt;/code&gt; の落とし穴についてお話します。&lt;/p&gt;
-
-&lt;p&gt;今回は Chrome に特化して解説しますが、Firefox や Safari でも同じ落とし穴があります。&lt;/p&gt;
-
-&lt;h1 id=&quot;consolelog-とは&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;console.log&lt;/code&gt; とは&lt;/h1&gt;
-
-&lt;p&gt;まずはさらっと基本をおさらいしましょう。&lt;/p&gt;
-
-&lt;p&gt;大前提なのですが、&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;console.log&lt;/code&gt; は &lt;span style=&quot;color:blue&quot;&gt;JavaScript の言語仕様（ECMAScript）で定義されていません&lt;/span&gt;。ブラウザ向けには &lt;a href=&quot;https://console.spec.whatwg.org/&quot;&gt;whatwg の仕様&lt;/a&gt;がありますが、あくまでもそれはブラウザ向けの仕様であり、Node.js を含むほぼ全ての JavaScript 環境で使えるのは &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;console.log&lt;/code&gt; がとても便利なので各環境で用意してくれているおかげです。似たような存在として &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;setTimeout&lt;/code&gt; があります。今回は &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;console.log&lt;/code&gt; の細かい話はしませんので、それ自体に興味のある方は&lt;a href=&quot;https://future-architect.github.io/typescript-guide/console.html&quot;&gt;こういった記事&lt;/a&gt;を見てみてください。&lt;/p&gt;
-
-&lt;p&gt;というわけで、&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;console.log&lt;/code&gt; とは、大抵は&lt;span style=&quot;color:red&quot;&gt;どこかになにかを出力する関数&lt;/span&gt;です。「どこ」に「何」を出力するか、というのは実装によって異なります。今回は Node.js と Chrome を比べて見てみましょう。&lt;/p&gt;
-
-&lt;h2 id=&quot;nodejs&quot;&gt;Node.js&lt;/h2&gt;
-
-&lt;p&gt;まず Node.js の場合ですが、標準出力に引数をそのまま表示します。最も直感に近い挙動であると言えるでしょう。&lt;/p&gt;
-
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ node
-Welcome to Node.js v18.12.1.
-Type &quot;.help&quot; for more information.
-&amp;gt; const a = [1, 2, 3]; console.log(a);
-[ 1, 2, 3 ]
-undefined
-&amp;gt; const b = { a: { a: { a: { a: { a: 0 } } } } }; console.log(b);
-{ a: { a: { a: [Object] } } }
-undefined
-&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;undefined は、最後の statement の値（この場合は console.log の返り値）です。オブジェクト等のネストが深くなると、全部は表示されなくなります。&lt;/p&gt;
-
-&lt;h2 id=&quot;chrome&quot;&gt;Chrome&lt;/h2&gt;
-
-&lt;p&gt;Chrome は、DevTools の Console に引数の内容を表示します。DevTools は F12 などで呼び出すことが出来ます。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/img/console-log-1.png&quot; alt=&quot;Chrome DevTools Console&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;オブジェクト等は、クリックすると開いて中を確認出来るようになります。&lt;/p&gt;
-
-&lt;h1 id=&quot;ハマりどころ&quot;&gt;ハマりどころ&lt;/h1&gt;
-
-&lt;p&gt;さて、ここまで見る限り何の問題もないように思えます。ではどこでハマるのでしょうか？&lt;/p&gt;
-
-&lt;p&gt;それは、Chrome において&lt;span style=&quot;color:red&quot;&gt;表示されている値がいつ時点の値なのかわからない&lt;/span&gt;点です。そんな馬鹿な、と思われるかも知れません。試してみましょう。まず直感的に理解しやすい Node.js の出力から見てみましょう。&lt;/p&gt;
-
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ node
-Welcome to Node.js v18.12.1.
-Type &quot;.help&quot; for more information.
-&amp;gt; const a = [1, 2, 3]; console.log(a); a[1] = 100; console.log(a);
-[ 1, 2, 3 ]
-[ 1, 100, 3 ]
-undefined
-&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;最初の &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;console.log&lt;/code&gt; が &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;[1, 2, 3]&lt;/code&gt; を、次の &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;console.log&lt;/code&gt; が &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;[1, 100, 3]&lt;/code&gt; を表示しています。問題なさそうですね！ではこれを Chrome で実行してみましょう。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/img/console-log-2.png&quot; alt=&quot;Chrome DevTools Console&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;おお、うまく表示されていますね、良かった良かった。では念のために最初の配列の中身を見てみましょうか。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/img/console-log-3.png&quot; alt=&quot;Chrome DevTools Console&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;なんと、中身が書き換わっています！&lt;/p&gt;
-
-&lt;h1 id=&quot;どうしてこのような挙動になるのか&quot;&gt;どうしてこのような挙動になるのか&lt;/h1&gt;
-
-&lt;p&gt;この挙動は次のように説明出来ます。オブジェクトや配列を &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;console.log&lt;/code&gt; で表示する時、画面にはとりあえず &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;console.log&lt;/code&gt; が呼ばれた時点の引数のオブジェクトの中身を確認し、その時の値を表示します。なので、最初に表示されているのは &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;[1, 2, 3]&lt;/code&gt; になるわけです。&lt;/p&gt;
-
-&lt;p&gt;ただし、この時点で DevTools は表示しているオブジェクトのディープコピーを作成しておらず、ただ参照だけを保持していると想像されます。巨大な配列等を含むオブジェクトを &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;console.log&lt;/code&gt; で表示するのは普通なので、これは理解出来る挙動です。もしディープコピーを作成していたら、&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;console.log(document);&lt;/code&gt; とかしてしまうと大変なことになるでしょう。&lt;/p&gt;
-
-&lt;p&gt;しかし、それ故に、落とし穴が発生してしまいました。改めて配列の中身をチェックしようとしてドロップダウンのアイコンをクリックすると、クリックされた時点で再度参照を確認し、その時点におけるオブジェクトの内容を取得して表示しているのです。なので、最初に &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;console.log&lt;/code&gt; が呼ばれた時はその時点の内容である &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;[1, 2, 3]&lt;/code&gt; が表示され、ドロップダウンのアイコンがクリックされた時はその時点の内容である &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;[1, 100, 3]&lt;/code&gt; が表示されました。&lt;/p&gt;
-
-&lt;p&gt;なので次のようなコードを実行すると、ドロップダウンをクリックするまで何が表示されるかわかりません。&lt;/p&gt;
-
-&lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;tick&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nf&quot;&gt;setTimeout&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;tick&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;nx&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;v&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;})();&lt;/span&gt;
-&lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;重要なポイントとして、リアルタイムで追随しているわけではない点に留意してください。上記コードを実行しても、DevTools のコンソールの値はオブジェクトの値をリアルタイムに反映しません。またドロップダウンを一度閉じて再度開いても、過去に開いた時にキャッシュした内容を表示しているようです。&lt;/p&gt;
-
-&lt;p&gt;また当然ながら、整数型や文字列型は参照ではなく値が表示されるので &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;console.log&lt;/code&gt; で表示された値が変わることはありません。&lt;/p&gt;
-
-&lt;p&gt;余談ですが、昔のバージョンの Chrome では DevTools 上に表示されたオブジェクトにおける変更がリアルタイムに表示されていたこともありました。その仕様は値をコピーしようとした時などに結構不便だったので、個人的には今の仕様の方が好みではあります。&lt;/p&gt;
-
-&lt;h1 id=&quot;さらなる落とし穴メモリリーク&quot;&gt;さらなる落とし穴・メモリリーク&lt;/h1&gt;
-
-&lt;p&gt;上記を理解すると、実行時に変更されうるオブジェクトや配列を &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;console.log&lt;/code&gt; で表示する際に気をつけよう、という結論になると思います。基本的にはそれで良いのですが、&lt;span style=&quot;color:blue&quot;&gt;実はもう一段深い落とし穴&lt;/span&gt;があるので、そちらも紹介させてください。&lt;/p&gt;
-
-&lt;p&gt;上記の仮説が正しければ、DevTools のコンソールは表示しているオブジェクトへの参照を持っていることになります。そして、参照を持っているということは、&lt;span style=&quot;color:red&quot;&gt;Chrome のコンソールに表示されているオブジェクトはガベージコレクションの対象になりません&lt;/span&gt;。DevTools を開いている限り、そのオブジェクトは開放されないことになります（最初から開いていないと開放されます）。&lt;/p&gt;
-
-&lt;p&gt;これは、DevTools を使ってメモリリークの調査をしている時に、とんでもない落とし穴になります。どれだけ修正してもメモリリークが消えない・・・という時は、もしかしたらコンソールに出しているデバッグ用のメッセージが参照を握っているせいかもしれません。もしその状況に陥ったら、その &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;console.log&lt;/code&gt; の出力を消さない限り、メモリリークの調査をしようとして DevTools を開いた時だけ発生し、DevTools を閉じている時には発生しないメモリリークになってしまいます。&lt;/p&gt;
-
-&lt;p&gt;私は過去にこれで何時間もロスしました・・・。&lt;/p&gt;
-
-&lt;blockquote class=&quot;twitter-tweet&quot;&gt;&lt;p lang=&quot;ja&quot; dir=&quot;ltr&quot;&gt;結局、メモリリークの全ての原因は、デバッグ用に新規インスタンス生成時に毎回表示していた console.log(&amp;quot;mainObject:&amp;quot;, mainObject); だった。weak mapsもしくはconsole.logのスナップショット化を頼みたいところだ&lt;/p&gt;&amp;mdash; Takuo Kihira (@tkihira) &lt;a href=&quot;https://twitter.com/tkihira/status/237759589058240512?ref_src=twsrc%5Etfw&quot;&gt;August 21, 2012&lt;/a&gt;&lt;/blockquote&gt;
-&lt;script async=&quot;&quot; src=&quot;https://platform.twitter.com/widgets.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;
-
-&lt;p&gt;なお、Chrome における &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;console.log&lt;/code&gt; の挙動はバージョンによって変わってくることもあるので、今ここに書いてあることが将来的にもずっと正しい訳ではありません。その点はご留意ください。&lt;/p&gt;
-
-&lt;h1 id=&quot;どうすればいいのか&quot;&gt;どうすればいいのか&lt;/h1&gt;
-
-&lt;p&gt;まずは、ブラウザのコンソールはこのような挙動であることをしっかり理解しましょう。&lt;/p&gt;
-
-&lt;p&gt;その上でログとして出力したい場合には、参照ではなくて値で渡される数値なり文字列なりに変換する、もしくはオブジェクトのディープコーピーを作成して表示するのが望ましいでしょう。&lt;a href=&quot;https://developer.mozilla.org/en-US/docs/Web/API/Console/log#logging_objects&quot;&gt;MDN では、このような手法が紹介されています&lt;/a&gt;。&lt;/p&gt;
-
-&lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;JSON&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;parse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;JSON&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;stringify&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;obj&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)))&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;ただしこの方法は、関数等の JSON 化出来ないオブジェクトであったり、循環参照が含まれていたりして &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;JSON.stringify&lt;/code&gt; が利用できない場合は利用できません。ご注意ください。&lt;/p&gt;
-
-&lt;h1 id=&quot;余談その1-whatwg-の仕様を確認&quot;&gt;余談その1: whatwg の仕様を確認&lt;/h1&gt;
-
-&lt;p&gt;一番最初に書いた通り、そもそも &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;console.log&lt;/code&gt; は ECMAScript の言語仕様にありません。（私の記憶が正しければ）Firebug が最初に実装し、その後各実装が勝手に作っていた記憶があります。少なくとも IE6 の時代には &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;console.log&lt;/code&gt; などという便利な命令はなく、開発者は自前でコンソール用の DIV や TEXTAREA を用意して、そこにデバッグログを表示していました。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://console.spec.whatwg.org/&quot;&gt;whatwg で策定されている console.log の仕様があります&lt;/a&gt;。ただあまり有用なことは書かれておりません。「ああ、やっぱり実装依存だったんだなぁ」と確認する程度の役には立ちます。&lt;/p&gt;
-
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;2.3. Printer(logLevel, args[, options])
-The printer operation is implementation-defined. 
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://console.spec.whatwg.org/#nodejs-printer&quot;&gt;Node.js の実装&lt;/a&gt;が参考に書かれているくらいが見どころでしょうか。&lt;/p&gt;
-
-&lt;h1 id=&quot;余談その2-ブラウザ-consolelog-の装飾機能&quot;&gt;余談その2: ブラウザ &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;console.log&lt;/code&gt; の装飾機能&lt;/h1&gt;
-
-&lt;p&gt;ブラウザ &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;console.log&lt;/code&gt; は、表示文字列に &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;%c&lt;/code&gt; を埋め込み、対応する CSS を引数を与えることによって、DevTools のコンソールに表示される文字に装飾を加えることが出来ます。例えば、&lt;/p&gt;
-
-&lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;%cHello, %cWorld!&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;color:red; font-weight: bold; font-size: 100px&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;color:blue; font-weight: bold; font-size: 100px&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;という風に書くと、次のように表示されます。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/img/console-log-4.png&quot; alt=&quot;Console Log DevTools&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;私はこれを利用して、スマートニュースの英語版のページにロゴを仕込みました。&lt;span style=&quot;red&quot;&gt;わずか 1554 byte でスマートニュースのロゴを表示しております&lt;/span&gt;。色情報をハフマン符号化で圧縮しつつ、Base64 にランレングスも駆使してコードゴルフした自信作です。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/img/console-log-5.png&quot; alt=&quot;Console Log DevTools&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://www.smartnews.com/en/&quot;&gt;https://www.smartnews.com/en/&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;ぜひ上記ページに行ってコンソールを開いてみてください。&lt;/p&gt;
-
-&lt;p&gt;（2023/02/01 追記: 上記機能はリニューアルにより消えましたので、このページのコンソールに置くことにしました。ぜひここで DevTools を開いてみて下さい）&lt;/p&gt;
-
-&lt;script&gt;
-{let A=4473,f=[...atob(&quot;P//3s5zMVV8zMzN3f//4u5hIoZAACsKwAACsABczd//43MaRz2aqq5pcjSpZ3//37mNNTVV7S0rOd//33F1Oqq7HK5v//+4FTVV3UyRIkSJEiMldkM3//27qhWZ007VOlPGMYxjGBToM3f/9xQqjj8M2cYxjGMYrNAu7//Ixa6jxx7TM2cYxjGMYrNAub//uLXXhqKK6OHWGYYQIECBAmhslVru//27i11VV7Aub//uLXUBAgQIECBUOo4476gUs7//uLXVJve973uQ7M6aa7Y1Wu7//uLXRTve973vJqq4gJM3//cWuine973veTR448iHQLkj//cWuine973veTcGoo8wdAub//uLXRTve973vJqq4gXJH/+4tdUHve973sg4nBgwYMGDBgpmgXd//23FrrA0DpElJSUmkgOAMmTJkyZMmTjNVrsj//cUKqq7gXd//23FCqq7oFyR//29X+dGjRo0aH5ECBAgRp6enp6d8qFChQoUBm7//29wD5RR5iSyy4885wmGG4H0hnN//33F3lFF4GJLL5zz5CYY5V5nnN//33MdPkRR4iSyy4885wmGG3H0jzm7//39xXT3PkRRiSyy4885wmGFua5Llc3//47mKAAFdYAAVhWAA3LmSP//493MzFVVJFVV6zN3f/7P7+/sB/+fh1wH/8fnlAf/3+/EZ//Xz7wH/7effAf/3++28B/9/xxwH/4fPLAf//3fkB//XrxQH//339Af/38+8B//v59QH/+fXhAf/16cEB//5QH/+/XlAf/9+/EB//237+YEJHR0dAf/T7akB/7HV/wH36b0HAbfluQcBs1tj/QEHJSUlAS9PWd8Bs+W5BwH3W2X/AbdbY/sBL1NZ3wADVV4Abf7+/sB9//4wH/7ff3Af/z++sBBUFBQQH/9fHtAf/7+fcB//239/QEJISEhAfNbZf8BL8mnB9/z6b0HAbP9/f2D/6vn/zUv39/fAfP//38B//nz3QH/9ee/Af/79eEB/53XNwH/SZ3/av/7/fkB//v14wEHKysrQP/39fEj/+vl3QH//fnvL//27/fcB/9/xxQX/9eGVAf+3vf8BA4GBgQH/wfW1EwsBAQEB/3HlUwH/O8n/Av/9/fsO//n39QH/6b0HAf9bZf8W/+Xd0wH/6ePZD//z57sY/9nvvQgDAQEBAQcBAQEHBQEBAQMJAQEBAQAA5K//5wU=&quot;.replace(/(.)\1([0-9])/g,(_,a,b)=&gt;a.repeat(b)))].map(A=&gt;A.charCodeAt()),q=f.splice(559),x=415,V={},B=0,e=1,c=&quot;&quot;;for(;x;)V[B+=q[--x]||827]=`background-color:rgba(${q[--x]},${q[--x]},${q[--x]},${q[--x]/255})`;for(;A--;B&gt;&gt;=1)A%8||(B=f.pop()),e=e&lt;&lt;1|1&amp;B,V[e]&amp;&amp;(c+=(x%36?&quot;&quot;:&quot;\n&quot;)+&quot;%c　&quot;,q[x++]=V[e],e=1);console.log(c,...q)}
-&lt;/script&gt;
-
-&lt;p&gt;余談の余談ですが、以前はこの機能を利用するとサーバ上の画像を表示出来たので、サーバ側でのアクセスログを見ることで DevTools のコンソールが開かれたことを検知出来ました。ぱっと試した感じだと、今は出来なくなってしまっているようですね。&lt;/p&gt;
-
-&lt;h1 id=&quot;余談その3-consolelog-のちょっと便利な小技&quot;&gt;余談その3: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;console.log&lt;/code&gt; のちょっと便利な小技&lt;/h1&gt;
-
-&lt;p&gt;ブラウザ上などのデバッグで&lt;/p&gt;
-
-&lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;100&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;y&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;`x = &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;, y = &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;`&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;みたいなログを書いている方に朗報です。&lt;/p&gt;
-
-&lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;100&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;y&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;と書くと、こんな感じで表示されて超見やすいです。便利！！！&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/img/console-log-6.png&quot; alt=&quot;Console Log DevTools&quot; /&gt;&lt;/p&gt;
-</description>
-        <pubDate>Mon, 14 Nov 2022 00:00:00 +0000</pubDate>
-        <link>https://nmi.jp/2022-11-14-Be-careful-about-console-log-in-chrome</link>
-        <guid isPermaLink="true">https://nmi.jp/2022-11-14-Be-careful-about-console-log-in-chrome</guid>
         
         
         <category>JavaScript</category>

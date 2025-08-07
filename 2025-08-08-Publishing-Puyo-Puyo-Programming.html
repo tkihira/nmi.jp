@@ -6,12 +6,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>JavaScript で遅延評価を導入して起動を高速化した話</title>
-    <meta name="description" content="この記事は、JavaScript で Flash Player の実現を頑張った（もしくは現在進行系で頑張っている）人たちの集う Flash Advent Calendar 2020 に参加しております。Flash Player を JavaScript で実装していた際に、現場から「起動の高速化」という難しい要...">
+    <title>書籍『ぷよぷよプログラミング』を出版しました</title>
+    <meta name="description" content="『ぷよぷよプログラミング』という書籍を出版しました。本日 2025 年 8 月 8 日が発売日となります！すぐわかる！ ぷよぷよプログラミング SEGA公式ガイドブック「ぷよぷよ」ゲームをゼロから完成させるまでの道のりを、一冊の本の中で解説しております。ぜひお手にとって頂けましたら幸いです。発売記念イベントのお知...">
 
     <link rel="stylesheet" href=" /css/fontawesome/css/font-awesome.min.css ">
     <link rel="stylesheet" href=" /css/main.css ">
-    <link rel="canonical" href="https://nmi.jp/2020-12-22-Lazy-evaluation">
+    <link rel="canonical" href="https://nmi.jp/2025-08-08-Publishing-Puyo-Puyo-Programming">
     <link rel="alternate" type="application/rss+xml" title="nmi.jp" href="https://nmi.jp/feed.xml">
     <link rel="author" href="https://www.hatena.ne.jp/tkihira/" />
 <!-- <script type='text/javascript' src='//platform.twitter.com/widgets.js?ver=1.1'></script> -->
@@ -135,23 +135,21 @@
     <table style="width:100%;border:0;padding:0;"><tbody><tr style="padding:0">
         <td class="toppre" style="padding:0">
         
-        <a href="/2020-12-20-Make_VM_faster">JavaScript における VM の高速化手法</a>
+        <a href="/2024-08-28-Review-Binary-Hacks-Rebooted">書評 "Binary Hacks Rebooted"</a>
         
         </td><td class="topnex" style="text-align:right;padding:0">
-        
-        <a href="/2020-12-24-About-Acquiring">10 年前に JavaScript で Flash Player を開発し買収された話</a>
         
         </td>
     </tr></tbody></table>
 </div>
 
         <hr style="margin:0"/>
-        <h1 style="margin-top:10px">JavaScript で遅延評価を導入して起動を高速化した話</h1>
+        <h1 style="margin-top:10px">書籍『ぷよぷよプログラミング』を出版しました</h1>
 <hr />
         <div class="label">
 
             <div class="label-card">
-                <i class="fa fa-calendar"></i>2020-12-22
+                <i class="fa fa-calendar"></i>2025-08-08
             </div>
 
             <div class="label-card">
@@ -183,143 +181,106 @@
             </div>
 
             <div class="label-card">
-                <a href="https://github.com/tkihira/nmi.jp/blob/master/_posts/2020-12-22-Lazy-evaluation.md" target="_blank"><i class="fa fa-github"></i></a>
+                <a href="https://github.com/tkihira/nmi.jp/blob/master/_posts/2025-08-08-Publishing-Puyo-Puyo-Programming.md" target="_blank"><i class="fa fa-github"></i></a>
             </div>
 
         </div>
 
 <div class="entry fix" style="overflow:hidden;">
     <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
-				<iframe src="//www.facebook.com/plugins/like.php?href=http://nmi.jp/2020-12-22-Lazy-evaluation&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+				<iframe src="//www.facebook.com/plugins/like.php?href=https://nmi.jp/2025-08-08-Publishing-Puyo-Puyo-Programming&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
 					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
 			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
 				<a href="//twitter.com/share" class="twitter-share-button" data-count="horizontal" 
-					data-text="JavaScript で遅延評価を導入して起動を高速化した話" data-url="https://nmi.jp/2020-12-22-Lazy-evaluation">Tweet</a> 
+					data-text="書籍『ぷよぷよプログラミング』を出版しました" data-url="https://nmi.jp/2025-08-08-Publishing-Puyo-Puyo-Programming">Tweet</a> 
 			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
-					<a href="//b.hatena.ne.jp/entry/http://nmi.jp/2020-12-22-Lazy-evaluation" class="hatena-bookmark-button"
-					data-hatena-bookmark-layout="standard" title="JavaScript で遅延評価を導入して起動を高速化した話"
-					><img src="//b.st-hatena.com/images/entry-button/button-only.gif" alt="JavaScript で遅延評価を導入して起動を高速化した話" width="20"
+					<a href="//b.hatena.ne.jp/entry/https://nmi.jp/2025-08-08-Publishing-Puyo-Puyo-Programming" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="書籍『ぷよぷよプログラミング』を出版しました"
+					><img src="//b.st-hatena.com/images/entry-button/button-only.gif" alt="書籍『ぷよぷよプログラミング』を出版しました" width="20"
 					height="20" style="border: none;" /></a><script type="text/javascript" src="//b.st-hatena.com/js/bookmark_button.js"
 					charset="utf-8" async="async"></script>
 				</div>
 </div>
 </div>
         <article itemscope itemtype="//schema.org/BlogPosting">
-        <p>この記事は、JavaScript で Flash Player の実現を頑張った（もしくは現在進行系で頑張っている）人たちの集う <a href="https://qiita.com/advent-calendar/2020/flash">Flash Advent Calendar 2020</a> に参加しております。</p>
+        <p>『ぷよぷよプログラミング』という書籍を出版しました。本日 2025 年 8 月 8 日が発売日となります！</p>
 
-<p>Flash Player を JavaScript で実装していた際に、現場から「起動の高速化」という難しい要求をもらった際、「遅延評価」を導入したところ大変効果がありました。今回、その遅延評価について簡単なご紹介をしたいと思います。</p>
+<p><a href="https://amzn.to/41iHjgH" target="_blank"><img src="./img/cover_image_9784297147600.png" alt="cover image" style="width:300px" /></a></p>
 
-<h1 id="flash-player-起動までのステップ">Flash Player 起動までのステップ</h1>
+<p><a href="https://amzn.to/41iHjgH">すぐわかる！ ぷよぷよプログラミング SEGA公式ガイドブック</a></p>
 
-<p>当時 Flash Player を JavaScript で提供していた際、当時のスマートフォン端末においてロード完了から最初の画面が出るまで大体 150ms くらいかかっていました。普通の Web ページであれば 150ms はロード時間の中に吸収され許容範囲になる可能性が高いのですが、当時 Flash Player はほぼ全てのゲーム画面で使用されており、結果的に全ての画面遷移において 150ms の遅延が発生する状況となっておりました。これはユーザー体験を激しく損なっており、緩和が必要でした。</p>
+<p>「ぷよぷよ」ゲームをゼロから完成させるまでの道のりを、一冊の本の中で解説しております。ぜひお手にとって頂けましたら幸いです。</p>
 
-<p>Flash Player の起動までには次のようなステップがあります</p>
+<h3 id="発売記念イベントのお知らせ">発売記念イベントのお知らせ</h3>
 
-<ol>
-  <li>Flash Player JavaScript のダウンロード</li>
-  <li>Flash Player JavaScript のパース＆実行開始</li>
-  <li>Flash Player JavaScript が swf ファイルを読み込む</li>
-  <li>読み込んだ swf バイナリのパース</li>
-  <li>読み込んだ情報を元に最初のフレームを表示</li>
-</ol>
+<p>六本木蔦屋さんにて 8 月 11 日(月・祝)に<a href="https://store.tsite.jp/roppongi/event/business/48796-2018140724.html">発売記念イベント</a>を開催いたします。</p>
 
-<p>このうち、(1) と (3) は http キャッシュが効いてほぼゼロ、(2) も圧縮前で 150kb 以下なので無視できる範囲でした。なので現実的に時間を短縮出来るのは、(4) のバイナリのパース時間だけだったのです。</p>
+<ul>
+  <li>第一部　10時開始（9時45分開場）</li>
+  <li>第二部　11時30分開始（11時15分開場）</li>
+</ul>
 
-<p>swf は、タグという形で綺麗に構造化されたバイナリファイルです。バイナリの構造は本題とは離れるのでここでは解説しませんが、興味のある方は <a href="https://labs.gree.jp/blog/2010/08/631/">Yoya さんの書かれた資料</a>などに詳しく解説されているので参照してみてください。</p>
+<p>チケット料金は 2,420 円（書籍代）、書籍を買って頂く形となります。ぷよぷよeスポーツの<a href="https://x.com/piponeer">ぴぽにあプロ</a>のプレイの後で、私のリアルタイムコーディングを披露する予定です。一発勝負のコーディングになりますので、お近くにお住まいの方は是非ご参加頂いて、 <strong>現地で私がバグを出してワタワタしている</strong> ところを笑いに来ていただければ大変光栄です。</p>
 
-<p>当時はパース自体の高速化を図ることのできる選択肢はあまり多くなく（今なら TypedArray などを使うと効率があがりそうです）、パース自体の高速化はあまり現実的ではないと結論づけました。そこで考えたのが、タグの遅延評価です。</p>
+<p><a href="https://store.tsite.jp/roppongi/event/business/48796-2018140724.html">https://store.tsite.jp/roppongi/event/business/48796-2018140724.html</a></p>
 
-<h1 id="そもそも遅延評価とは">そもそも遅延評価とは？</h1>
+<h1 id="出版に至る前">出版に至る前</h1>
 
-<p>遅延評価それ自体は、プログラミング言語の基本機能として導入されていることも多い、一般的な概念です。Haskell 使いの方なら当然、Scala を使っていらっしゃる方でも馴染みの深い方は多かろうと思います。</p>
+<p>5 年ほど前に、セガさんより「JavaScript でぷよぷよを制作するという中高生向けの教育コンテンツを作りたいのだけれど、プログラムコードを書いてもらえないか？」という打診を頂きました。以前ニコニコ動画で公開していた「<a href="https://www.nicovideo.jp/watch/sm8517855">【プログラミング】テトリスを1時間強で作ってみた【実況解説】</a>」という動画がきっかけになりお声がけを頂いたと聞いております。</p>
 
-<p>遅延評価というのは、<span style="color:blue">本当に値が必要とされるまで計算をするのを抑える</span>という機能です。一般的なプログラミング言語では、式や関数の値はその場で計算され、戻り値がすぐに得られます。しかし遅延評価の場合、例えば関数呼び出しの戻り値に実際にアクセスしたタイミングで初めて関数呼び出しが行われます。関数の戻り値にアクセスしない場合には無駄な計算をせずに済むメリットがあり、計算量の最適化に役立ちます。</p>
+<p>その結果、「ぷよぷよプログラミング」というコンテンツが生まれました。セガさんの尽力もあり、コンテンツ自体をとても高く評価していただきました。青森の「ぷよりんご」など、このコンテンツをベースに改造されてバズったゲームも多く登場しました。ありがとうございました！</p>
 
-<p>今回の場合の目的は計算量の最適化というよりは、<span style="color:red">遅延評価することで起動時に集中していた swf ファイルのパースの時間を実行時間にバラけてしまおう</span>、というのが根底にあるアイデアです。起動時にどのようなタグがあるかのパースだけは一瞬で終えてしまい、そのタグに実際のアクセスがあったタイミングで改めてバイナリをパースすることで起動時にかかる時間を肩代わりします。</p>
+<p>そしてその後、私が「<a href="https://www.youtube.com/@nico_pro">ニコニコプログラミング</a>」という名前で YouTuber をやっていたら、技術評論社の編集の方から「書籍化しませんか？」という打診を頂きました。そこで私の方から「ぷよぷよプログラミング」の書籍化を提案した形で、今回の企画が進行しました。</p>
 
-<h1 id="javascript-による遅延評価の実装">JavaScript による遅延評価の実装</h1>
+<h1 id="本に込めた思い">本に込めた思い</h1>
 
-<p>では実際のサンプルコードを元に説明しましょう</p>
+<p><span style="color:red">この本は、 <strong>自分が中学生・高校生の時にほしかった書籍</strong> 、というコンセプトで執筆しております</span>。</p>
 
-<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">input</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">6[String]4[Test]2[Do]3[You]4[Like]3[JS?]1[I]4[Hate]4[That]8[Language]</span><span class="dl">'</span><span class="p">;</span>
+<p>自分が小学生・中学生の頃、「マイコン BASIC マガジン」（通称ベーマガ）という雑誌がありました。その雑誌には BASIC という言語で書かれた読者投稿のゲームプログラムが大量に掲載されており、まず私達はゲームを遊ぶためにそのプログラムコードを自分のコンピュータに打ち込みました。当時はインターネットもなく、フロッピーディスクは雑誌のおまけには少し不向きだった、そのような時代です。「写経」と呼ばれるのですが、ベーマガを楽しむために、ただひたすら雑誌のコードを打ち込んでいました。</p>
 
-<span class="kd">function</span> <span class="nf">parse</span><span class="p">(</span><span class="nx">input</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">let</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">[];</span>
-    <span class="kd">let</span> <span class="nx">offset</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="k">while</span><span class="p">(</span><span class="nx">offset</span> <span class="o">&lt;</span> <span class="nx">input</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
-        <span class="kd">const</span> <span class="nx">len</span> <span class="o">=</span> <span class="nc">Number</span><span class="p">(</span><span class="nx">input</span><span class="p">.</span><span class="nf">charAt</span><span class="p">(</span><span class="nx">offset</span><span class="p">));</span>
-        <span class="kd">const</span> <span class="nx">str</span> <span class="o">=</span> <span class="nx">input</span><span class="p">.</span><span class="nf">substring</span><span class="p">(</span><span class="nx">offset</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">offset</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">+</span> <span class="nx">len</span><span class="p">);</span>
-        <span class="nx">data</span><span class="p">.</span><span class="nf">push</span><span class="p">({</span><span class="nx">len</span><span class="p">,</span> <span class="nx">str</span><span class="p">});</span>
-        <span class="nx">offset</span> <span class="o">+=</span> <span class="nx">len</span> <span class="o">+</span> <span class="mi">3</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="k">return</span> <span class="nx">data</span><span class="p">;</span>
-<span class="p">}</span>
+<p>そうしているうちに、自分でゲームを改造したくなります。無敵にしたい、デモ画面を作りたい、もっと難しくしたい、新しいルールを追加したい、そのようなモチベーションが次々と湧いてきて、既存の完成品のコードを編集するようになります。私達の世代は、そのような形でプログラムを学んだ人が大勢おります。</p>
 
-<span class="kd">const</span> <span class="nx">data</span> <span class="o">=</span> <span class="nf">parse</span><span class="p">(</span><span class="nx">input</span><span class="p">);</span>
-<span class="kd">const</span> <span class="nx">neededInfo</span> <span class="o">=</span> <span class="nx">data</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span>
-<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">neededInfo</span><span class="p">.</span><span class="nx">str</span><span class="p">);</span>
-</code></pre></div></div>
+<p>時代の流れでベーマガは休刊になりました。インターネットのおかげで今の若い人たちは優れたプログラミング・コンテンツに囲まれており、また世界の第一人者とも github などで交流するチャンスが近くにあります。プログラミングを学ぶ方々にとって、素晴らしい環境だと思います。最近の若い方々のレベルは、自分が若い頃に比べて間違いなく高いなと思うことが多いですね。</p>
 
-<p>これは適当な構造のデータをパースして配列に変換するプログラムです。出力は <code class="language-plaintext highlighter-rouge">Like</code> になります。</p>
+<p>そんな中、<span style="color:red">本書はすべてのソースコードを本に載せております</span>。それも必要に応じて何度も何度も掲載しております。各章の扉ページにはその章で編集するすべてのソースコードを掲載しており、また本文中でも編集箇所をすべて示しています。</p>
 
-<p>このプログラムで注目してもらいたいのは、<span style="color:red">欲しいデータは配列の 4 番目のデータのみであるにも関わらず、parse 関数が全ての構造をパースしている</span>という点です。この程度のパースであればたいした負荷ではないですが、もしこの文字列が画像ファイルのバイナリであったりすれば、パースにはそこそこ時間がかかることが想定されるでしょう。</p>
+<p><img src="./img/book-image-9784297147600.png" alt="book image" /></p>
 
-<p>これを遅延評価で書き直すと、次のような形になります。</p>
+<p>これは、懐古主義として「写経」を勧めているわけではありません。中学生、高校生にとって、自室にパソコンがなく、限られた時間しかパソコンを触れないというような状況は今でも普通にあり得ると思います。プログラミングに強い興味を持っていても、実際に触ることのできる時間は限られており、それ以外の時間は周辺情報でしか学べない、という環境にいる方に、可能な限り最大限の学習効率を提供したいという思いを持って、この本を構成しました。</p>
 
-<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">input</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">6[String]4[Test]2[Do]3[You]4[Like]3[JS?]1[I]4[Hate]4[That]8[Language]</span><span class="dl">'</span><span class="p">;</span>
+<p>正直に言うと、ぷよぷよはプログラミング難易度的にかなり難しいゲームです。リアルに動くぷよ、回転の制御、4 つ繋がったら消える処理などなど、ある程度ゲームを作るのに慣れた方でも実装が難しいでしょう。しかしだからこそ、紙面で可能な限りの解説を入れ、ソースコードを省略せず紙面ですべてのソースコードを確認できる状態を担保し、紙面を言ったり来たりしながらでも理解できるようにする、そういったデザインが生きるだろうと考えました。</p>
 
-<span class="kd">function</span> <span class="nf">parse</span><span class="p">(</span><span class="nx">input</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">let</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">[];</span>
-    <span class="kd">let</span> <span class="nx">offset</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="k">while</span><span class="p">(</span><span class="nx">offset</span> <span class="o">&lt;</span> <span class="nx">input</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
-        <span class="kd">const</span> <span class="nx">len</span> <span class="o">=</span> <span class="nc">Number</span><span class="p">(</span><span class="nx">input</span><span class="p">.</span><span class="nf">charAt</span><span class="p">(</span><span class="nx">offset</span><span class="p">));</span>
-        <span class="kd">const</span> <span class="nx">_offset</span> <span class="o">=</span> <span class="nx">offset</span><span class="p">;</span>
-        <span class="kd">let</span> <span class="nx">str</span><span class="p">;</span>
-        <span class="kd">const</span> <span class="nx">item</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="nx">len</span><span class="p">,</span>
-            <span class="kd">get</span> <span class="nf">str</span><span class="p">()</span> <span class="p">{</span>
-                <span class="k">return</span> <span class="nx">str</span> <span class="o">||</span> <span class="p">(</span><span class="nx">str</span> <span class="o">=</span> <span class="nx">input</span><span class="p">.</span><span class="nf">substring</span><span class="p">(</span><span class="nx">_offset</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="nx">_offset</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">+</span> <span class="nx">len</span><span class="p">));</span>
-            <span class="p">}</span>
-        <span class="p">};</span>
-        <span class="nx">data</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="nx">item</span><span class="p">);</span>
-        <span class="nx">offset</span> <span class="o">+=</span> <span class="nx">len</span> <span class="o">+</span> <span class="mi">3</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="k">return</span> <span class="nx">data</span><span class="p">;</span>
-<span class="p">}</span>
+<p>プログラミングをしてみたいという方にとって、ゲームを作ってみたいというモチベーションは一般的だと思います。本書がその思いを後押しし、その方にプログラミングの可能性や楽しさをお伝えできれば、そしてこの本がきっかけでよりプログラミングを楽しんでもらうようになれば、著者としてこれ以上の喜びはありません。</p>
 
-<span class="kd">const</span> <span class="nx">data</span> <span class="o">=</span> <span class="nf">parse</span><span class="p">(</span><span class="nx">input</span><span class="p">);</span>
-<span class="kd">const</span> <span class="nx">neededInfo</span> <span class="o">=</span> <span class="nx">data</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span>
-<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">neededInfo</span><span class="p">.</span><span class="nx">str</span><span class="p">);</span>
-</code></pre></div></div>
+<h1 id="プログラミング経験者の皆様にもオススメ">プログラミング経験者の皆様にもオススメ</h1>
 
-<p>Object の getter を使って <code class="language-plaintext highlighter-rouge">str</code> を定義しています。初回の <code class="language-plaintext highlighter-rouge">str</code> のアクセスの際に初めて <code class="language-plaintext highlighter-rouge">substring</code> でデータの中身を取り出しており、2 回目以降はキャッシュされたデータを返しているのが見て取れると思います。<code class="language-plaintext highlighter-rouge">data[4]</code> のみならず、他のデータもアクセスされるまで中身は取り出されません。</p>
+<p>もちろん、初心者ではないプログラマの皆様にも胸を張っておすすめします。普段ゲームプログラムを書いていらっしゃる方は少ないでしょうから、ゲーム独特のテクニックなどは参考になるのではないかと思います。また JavaScript ならではの、DOM を使ったゲーム画面の構築は面白いと思います（本書では Canvas は使っていません。迷ったのですが…）。</p>
 
-<p>重ねて言いますが、このサンプル程度だとパースはたいした手間ではないのですが、データの中身が複雑かつ大量になればどんどん時間がかかるようになってきます。</p>
+<p>JavaScript 初学者のために、かなり独特なプログラムを書きました。例えばオブジェクト指向は難しかろうと思い、Class を完全に namespace と割り切って使っていて、一切インスタンス化していません。他にもいくつか割り切った設計をしているところが多いですが、もし気づかれたらその背景を考えていただければ面白いかと思います。</p>
 
-<h1 id="効果">効果</h1>
+<p>普段のコーディングとは大きく違う世界だと思うので、その別世界における設計やデザインを見て頂くだけでも色々と刺激になると思います。</p>
 
-<p>当時、これは大きな効果をあげました。Flash Player の起動時間がほぼ 1〜2 frame 程度（33ms 以下）になったため、ほぼ起動の問題がなくなり、ユーザーが短時間に多量の画面遷移をしてもストレスを感じることがなくなりました。</p>
+<h1 id="最後に">最後に</h1>
 
-<p>遅延評価にはデメリットもあります。実際の評価のタイミングがいつ起こるか読めなくなるので、Flash Player のプチフリーズ（プチフリ）が起こる可能性があります。幸いなことに実際の運用ではプチフリが問題になって報告されたことは一度もありませんでしたが、事前に評価するのが難しいので実装を終えてみるまでデメリットを評価しづらいのが難点でした。一方で実装の負荷はほとんどなかったので、そういう意味では投資対効果（ROI）の良い技術と言えますね。</p>
+<p>本書はセガの関係者の皆様のご尽力の元に実現したプロジェクトです。セガの皆様のプログラミング教育にかける熱意には感服します。各地でイベントや授業を開催されるたびに細かく改良され、そのノウハウをご共有頂けたことに感謝しております。ありがとうございました。</p>
 
-<p><a href="https://github.com/PexJS/PexJS/blob/master/src/parser/utils_tag.js#L16">GitHub にて実際のコード</a>をご確認いただけます。当時は ECMAScript 5 の仕様がまだ固まっておらず、<code class="language-plaintext highlighter-rouge">__defineGetter__</code> という謎のビルトイン関数で getter を定義しておりました。これは今でも使えるのですが当然 deprecated ですし、そもそも機能的に使う意味もないので新しいプロジェクトではきちんと <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get">modern な getter</a> を使いましょう。</p>
+<p>また本書のレビューにご参加頂きました、<a href="https://x.com/shibu_jp">渋川よしき</a>さん、<a href="https://x.com/h_doxas">杉本雅広</a>さん、<a href="https://x.com/daigo">Daigo</a>さん、<a href="https://x.com/ringo">中嶋謙互</a>さん、<a href="https://x.com/yosuke_furukawa">古川陽介</a>さん、ありがとうございました！</p>
 
-<p>今回ご紹介した内容は遅延評価の初歩の初歩ではあるのですが、手軽に導入出来る割には大きな効果が期待できることが多いので、パーサーなどを設計されている方や起動時間で悩まれている方は、解決可能性のある選択肢の一つとして遅延評価を念頭に置いてみてください。今回の記事がみなさんの新しい高速化のアイデアの源になれば幸いです。</p>
 
         </article>
         <hr>
 
 <div class="entry fix" style="overflow:hidden;">
     <div style="height:33px; padding-top:2px; padding-bottom:2px; clear:both;" class="really_simple_share"><div style="float:left; width:100px; " class="really_simple_share_facebook_like"> 
-				<iframe src="//www.facebook.com/plugins/like.php?href=http://nmi.jp/2020-12-22-Lazy-evaluation&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
+				<iframe src="//www.facebook.com/plugins/like.php?href=https://nmi.jp/2025-08-08-Publishing-Puyo-Puyo-Programming&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=27" 
 					scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:100px; height:27px;" allowTransparency="true"></iframe>
 			</div><div style="float:left; width:110px; padding-left:10px;" class="really_simple_share_twitter"> 
 				<a href="//twitter.com/share" class="twitter-share-button" data-count="horizontal" 
-					data-text="JavaScript で遅延評価を導入して起動を高速化した話" data-url="https://nmi.jp/2020-12-22-Lazy-evaluation">Tweet</a> 
+					data-text="書籍『ぷよぷよプログラミング』を出版しました" data-url="https://nmi.jp/2025-08-08-Publishing-Puyo-Puyo-Programming">Tweet</a> 
 			</div><div style="float:left; padding-left:10px;" class="really_simple_share_hyves">
-					<a href="//b.hatena.ne.jp/entry/http://nmi.jp/2020-12-22-Lazy-evaluation" class="hatena-bookmark-button"
-					data-hatena-bookmark-layout="standard" title="JavaScript で遅延評価を導入して起動を高速化した話"
-					><img src="//b.st-hatena.com/images/entry-button/button-only.gif" alt="JavaScript で遅延評価を導入して起動を高速化した話" width="20"
+					<a href="//b.hatena.ne.jp/entry/https://nmi.jp/2025-08-08-Publishing-Puyo-Puyo-Programming" class="hatena-bookmark-button"
+					data-hatena-bookmark-layout="standard" title="書籍『ぷよぷよプログラミング』を出版しました"
+					><img src="//b.st-hatena.com/images/entry-button/button-only.gif" alt="書籍『ぷよぷよプログラミング』を出版しました" width="20"
 					height="20" style="border: none;" /></a><script type="text/javascript" src="//b.st-hatena.com/js/bookmark_button.js"
 					charset="utf-8" async="async"></script>
 				</div>
@@ -364,13 +325,11 @@
     <div class="pre">
 
     
-        <p><strong>前の投稿</strong> <a href="/2020-12-20-Make_VM_faster">JavaScript における VM の高速化手法</a></p>
+        <p><strong>前の投稿</strong> <a href="/2024-08-28-Review-Binary-Hacks-Rebooted">書評 "Binary Hacks Rebooted"</a></p>
     
     </div>
     <div class="nex">
 
-        
-        <p><strong>次の投稿</strong> <a href="/2020-12-24-About-Acquiring">10 年前に JavaScript で Flash Player を開発し買収された話</a></p>
         
     </div>
 </div>
