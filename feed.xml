@@ -5,15 +5,15 @@
     <description></description>
     <link>https://nmi.jp/</link>
     <atom:link href="https://nmi.jp/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 07 Aug 2025 21:48:16 +0000</pubDate>
-    <lastBuildDate>Thu, 07 Aug 2025 21:48:16 +0000</lastBuildDate>
+    <pubDate>Thu, 07 Aug 2025 22:27:09 +0000</pubDate>
+    <lastBuildDate>Thu, 07 Aug 2025 22:27:09 +0000</lastBuildDate>
     <generator>Jekyll v4.4.1</generator>
     
       <item>
         <title>書籍『ぷよぷよプログラミング』を出版しました</title>
         <description>&lt;p&gt;『ぷよぷよプログラミング』という書籍を出版しました。本日 2025 年 8 月 8 日が発売日となります！&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&quot;https://amzn.to/41iHjgH&quot; target=&quot;_blank&quot;&gt;&lt;img src=&quot;./img/cover_image_9784297147600.png&quot; alt=&quot;cover image&quot; style=&quot;width:300px&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://amzn.to/41iHjgH&quot; target=&quot;_blank&quot;&gt;&lt;img src=&quot;/img/cover_image_9784297147600.png&quot; alt=&quot;cover image&quot; style=&quot;width:300px&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&quot;https://amzn.to/41iHjgH&quot;&gt;すぐわかる！ ぷよぷよプログラミング SEGA公式ガイドブック&lt;/a&gt;&lt;/p&gt;
 
@@ -2058,7 +2058,7 @@ sys	0m0.071s
 
 &lt;p&gt;図にすると、こんな感じです&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;./img/stackoverflow001.png&quot; alt=&quot;再帰呼び出し、もしくは循環呼び出しの図&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/stackoverflow001.png&quot; alt=&quot;再帰呼び出し、もしくは循環呼び出しの図&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;ちなみに、関数呼び出しがなければこのエラーは発生しません。ただの無限ループでは決して発生しないエラーです。以下、解説を書きます。&lt;/p&gt;
 

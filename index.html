@@ -207,7 +207,7 @@
                 <div class="excerpt">
                     <p>『ぷよぷよプログラミング』という書籍を出版しました。本日 2025 年 8 月 8 日が発売日となります！</p>
 
-<p><a href="https://amzn.to/41iHjgH" target="_blank"><img src="./img/cover_image_9784297147600.png" alt="cover image" style="width:300px" /></a></p>
+<p><a href="https://amzn.to/41iHjgH" target="_blank"><img src="/img/cover_image_9784297147600.png" alt="cover image" style="width:300px" /></a></p>
 
 <p><a href="https://amzn.to/41iHjgH">すぐわかる！ ぷよぷよプログラミング SEGA公式ガイドブック</a></p>
 
@@ -1892,6 +1892,18 @@
         </div>
     </div>
 </div>
+<script>
+  /**
+   * target _blank
+   */
+  (function() {
+      var aTags = document.querySelectorAll('div.excerpt a')
+      for (var i = 0; i < aTags.length; i++) {
+          aTags[i].setAttribute('target', '_blank')
+      }
+  }());
+  </script>
+  
 <!-- <script src="/js/scroll.min.js " charset="utf-8"></script> -->
 <!-- <script src="/js/pageContent.js " charset="utf-8"></script> -->
 

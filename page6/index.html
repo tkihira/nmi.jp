@@ -1873,6 +1873,18 @@
         </div>
     </div>
 </div>
+<script>
+  /**
+   * target _blank
+   */
+  (function() {
+      var aTags = document.querySelectorAll('div.excerpt a')
+      for (var i = 0; i < aTags.length; i++) {
+          aTags[i].setAttribute('target', '_blank')
+      }
+  }());
+  </script>
+  
 <!-- <script src="/js/scroll.min.js " charset="utf-8"></script> -->
 <!-- <script src="/js/pageContent.js " charset="utf-8"></script> -->
 
