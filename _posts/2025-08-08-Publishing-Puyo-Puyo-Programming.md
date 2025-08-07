@@ -7,7 +7,7 @@ categories:
 
 『ぷよぷよプログラミング』という書籍を出版しました。本日 2025 年 8 月 8 日が発売日となります！
 
-<a href="https://amzn.to/41iHjgH" target="_blank"><img src="./img/cover_image_9784297147600.png" alt="cover image" style="width:300px"></a>
+<a href="https://amzn.to/41iHjgH" target="_blank"><img src="/img/cover_image_9784297147600.png" alt="cover image" style="width:300px"></a>
 
 [すぐわかる！ ぷよぷよプログラミング SEGA公式ガイドブック](https://amzn.to/41iHjgH)
 
